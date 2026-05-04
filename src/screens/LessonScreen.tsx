@@ -1048,7 +1048,7 @@ export default function LessonScreen({
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col px-6 overflow-y-auto ${shakeWrong ? 'animate-shake' : ''}`}>
+      <div className={`flex-1 flex flex-col px-6 overflow-y-auto max-w-2xl mx-auto w-full ${shakeWrong ? 'animate-shake' : ''}`}>
         <style>{`
           @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -1382,7 +1382,8 @@ export default function LessonScreen({
 
       {/* Bottom Actions */}
       <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-6 py-4 pb-6 space-y-3">
-        {/* Record button for speak steps */}
+        <div className="max-w-2xl mx-auto w-full space-y-3">
+          {/* Record button for speak steps */}
         {step.type === 'speak' && (
           <div className="flex justify-center pb-2">
             <button
@@ -1433,6 +1434,7 @@ export default function LessonScreen({
             {t('lesson.skip')}
           </button>
         )}
+        </div>
       </div>
     </div>
   );

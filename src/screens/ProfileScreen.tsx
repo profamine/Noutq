@@ -57,56 +57,58 @@ export default function ProfileScreen({
   }).length;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50 pb-24">
+    <div className="flex-1 overflow-y-auto bg-gray-50 pb-24 md:pb-6">
       {/* ── Hero Header ── */}
-      <div className="bg-white border-b border-gray-100 px-6 pt-10 pb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">{t('nav.profile')}</h1>
-          
-          {/* Language Switcher */}
-          <button
-            onClick={() => setLanguage(language === 'hy' ? 'ar' : 'hy')}
-            className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition-colors"
-          >
-            <Globe size={16} className="text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">
-              {language === 'hy' ? 'Հայ' : 'عربي'}
-            </span>
-          </button>
-        </div>
-        <div className="flex items-center gap-5">
-          {/* Avatar */}
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
-              {language === 'hy' ? 'Ա' : 'أ'}
-            </div>
-            {/* Level badge on avatar */}
-            <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-              {levelBadge}
-            </div>
+      <div className="bg-white border-b border-gray-100 px-6 pt-10 pb-6 w-full">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-gray-900">{t('nav.profile')}</h1>
+            
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(language === 'hy' ? 'ar' : 'hy')}
+              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition-colors"
+            >
+              <Globe size={16} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">
+                {language === 'hy' ? 'Հայ' : 'عربي'}
+              </span>
+            </button>
           </div>
-
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 truncate">Արամ</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{t('profile.member_since')}</p>
-
-            {/* League badge */}
-            <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">
-              <Star size={11} fill="currentColor" />
-              {t('profile.bronze_league')}
+          <div className="flex items-center gap-5">
+            {/* Avatar */}
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                {language === 'hy' ? 'Ա' : 'أ'}
+              </div>
+              {/* Level badge on avatar */}
+              <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                {levelBadge}
+              </div>
             </div>
-          </div>
 
-          {/* Total XP pill */}
-          <div className="flex flex-col items-center bg-yellow-50 border border-yellow-200 rounded-2xl px-4 py-3">
-            <Zap size={18} className="text-yellow-500 mb-0.5" />
-            <span className="text-lg font-bold text-gray-800 leading-none">{totalXP}</span>
-            <span className="text-[10px] text-gray-500 font-medium mt-0.5">XP</span>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-gray-900 truncate">Արամ</h1>
+              <p className="text-sm text-gray-500 mt-0.5">{t('profile.member_since')}</p>
+
+              {/* League badge */}
+              <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">
+                <Star size={11} fill="currentColor" />
+                {t('profile.bronze_league')}
+              </div>
+            </div>
+
+            {/* Total XP pill */}
+            <div className="flex flex-col items-center bg-yellow-50 border border-yellow-200 rounded-2xl px-4 py-3">
+              <Zap size={18} className="text-yellow-500 mb-0.5" />
+              <span className="text-lg font-bold text-gray-800 leading-none">{totalXP}</span>
+              <span className="text-[10px] text-gray-500 font-medium mt-0.5">XP</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-5 space-y-8">
+      <div className="p-5 space-y-8 max-w-2xl mx-auto w-full">
         {/* ── Stats Grid ── */}
         <section>
           <h2 className="text-base font-bold text-gray-700 mb-3">{t('profile.stats')}</h2>

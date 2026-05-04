@@ -8,6 +8,26 @@
 
 body {
   background-color: #e5e7eb; /* gray-200 for outer background */
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* padding: 1rem; - removed on mobile so it takes full screen */
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  #root {
+    padding: 2rem;
+    flex-direction: row;
+    gap: 20px;
+  }
 }
 
 @keyframes ripple {

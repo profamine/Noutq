@@ -6,15 +6,17 @@ export default function PracticeScreen() {
   const { t } = useLanguage();
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50 pb-24">
-      <div className="bg-gradient-to-b from-blue-500 to-blue-600 px-6 pt-12 pb-8 rounded-b-3xl text-white shadow-md">
-        <h1 className="text-2xl font-bold mb-2">تدريب</h1>
-        <p className="text-blue-100 mb-4 opacity-90">
-          Վարժություններ (Practice)
-        </p>
+    <div className="flex-1 overflow-y-auto bg-gray-50 pb-24 md:pb-6 w-full">
+      <div className="bg-gradient-to-b from-blue-500 to-blue-600 px-6 pt-12 pb-8 md:rounded-b-3xl text-white shadow-md w-full">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-2xl font-bold mb-2">تدريب</h1>
+          <p className="text-blue-100 mb-4 opacity-90">
+            Վարժություններ (Practice)
+          </p>
+        </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 max-w-2xl mx-auto w-full">
         
         <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
           <div className="flex items-center gap-4">

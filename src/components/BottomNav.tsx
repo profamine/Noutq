@@ -126,10 +126,10 @@ function NavButton({
   return (
     <button
       onClick={handleClick}
-      className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-300 overflow-hidden group min-w-[64px] ${
+      className={`relative flex flex-col md:flex-row md:justify-start md:px-5 md:py-3 items-center justify-center py-1 px-3 rounded-2xl transition-all duration-300 overflow-hidden group min-w-[64px] md:w-full md:min-h-12 ${
         isActive
-          ? 'text-emerald-600'
-          : 'text-gray-400 hover:text-gray-600 active:scale-95'
+          ? 'text-emerald-600 bg-emerald-50 ml-0 mr-0 md:bg-emerald-50'
+          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50 active:scale-95'
       }`}
       aria-label={item.label}
       aria-current={isActive ? 'page' : undefined}
@@ -169,17 +169,21 @@ function NavButton({
 
       {/* Label */}
       <span
-        className={`relative z-10 text-[10px] mt-1 font-semibold transition-all duration-300 leading-tight ${
+        className={`relative z-10 text-[10px] md:text-sm md:ml-4 mt-1 md:mt-0 font-semibold transition-all duration-300 leading-tight ${
           isActive ? 'text-emerald-700 opacity-100' : 'opacity-70'
         }`}
       >
         {item.label}
       </span>
 
-      {/* Active dot indicator */}
-      <div className="relative z-10 mt-0.5">
+      {/* Active dot indicator / line */}
+      <div className="relative z-10 mt-0.5 md:hidden">
         <ActiveDot active={isActive} />
       </div>
+      {/* Active line indicator on Desktop */}
+      {isActive && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-emerald-500 rounded-r-full hidden md:block animate-in slide-in-from-left-2" />
+      )}
     </button>
   );
 }
@@ -272,24 +276,24 @@ export default function BottomNav({
       `}</style>
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 max-w-md mx-auto"
+        className="md:relative md:w-64 md:h-full md:border-r border-gray-200/60 flex-shrink-0 bg-white/95 md:bg-white fixed bottom-0 left-0 right-0 z-40 max-w-full"
         role="navigation"
         aria-label="Main navigation"
       >
         {/* Streak banner (shown when streak is active) */}
         {dailyStreak >= 3 && (
-          <div className="flex justify-center mb-1 animate-slide-up">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-              <Zap size={10} />
+          <div className="flex justify-center md:px-5 md:pt-6 mb-1 md:mb-6 animate-slide-up">
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+              <Zap size={14} />
               {dailyStreak} {t('nav.streak_banner')} 🔥
             </div>
           </div>
         )}
 
         {/* Main nav bar */}
-        <div className="relative bg-white/95 backdrop-blur-xl border-t border-gray-200/60 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-          {/* Top sliding indicator line */}
-          <div className="absolute top-0 left-0 right-0 h-[3px]">
+        <div className="relative md:h-full md:flex md:flex-col md:px-4 md:gap-2 bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t md:border-t-0 border-gray-200/60 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] md:shadow-none">
+          {/* Top sliding indicator line (Mobile only) */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] md:hidden">
             <div
               className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all duration-500 ease-out shadow-sm shadow-emerald-300"
               style={{
@@ -300,7 +304,7 @@ export default function BottomNav({
           </div>
 
           {/* Nav items */}
-          <div className="flex justify-around items-center px-2 pt-2 pb-safe">
+          <div className="flex justify-around md:flex-col md:justify-start md:items-start items-center px-2 md:px-0 pt-2 md:pt-4 pb-safe md:pb-0 gap-1 md:gap-3">
             {navItems.map((item) => (
               <NavButton
                 key={item.id}

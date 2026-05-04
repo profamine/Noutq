@@ -121,16 +121,16 @@ export default function HomeScreen({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 bg-gray-50 relative">
+    <div className="flex-1 overflow-y-auto pb-24 md:pb-6 bg-gray-50 relative">
       {showAboutModal && <AboutModal onClose={() => setShowAboutModal(false)} />}
       
       {/* ── Header ── */}
-      <div className="bg-green-600 text-white px-6 pt-10 pb-8 rounded-b-3xl shadow-lg sticky top-0 z-10">
-        <div className="flex justify-between items-center">
+      <div className="bg-green-600 text-white px-6 pt-10 pb-8 md:rounded-b-3xl shadow-lg sticky top-0 z-10 w-full mb-4">
+        <div className="flex justify-between items-center max-w-2xl mx-auto">
           <div className="flex items-center gap-3">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">{t('home.title')}</h1>
-              <p className="text-green-200 text-sm mt-0.5">{t('home.subtitle')}</p>
+              <h1 className="text-[clamp(1.5rem,4vw,2.25rem)] font-bold tracking-tight">{t('home.title')}</h1>
+              <p className="text-green-200 text-[clamp(0.875rem,2vw,1rem)] mt-0.5">{t('home.subtitle')}</p>
             </div>
             <button 
               onClick={() => setShowAboutModal(true)}
@@ -155,18 +155,18 @@ export default function HomeScreen({
         </div>
 
         {/* Progress bar */}
-        <div className="mt-4 bg-white/20 rounded-full h-2">
+        <div className="mt-4 bg-white/20 rounded-full h-2 max-w-2xl mx-auto">
           <div
             className="bg-white rounded-full h-2 transition-all duration-500"
             style={{ width: `${(completedUnits.length / 20) * 100}%` }}
           />
         </div>
-        <p className="text-green-200 text-xs mt-1.5">
+        <p className="text-green-200 text-xs mt-1.5 max-w-2xl mx-auto">
           {completedUnits.length} / 20 {t('home.lessons_completed')}
         </p>
       </div>
 
-      <div className="p-5 space-y-8">
+      <div className="p-5 space-y-8 max-w-2xl mx-auto w-full">
         {/* ── Unit 1 ── */}
         <UnitSection
           title={t('home.unit1.title')}

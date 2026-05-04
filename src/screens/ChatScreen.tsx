@@ -575,10 +575,11 @@ export default function ChatScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden pb-24">
+    <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden pb-24 md:pb-0">
       {/* Header */}
-      <div className="bg-white/95 backdrop-blur-md px-4 py-3 border-b border-gray-200/50 flex items-center justify-between shadow-sm sticky top-0 z-30">
-        <div className="flex items-center gap-3">
+      <div className="bg-white/95 backdrop-blur-md px-4 py-3 border-b border-gray-200/50 shadow-sm sticky top-0 z-30 w-full">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <div className="flex items-center gap-3">
           <button className="p-1.5 rounded-full hover:bg-gray-100 transition-colors lg:hidden">
             <ArrowLeft size={20} className="text-gray-600" />
           </button>
@@ -634,6 +635,7 @@ export default function ChatScreen() {
             )}
           </div>
         </div>
+        </div>
       </div>
 
       {/* Date Separator */}
@@ -653,7 +655,7 @@ export default function ChatScreen() {
       <div
         ref={chatContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 space-y-4 pb-4 scroll-smooth"
+        className="flex-1 overflow-y-auto px-4 space-y-4 pb-4 scroll-smooth w-full max-w-2xl mx-auto"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#d1d5db transparent' }}
       >
         {messages.map((msg) => (
@@ -683,7 +685,7 @@ export default function ChatScreen() {
 
       {/* Quick Replies */}
       {showQuickReplies && !isTyping && (
-        <div className="px-4 pb-2 overflow-x-auto">
+        <div className="px-4 pb-2 overflow-x-auto w-full max-w-2xl mx-auto">
           <div className="flex gap-2 pb-1">
             {quickReplies.map((reply, idx) => (
               <button
@@ -699,8 +701,8 @@ export default function ChatScreen() {
       )}
 
       {/* Input Area */}
-      <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/50 px-3 py-3 z-20">
-        <div className="flex items-end gap-2">
+      <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/50 px-3 py-3 z-20 w-full">
+        <div className="flex items-end gap-2 max-w-2xl mx-auto">
           <button className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 mb-0.5">
             <Smile size={22} className="text-gray-400" />
           </button>
