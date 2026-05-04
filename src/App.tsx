@@ -123,19 +123,19 @@ function AppContent() {
 
   if (showSetup) {
     return (
-      <div className="flex flex-col flex-1 h-full w-full bg-gray-50 overflow-hidden relative md:rounded-3xl shadow-none md:shadow-2xl">
+      <div className="flex flex-col flex-1 h-full w-full bg-gray-50 relative md:rounded-3xl shadow-none md:shadow-2xl">
         <SpeechSetupScreen onDone={handleSetupDone} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 h-full w-full bg-gray-50 overflow-hidden relative rounded-none md:rounded-3xl shadow-none md:shadow-2xl">
+    <div className="flex flex-col md:flex-row flex-1 h-full w-full bg-gray-50 relative rounded-none md:rounded-3xl shadow-none md:shadow-2xl">
       {showNav && (
         <BottomNav currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} />
       )}
       
-      <div className="flex-1 w-full flex flex-col h-full bg-white md:border-l border-gray-100 overflow-hidden relative">
+      <div className="flex-1 w-full flex flex-col h-full bg-white md:border-l border-gray-100 relative">
         {currentScreen === 'home'    && <HomeScreen onStartLesson={navigateToLesson} completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
         {currentScreen === 'lesson'  && <LessonScreen onBack={goBack} lessonId={activeLesson} onComplete={markUnitComplete} />}
         {currentScreen === 'profile' && <ProfileScreen completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
