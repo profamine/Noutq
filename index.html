@@ -1,16 +1,24 @@
+<!style>
 <!doctype html>
-<html lang="en">
+<html lang="en"> <!-- Change en "ar" ou "hy" dynamiquement via JS si possible -->
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- Meta tags pour PWA / Mobile -->
     <meta name="theme-color" content="#16a34a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Noutq" />
+    
+    <!-- SEO -->
+    <meta name="description" content="Learn Arabic for Armenian speakers with Noutq" />
     <title>Noutq | Arabic Learning for Armenians</title>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Assure-toi que ce chemin correspond bien à ton fichier dans le dossier src -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
