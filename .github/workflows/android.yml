@@ -33,10 +33,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Sync Capacitor Android
+      # Remplacez l'ancienne étape "Sync Capacitor Android" par ces lignes :
+      - name: Sync & Add Capacitor Android
         run: |
+          npx cap add android || true
           npx cap sync android
-
       - name: Build APK with Gradle
         run: |
           cd android
