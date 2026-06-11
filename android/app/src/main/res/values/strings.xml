@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Noutq</string>
+    <string name="title_activity_main">Noutq</string>
+    <string name="package_name">com.noutq.app</string>
+    <string name="custom_url_scheme">com.noutq.app</string>
+</resources>
