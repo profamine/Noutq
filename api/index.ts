@@ -91,36 +91,48 @@ app.post(
 
 app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { text } = req.query;
+    const { text, lang } = req.query;
     if (!text || typeof text !== 'string') {
       res.status(400).json({ error: '`text` is required.' });
       return;
     }
-    
+    if (!process.env.GEMINI_API_KEY) {
+      res.status(503).json({ error: 'GEMINI_API_KEY non configurée sur le serveur.' });
+      return;
+    }
+
     const ai = createGenAIClient();
+
+    // Pour l'arabe on guide le style sans que la consigne soit prononcée :
+    // on met la consigne dans systemInstruction, pas dans le texte à lire.
+    const isArabic = (lang === 'ar') || /[\u0600-\u06FF]/.test(text);
+
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: "Read this out loud: " + text }] }],
+      model: 'gemini-2.5-flash-preview-tts',
+      contents: [{ parts: [{ text }] }],
       config: {
         responseModalities: [Modality.AUDIO],
+        ...(isArabic
+          ? { systemInstruction: 'Pronounce the following clearly in Modern Standard Arabic.' }
+          : {}),
         speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Kore' },
-            },
+          voiceConfig: {
+            // 'Kore' convient ; tester aussi d'autres voix prebuilt selon le rendu.
+            prebuiltVoiceConfig: { voiceName: 'Kore' },
+          },
         },
       },
     });
 
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!base64Audio) {
-      throw new Error('No audio generated from TTS model');
-    }
+    const base64Audio =
+      response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!base64Audio) throw new Error('No audio generated from TTS model');
 
     const pcmBytes = Buffer.from(base64Audio, 'base64');
     const wavBuffer = encodeWAV(pcmBytes, 24000);
 
     res.set('Content-Type', 'audio/wav');
-    res.set('Cache-Control', 'public, max-age=3600');
+    res.set('Cache-Control', 'public, max-age=86400');
     res.send(wavBuffer);
   } catch (err) {
     console.error('TTS API Error:', err);

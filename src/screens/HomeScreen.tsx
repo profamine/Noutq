@@ -112,7 +112,7 @@ export default function HomeScreen({
   const getStatus = (id: string): NodeStatus => {
     const ids = ['u1','u2','u3','u4','u5','u6','u7','u8',
                  'u9','u10','u11','u12','u13','u14','u15','u16',
-                 'u17','u18','u19','u20'];
+                 'u17','u18','u19','u20','u21','u22'];
     const idx = ids.indexOf(id);
     if (completedUnits.includes(id)) return 'completed';
     const prev = ids[idx - 1];
@@ -158,11 +158,11 @@ export default function HomeScreen({
         <div className="mt-4 bg-white/20 rounded-full h-2 max-w-2xl mx-auto">
           <div
             className="bg-white rounded-full h-2 transition-all duration-500"
-            style={{ width: `${(completedUnits.length / 20) * 100}%` }}
+            style={{ width: `${(completedUnits.length / 22) * 100}%` }}
           />
         </div>
         <p className="text-green-200 text-xs mt-1.5 max-w-2xl mx-auto">
-          {completedUnits.length} / 20 {t('home.lessons_completed')}
+          {completedUnits.length} / 22 {t('home.lessons_completed')}
         </p>
       </div>
 
@@ -370,6 +370,26 @@ export default function HomeScreen({
           color="orange"
         >
           <LessonNode title={t('home.node.u20')} status={getStatus('u20')} onClick={() => onStartLesson('u20')} isRight color="orange" />
+        </UnitSection>
+
+        {/* ── Unit 21 ── */}
+        <UnitSection
+          title={t('home.unit21.title')}
+          subtitle={t('home.unit21.subtitle')}
+          progress={completedUnits.includes('u21') ? '1/1' : '0/1'}
+          color="green"
+        >
+          <LessonNode title={t('home.node.u21')} status={getStatus('u21')} onClick={() => onStartLesson('u21')} color="green" />
+        </UnitSection>
+
+        {/* ── Unit 22 ── */}
+        <UnitSection
+          title={t('home.unit22.title')}
+          subtitle={t('home.unit22.subtitle')}
+          progress={completedUnits.includes('u22') ? '1/1' : '0/1'}
+          color="blue"
+        >
+          <LessonNode title={t('home.node.u22')} status={getStatus('u22')} onClick={() => onStartLesson('u22')} isRight color="blue" />
         </UnitSection>
       </div>
     </div>

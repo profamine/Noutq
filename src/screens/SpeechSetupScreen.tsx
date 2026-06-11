@@ -9,6 +9,7 @@ import {
   ChevronRight, ChevronLeft, Smartphone, Settings,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useArabicTTS } from '../hooks/useArabicTTS';
 
 interface Props {
   onDone: () => void;
@@ -22,6 +23,7 @@ type Platform = 'android' | 'ios' | 'desktop';
 export default function SpeechSetupScreen({ onDone }: Props) {
   const { language } = useLanguage();
   const ar = language === 'ar';
+  const { speak } = useArabicTTS();
 
   const [step, setStep]       = useState<StepId>('synthesis');
   const [ttsState, setTtsState] = useState<TestState>('idle');
@@ -36,98 +38,18 @@ export default function SpeechSetupScreen({ onDone }: Props) {
     if (/Android/i.test(ua))         setPlatform('android');
     else if (/iPhone|iPad|iPod/i.test(ua)) setPlatform('ios');
     else                             setPlatform('desktop');
-
-    if (!('speechSynthesis' in window)) return;
-
-    // Préchargement des voix
-    const loadVoices = () => window.speechSynthesis.getVoices();
-    loadVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
-
-    // Nettoyage pour éviter la fuite mémoire
-    return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
-    };
-  }, []);
-
-  // ─── Helpers voix ────────────────────────────────────────────────────────
-  const getVoicesAsync = (): Promise<SpeechSynthesisVoice[]> =>
-    new Promise(resolve => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) return resolve(voices);
-      // Les voix ne sont pas encore chargées — on attend l'événement
-      const handler = () => {
-        resolve(window.speechSynthesis.getVoices());
-        window.speechSynthesis.removeEventListener('voiceschanged', handler);
-      };
-      window.speechSynthesis.addEventListener('voiceschanged', handler);
-      // Délai de sécurité si l'événement ne se déclenche jamais
-      setTimeout(() => resolve(window.speechSynthesis.getVoices()), 1500);
-    });
-
-  // ─── TTS via serveur (Google Translate) ─────────────────────────
-  const playServerTTS = useCallback(() => {
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    const audio = new Audio(`/api/tts?text=${encodeURIComponent('\u0645\u0631\u062d\u0628\u0627\u064b')}`);
-    audio.onended = () => setTtsState('ok');
-    audio.onerror = () => setTtsState('fail');
-    audio.play().catch(() => setTtsState('fail'));
   }, []);
 
   // ─── Test TTS ────────────────────────────────────────────────────────────
   const testTTS = useCallback(async () => {
     setTtsState('testing');
-    fallbackTriggeredRef.current = false;
-
-    if (!('speechSynthesis' in window)) {
-      playServerTTS();
-      return;
-    }
-
     try {
-      window.speechSynthesis.cancel();
-
-      const voices = await getVoicesAsync();
-      const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-
-      if (!arabicVoice && voices.length > 0) {
-        playServerTTS();
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance('مرحباً');
-      utterance.lang = 'ar-SA';
-      utterance.rate = 0.8;
-      utterance.volume = 1;
-      if (arabicVoice) utterance.voice = arabicVoice;
-
-      const timeout = setTimeout(() => {
-        if (!fallbackTriggeredRef.current) {
-          fallbackTriggeredRef.current = true;
-          playServerTTS();
-        }
-      }, 3000);
-
-      utterance.onstart = () => clearTimeout(timeout);
-
-      utterance.onend = () => {
-        clearTimeout(timeout);
-        if (!fallbackTriggeredRef.current) setTtsState('ok');
-      };
-
-      utterance.onerror = () => {
-        clearTimeout(timeout);
-        if (!fallbackTriggeredRef.current) {
-          fallbackTriggeredRef.current = true;
-          playServerTTS();
-        }
-      };
-
-      window.speechSynthesis.speak(utterance);
+      await speak('مرحباً', 1.0);
+      setTimeout(() => setTtsState('ok'), 1500);
     } catch {
-      playServerTTS();
+      setTtsState('fail');
     }
-  }, [playServerTTS]);
+  }, [speak]);
 
   // ─── Test Microphone ─────────────────────────────────────────────────────
   const testMic = useCallback(async () => {

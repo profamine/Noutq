@@ -31,6 +31,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useArabicTTS } from '../hooks/useArabicTTS';
 import { lessonsData, type LessonData, type LessonStep, type QuizOption } from '../data/lessons';
 
 // ===== Sound Effects (Real Web Audio + Vibration) =====
@@ -397,7 +398,57 @@ const normalize = (s: string) =>
   s.trim()
    .replace(/[\u200f\u200e\u200b]/g, '')   // remove directional marks
    .replace(/[\u064B-\u065F]/g, '')         // strip all tashkeel (diacritics)
-   .replace(/\s+/g, ' ');
+   .replace(/[.,!?؟'"]/g, '')               // remove punctuation
+   .replace(/\s+/g, ' ')
+   .toLowerCase();
+
+function getSimilarity(s1: string, s2: string): number {
+  let longer = s1;
+  let shorter = s2;
+  if (s1.length < s2.length) {
+    longer = s2;
+    shorter = s1;
+  }
+  const longerLength = longer.length;
+  if (longerLength === 0) {
+    return 1.0;
+  }
+  return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength.toString());
+}
+
+function editDistance(s1: string, s2: string): number {
+  const costs = [];
+  for (let i = 0; i <= s1.length; i++) {
+    let lastValue = i;
+    for (let j = 0; j <= s2.length; j++) {
+      if (i === 0) costs[j] = j;
+      else {
+        if (j > 0) {
+          let newValue = costs[j - 1];
+          if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+          }
+          costs[j - 1] = lastValue;
+          lastValue = newValue;
+        }
+      }
+    }
+    if (i > 0) costs[s2.length] = lastValue;
+  }
+  return costs[s2.length];
+}
+
+// Choisit le premier conteneur audio supporté par le navigateur courant.
+function pickMimeType(): string | undefined {
+  if (typeof MediaRecorder === 'undefined') return undefined;
+  const candidates = [
+    'audio/webm;codecs=opus', // Chrome / Android
+    'audio/webm',
+    'audio/mp4',              // Safari iOS 14.3+
+    'audio/ogg;codecs=opus',
+  ];
+  return candidates.find((t) => MediaRecorder.isTypeSupported?.(t));
+}
 
 export default function LessonScreen({
   onBack,
@@ -420,7 +471,7 @@ export default function LessonScreen({
   const [streak, setStreak] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { speak, isPlaying } = useArabicTTS();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -451,15 +502,6 @@ export default function LessonScreen({
     }
   }, [isValidLesson, onBack]);
 
-  // Préchargement des voix système — obligatoire sur mobile
-  useEffect(() => {
-    if (!('speechSynthesis' in window)) return;
-    const loadVoices = () => window.speechSynthesis.getVoices();
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
-  }, []);
-
   if (!isValidLesson) return null;
 
   const lesson = lessonsData[lessonId!];
@@ -477,139 +519,8 @@ export default function LessonScreen({
     }
   }, [step]);
 
-  // Cache audio blobs per text+speed to avoid redundant API calls
-  const audioCache = useRef<Map<string, string>>(new Map());
-  const currentAudio = useRef<HTMLAudioElement | null>(null);
-
-  const playVoice = (speed: number) => {
-    if (isPlaying) return;
-
-    if (currentAudio.current) {
-      currentAudio.current.pause();
-      currentAudio.current = null;
-    }
-
-    setIsPlaying(true);
-    playSound('click');
-
-    const cacheKey = `${step.arabic}__${speed}`;
-
-    const fallbackToServerTTS = () => {
-      const cacheHit = audioCache.current.get(cacheKey);
-      const audioUrl = cacheHit ?? `/api/tts?text=${encodeURIComponent(step.arabic)}&lang=ar`;
-
-      const audio = new Audio(audioUrl);
-      currentAudio.current = audio;
-      audio.playbackRate = speed;
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => setIsPlaying(false);
-
-      if (!cacheHit) {
-        // Mise en cache du blob pour éviter les appels répétés
-        fetch(audioUrl)
-          .then(r => r.blob())
-          .then(blob => {
-            const url = URL.createObjectURL(blob);
-            audioCache.current.set(cacheKey, url);
-          })
-          .catch(() => {});
-      }
-
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => setIsPlaying(false));
-      }
-    };
-
-    try {
-      if (!('speechSynthesis' in window)) {
-        fallbackToServerTTS();
-        return;
-      }
-      
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(step.arabic);
-      utterance.lang = 'ar-SA';
-      utterance.rate = speed < 1 ? 0.4 : 0.8;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      const voices = window.speechSynthesis.getVoices();
-      const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-      
-      // Condition 1: Aucun voix arabe dispo
-      if (!arabicVoice && voices.length > 0) {
-        fallbackToServerTTS();
-        return;
-      }
-
-      if (arabicVoice) utterance.voice = arabicVoice;
-
-      let fallbackTriggered = false;
-
-      // Condition 2: Timeout après 3 secondes (si onstart ne se déclenche pas ou bug)
-      const timeoutMsg = setTimeout(() => {
-        if (!fallbackTriggered) {
-          fallbackTriggered = true;
-          fallbackToServerTTS();
-        }
-      }, 3000);
-
-      const keepAlive = setInterval(() => {
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        } else {
-          clearInterval(keepAlive);
-        }
-      }, 10000);
-
-      utterance.onstart = () => {
-        clearTimeout(timeoutMsg);
-      };
-
-      utterance.onend = () => {
-        clearTimeout(timeoutMsg);
-        clearInterval(keepAlive);
-        if (!fallbackTriggered) {
-          setIsPlaying(false);
-        }
-      };
-
-      // Condition 3: Erreur de synthèse
-      utterance.onerror = (e) => {
-        clearTimeout(timeoutMsg);
-        clearInterval(keepAlive);
-        if (fallbackTriggered) return;
-        
-        fallbackTriggered = true;
-        fallbackToServerTTS();
-      };
-
-      window.speechSynthesis.speak(utterance);
-
-      // Si voix non chargées, timeout couvre l'échec
-      if (!voices.length) {
-        window.speechSynthesis.onvoiceschanged = () => {
-          // juste attendre evt, sinon timeout va fallback
-        };
-      }
-    } catch (err) {
-      console.error('TTS error:', err);
-      fallbackToServerTTS();
-    }
-  };
-
-  const handlePlayAudio = () => playVoice(1.0);
-  const handlePlaySlow = () => playVoice(0.7);
-
-  const normalize = (str: string) => {
-    return str
-      .replace(/[\u064B-\u065F]/g, '') // Remove Arabic diacritics
-      .replace(/[.,!?؟'"]/g, '')       // Remove punctuation
-      .trim()
-      .toLowerCase();
-  };
+  const handlePlayAudio = () => speak(step.arabic, 1.0);
+  const handlePlaySlow = () => speak(step.arabic, 0.7);
 
   const handleSimulatedRecord = () => {
     if (recording) {
@@ -651,10 +562,17 @@ export default function LessonScreen({
   };
 
   const handleRecord = async () => {
+    // Stop si déjà en cours d'enregistrement.
     if (recording) {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-      }
+      mediaRecorderRef.current?.stop();
+      return;
+    }
+    if (isTranscribing) return; // évite le double-clic pendant l'analyse
+
+    // Vérifie le support du navigateur.
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setFeedback('poor');
+      playSound('wrong');
       return;
     }
 
@@ -665,91 +583,101 @@ export default function LessonScreen({
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+      const mimeType = pickMimeType();
+      const mediaRecorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream); // laisse le navigateur choisir si rien n'est supporté
       mediaRecorderRef.current = mediaRecorder;
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
 
       mediaRecorder.onstop = () => {
         setRecording(false);
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((t) => t.stop());
 
-        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
+        const blob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
         const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
+        reader.readAsDataURL(blob);
         reader.onloadend = async () => {
           const result = reader.result as string;
-          if (!result || !result.includes(',')) return;
+          if (!result?.includes(',')) { setRecording(false); return; }
           const base64Data = result.split(',')[1];
 
           setIsTranscribing(true);
           try {
-             const res = await fetch('/api/transcribe', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ audioData: base64Data, mimeType: mediaRecorder.mimeType, expectedLanguage: 'Arabic' })
-             });
-             const data = await res.json();
-             const transcript = data.text;
-             const normalizedTranscript = normalize(transcript);
-             const expected = normalize(step.arabic);
-             
-             // Very simple exact match or partial match approach
-             if (normalizedTranscript === expected || normalizedTranscript.includes(expected)) {
-               setFeedback('excellent');
-               setXp((prev) => prev + 15);
-               setStreak((prev) => prev + 1);
-               setCorrectAnswers((prev) => prev + 1);
-               playSound('correct');
-               if (streak > 0 && (streak + 1) % 3 === 0) {
-                 setShowStreakBonus(true);
-                 setXp((prev) => prev + 5);
-                 setTimeout(() => setShowStreakBonus(false), 2000);
-               }
-             } else if (expected.split(' ').some(w => normalizedTranscript.includes(w))) {
-               // partial match
-               setFeedback('good');
-               setXp((prev) => prev + 8);
-               setCorrectAnswers((prev) => prev + 1);
-               playSound('correct');
-             } else {
-               setFeedback('poor');
-               setStreak(0);
-               playSound('wrong');
-               setShakeWrong(true);
-               setTimeout(() => setShakeWrong(false), 500);
-             }
-             setTotalAnswered((prev) => prev + 1);
-          } catch(err) {
-             console.error(err);
-             setFeedback('poor');
-             setStreak(0);
-             playSound('wrong');
-             setShakeWrong(true);
-             setTimeout(() => setShakeWrong(false), 500);
-             setTotalAnswered((prev) => prev + 1);
+            const res = await fetch('/api/transcribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                audioData: base64Data,
+                mimeType: mediaRecorder.mimeType,
+                expectedLanguage: 'Arabic',
+              }),
+            });
+            if (!res.ok) throw new Error(`transcribe ${res.status}`);
+            const { text: transcript } = await res.json();
+
+            const normalizedTranscript = normalize(transcript || '');
+            const expected = normalize(step.arabic);
+            const similarity = getSimilarity(normalizedTranscript, expected);
+
+            if (similarity > 0.75 || (expected && normalizedTranscript.includes(expected))) {
+              setFeedback('excellent');
+              setXp((p) => p + 15);
+              setStreak((p) => p + 1);
+              setCorrectAnswers((p) => p + 1);
+              playSound('correct');
+              if (streak > 0 && (streak + 1) % 3 === 0) {
+                setShowStreakBonus(true);
+                setXp((p) => p + 5);
+                setTimeout(() => setShowStreakBonus(false), 2000);
+              }
+            } else if (
+              similarity > 0.4 ||
+              expected.split(' ').some((w) => w.length > 2 && normalizedTranscript.includes(w))
+            ) {
+              setFeedback('good');
+              setXp((p) => p + 8);
+              setCorrectAnswers((p) => p + 1);
+              playSound('correct');
+            } else {
+              setFeedback('poor');
+              setStreak(0);
+              playSound('wrong');
+              setShakeWrong(true);
+              setTimeout(() => setShakeWrong(false), 500);
+            }
+            setTotalAnswered((p) => p + 1);
+          } catch (err) {
+            console.error('[transcribe]', err);
+            setFeedback('poor');
+            setStreak(0);
+            playSound('wrong');
+            setShakeWrong(true);
+            setTimeout(() => setShakeWrong(false), 500);
+            setTotalAnswered((p) => p + 1);
           } finally {
-             setIsTranscribing(false);
+            setIsTranscribing(false);
           }
         };
       };
 
       mediaRecorder.start();
-
-      // Ensure that we stop recording after 5.5 seconds max
+      // Arrêt automatique au bout de 5,5 s max.
       setTimeout(() => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.stop();
+        if (mediaRecorderRef.current?.state === 'recording') {
+          mediaRecorderRef.current.stop();
         }
       }, 5500);
-
     } catch (err) {
-      console.error('Error accessing microphone', err);
-      handleSimulatedRecord();
+      // Permission refusée ou micro indisponible.
+      console.error('Micro inaccessible :', err);
+      setRecording(false);
+      setFeedback('poor');
+      playSound('wrong');
+      // Optionnel : afficher un message « activez le micro dans les réglages ».
     }
   };
 

@@ -27,6 +27,7 @@ import {
   MicOff
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useArabicTTS } from '../hooks/useArabicTTS';
 
 // ===== Types =====
 interface Message {
@@ -357,6 +358,7 @@ function MessageBubble({
 // ===== Main Chat Screen =====
 export default function ChatScreen() {
   const { t } = useLanguage();
+  const { speak } = useArabicTTS();
   
   // ===== Quick Replies =====
   const quickReplies: QuickReply[] = [
@@ -536,29 +538,7 @@ export default function ChatScreen() {
   };
 
   const handleSpeak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      // Try to use native Arabic voice if possible
-      const voices = window.speechSynthesis.getVoices();
-      const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-      
-      if (arabicVoice || voices.length === 0) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ar-SA';
-        utterance.rate = 0.8;
-        if (arabicVoice) utterance.voice = arabicVoice;
-        utterance.onerror = () => {
-          // Fallback to server TTS if native fails
-          new Audio(`/api/tts?text=${encodeURIComponent(text)}`).play().catch(() => {});
-        };
-        window.speechSynthesis.speak(utterance);
-        return;
-      }
-    }
-    
-    // Fallback if no native voice or no Speech Synthesis
-    const audio = new Audio(`/api/tts?text=${encodeURIComponent(text)}`);
-    audio.play().catch(() => {});
+    speak(text, 1.0);
   };
 
   const handleClearChat = () => {

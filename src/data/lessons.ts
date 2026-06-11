@@ -21,6 +21,9 @@ import { u18 } from './lessons/u18';
 import { u19 } from './lessons/u19';
 import { u20 } from './lessons/u20';
 
+import { u21 } from './lessons/u21';
+import { u22 } from './lessons/u22';
+
 export const lessonsData: Record<string, LessonData> = {
   u1,
   u2,
@@ -42,6 +45,8 @@ export const lessonsData: Record<string, LessonData> = {
   u18,
   u19,
   u20,
+  u21,
+  u22,
 };
 
 export type { LessonData, LessonStep, MatchPair, QuizOption };

@@ -18,40 +18,40 @@ export default function PracticeScreen() {
 
       <div className="p-4 space-y-4 max-w-2xl mx-auto w-full">
         
-        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
+        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow opacity-70 cursor-not-allowed">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <BookOpen size={24} />
             </div>
             <div className="text-right">
               <h3 className="font-bold text-gray-800 text-lg">Բառապաշար</h3>
-              <p className="text-sm text-gray-500">مراجعة الكلمات</p>
+              <p className="text-sm text-gray-500">مراجعة الكلمات (Շուտով)</p>
             </div>
           </div>
           <CheckCircle2 className="text-gray-300" />
         </button>
 
-        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
+        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow opacity-70 cursor-not-allowed">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
               <Headphones size={24} />
             </div>
             <div className="text-right">
               <h3 className="font-bold text-gray-800 text-lg">Լսողություն</h3>
-              <p className="text-sm text-gray-500">استماع</p>
+              <p className="text-sm text-gray-500">استماع (Շուտով)</p>
             </div>
           </div>
           <CheckCircle2 className="text-gray-300" />
         </button>
 
-        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
+        <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow opacity-70 cursor-not-allowed">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
               <PenTool size={24} />
             </div>
             <div className="text-right">
               <h3 className="font-bold text-gray-800 text-lg">Քերականություն</h3>
-              <p className="text-sm text-gray-500">قواعد</p>
+              <p className="text-sm text-gray-500">قواعد (Շուտով)</p>
             </div>
           </div>
           <CheckCircle2 className="text-gray-300" />

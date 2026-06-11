@@ -59,6 +59,10 @@ const translations: Record<string, Record<Language, string>> = {
   'home.unit19.subtitle': { hy: 'Օրական գործունեություններ', ar: 'الروتين اليومي' },
   'home.unit20.title': { hy: 'Միավոր 20: Վերջնական թեստ', ar: 'الوحدة 20: المراجعة' },
   'home.unit20.subtitle': { hy: 'Ամբողջական վերջնական թեստ', ar: 'مراجعة شاملة ونهائية' },
+  'home.unit21.title': { hy: 'Միավոր 21: Թվերի կիրառում', ar: 'الوحدة 21: توظيف الأعداد' },
+  'home.unit21.subtitle': { hy: 'Արաբական թվեր և դրանց կիրառումը', ar: 'الأعداد وتوظيفها في جمل' },
+  'home.unit22.title': { hy: 'Միավոր 22: Հարաքաթներ', ar: 'الوحدة 22: الحركات الإعرابية' },
+  'home.unit22.subtitle': { hy: 'Քերականական ձայնավորներ', ar: 'الحركات الإعرابية والجر' },
 
   'home.completed': { hy: 'Ավարտված', ar: 'مكتمل' },
   'home.start': { hy: 'Սկսել →', ar: 'ابدأ →' },
@@ -84,6 +88,8 @@ const translations: Record<string, Record<Language, string>> = {
   'home.node.u18': { hy: 'Ուղղություններ', ar: 'الاتجاهات' },
   'home.node.u19': { hy: 'Օրվա կյանք', ar: 'الروتين' },
   'home.node.u20': { hy: 'Թեստ', ar: 'الاختبار' },
+  'home.node.u21': { hy: 'Թվերի կիրառում', ar: 'الأعداد' },
+  'home.node.u22': { hy: 'Հարաքաթներ', ar: 'الحركات' },
 
   // Lesson Screen
   'arabic': { hy: 'Արաբերեն', ar: 'العربية' },
@@ -218,7 +224,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem('app_language', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   };
+
+  useEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, [language]);
 
   const t = (key: string) => {
     return translations[key]?.[language] || key;
