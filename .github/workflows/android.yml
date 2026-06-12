@@ -24,11 +24,11 @@ jobs:
       - name: Build Web Project (Vite/React)
         run: npm run build
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17' # Aligné sur la version stable pour Gradle/Capacitor
+          java-version: '21' # Remplacer 17 par 21 ici
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
