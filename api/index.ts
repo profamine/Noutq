@@ -102,49 +102,82 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
     }
 
     const ai = createGenAIClient();
+    
+    // NETTOYAGE : Suppression des kashidas (ـ), des points de suspension et des points d'interrogation pour le moteur TTS
+    let cleanText = text.trim()
+      .replace(/[\u0640]/g, '') // Enlever le tatweel/kashida de prolongation arabe
+      .replace(/[؟?\.…_ـ]+/g, ' ') // Remplacer la ponctuation graphique/trous de texte par des espaces simples
+      .replace(/\s+/g, ' ') // Nettoyer les doubles espaces créés
+      .trim();
 
-    // Pour l'arabe on guide le style sans que la consigne soit prononcée :
-    // on met la consigne dans systemInstruction, pas dans le texte à lire.
-    const isArabic = (lang === 'ar') || /[\u0600-\u06FF]/.test(text);
+    // Si après nettoyage le texte est vide (ex: juste un point d'interrogation envoyé)
+    if (!cleanText) {
+      res.status(400).json({ error: "Le texte ne contient aucun caractère prononçable après nettoyage." });
+      return;
+    }
 
+    const isArabic = (lang === 'ar') || /[\u0600-\u06FF]/.test(cleanText);
+
+    // Répétition 3x pour les lettres courtes afin de fournir assez de matière phonétique au synthétiseur
+    const ttsText = (isArabic && cleanText.length <= 3)
+      ? `${cleanText} ${cleanText} ${cleanText}`
+      : cleanText;
+
+    // Utilisation stricte de gemini-2.5-flash
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-tts',
-      contents: [{ parts: [{ text }] }],
+      model: 'gemini-2.5-flash',
+      contents: [{ parts: [{ text: ttsText }] }],
       config: {
         responseModalities: [Modality.AUDIO],
-        ...(isArabic
-          ? { systemInstruction: 'Pronounce the following clearly in Modern Standard Arabic.' }
-          : {}),
         speechConfig: {
           voiceConfig: {
-            // 'Kore' convient ; tester aussi d'autres voix prebuilt selon le rendu.
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
+            prebuiltVoiceConfig: { voiceName: 'Charon' },
           },
         },
+        // L'instruction système définit un cadre applicatif strict pour contourner la modération médicale/sensible
+        systemInstruction: isArabic 
+          ? "Tu agis exclusivement comme un moteur automatisé de synthèse vocale (Text-To-Speech) pour une application d'apprentissage de l'arabe. Ton unique rôle est de lire à voix haute le texte fourni, exactement tel qu'il est vocalisé, avec une élocution claire. Ignore complètement le sens contextuel ou médical des mots (ex: douleur, anatomie), ne donne aucun conseil, et ne génère aucun mot d'introduction ou commentaire."
+          : "Tu dois lire à voix haute le texte fourni, de manière claire et articulée, sans ajouter de fioritures ou de commentaires."
       },
     });
 
-    const base64Audio =
-      response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!base64Audio) throw new Error('No audio generated from TTS model');
+    const candidate = response.candidates?.[0];
+    const audioPart = candidate?.content?.parts?.find(p => p.inlineData?.data);
+    const base64Audio = audioPart?.inlineData?.data;
+
+    if (!base64Audio) {
+      const textResponse = candidate?.content?.parts?.find(p => p.text)?.text;
+      console.warn(`⚠️ Pas de flux audio généré pour "${cleanText}". Réponse texte :`, textResponse);
+      
+      res.status(422).json({ 
+        error: "Le modèle n'a pas retourné de flux audio.",
+        details: textResponse 
+      });
+      return;
+    }
 
     const pcmBytes = Buffer.from(base64Audio, 'base64');
     const wavBuffer = encodeWAV(pcmBytes, 24000);
 
     res.set('Content-Type', 'audio/wav');
-    res.set('Cache-Control', 'public, max-age=86400');
+    res.set('Cache-Control', 'public, max-age=31536000, immutable'); 
     res.send(wavBuffer);
   } catch (err) {
     console.error('TTS API Error:', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: extractErrorMessage(err) });
   }
 });
 
 app.post('/api/transcribe', async (req: Request, res: Response): Promise<void> => {
   try {
     const { audioData, mimeType, expectedLanguage } = req.body;
-    if (!audioData) {
-      res.status(400).json({ error: 'audioData is required' });
+    if (!audioData || typeof audioData !== 'string') {
+      res.status(400).json({ error: 'audioData is required and must be a string' });
+      return;
+    }
+
+    if (audioData.length > 15 * 1024 * 1024) {
+      res.status(413).json({ error: 'audioData base64 payload is too large' });
       return;
     }
 

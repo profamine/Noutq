@@ -32,9 +32,8 @@ async function startServer(): Promise<void> {
   // ── Démarrage ───────────────────────────────────────────────────────────
   app.listen(PORT, '0.0.0.0', () => {
     const env = IS_PROD ? 'production' : 'développement';
-    const model = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile';
     console.log(`✅ Serveur ${env} démarré → http://localhost:${PORT}`);
-    console.log(`🤖 Modèle Groq : ${model}`);
+    console.log(`🤖 Modèle Gemini : gemini-2.5-flash`);
   });
 }
 
