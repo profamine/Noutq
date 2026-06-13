@@ -212,7 +212,7 @@ export function useArabicTTS() {
 
     if (canUseNative) {
       try { playNative(clean, speed); return; }
-      catch (err) { console.error('[TTS] native échouée :', err); }
+      catch (err) { console.error('[TTS] native échouée :', err); setIsPlaying(false); }
     }
 
     // 3) Repli serveur — DÉSACTIVÉ dans Capacitor (aucun serveur Express dans l'APK).

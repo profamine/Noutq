@@ -1,5 +1,5 @@
-import React from 'react';
-import { Flame, Zap, Calendar as CalendarIcon, Trophy, Target, BookOpen, Star, Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flame, Zap, Calendar as CalendarIcon, Trophy, Target, BookOpen, Star, Globe, Pencil, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -24,6 +24,7 @@ interface StatCardProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const WEEKDAY_LABELS = ['Կ', 'Ե', 'Ե', 'Չ', 'Հ', 'Ո', 'Շ'];
+const TOTAL_LESSONS = 22;
 
 // ─── ProfileScreen ────────────────────────────────────────────────────────────
 
@@ -38,17 +39,37 @@ export default function ProfileScreen({
 }) {
   const { t, language, setLanguage } = useLanguage();
 
-  const levelBadge = completedUnits.length < 4 ? 'A1' : completedUnits.length < 8 ? 'A2' : 'B1';
-
-  const studyDates: string[] = JSON.parse(
-    localStorage.getItem('studyHistory') || '[]'
+  // ── Nom éditable ────────────────────────────────────────────────────────
+  const [userName, setUserName] = useState<string>(
+    () => localStorage.getItem('userName') || (language === 'hy' ? 'Արամ' : 'أحمد')
   );
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(userName);
 
-  const ach1Done  = completedUnits.length >= 1;
-  const ach2Done  = streak >= 3;
-  const ach3Done  = completedUnits.length >= 10;
-  const ach4Done  = completedUnits.length >= 20;
-  const achCount  = [ach1Done, ach2Done, ach3Done, ach4Done].filter(Boolean).length;
+  const saveName = () => {
+    const trimmed = nameInput.trim();
+    if (trimmed) {
+      setUserName(trimmed);
+      localStorage.setItem('userName', trimmed);
+    }
+    setEditingName(false);
+  };
+
+  // ── Données ─────────────────────────────────────────────────────────────
+  const levelBadge = completedUnits.length < 4 ? 'A1' : completedUnits.length < 10 ? 'A2' : 'B1';
+
+  const studyDates: string[] = (() => {
+    try { return JSON.parse(localStorage.getItem('studyHistory') || '[]'); }
+    catch { return []; }
+  })();
+
+  const ach1Done = completedUnits.length >= 1;
+  const ach2Done = streak >= 7;
+  const ach3Done = completedUnits.length >= 10;
+  const ach4Done = completedUnits.length >= TOTAL_LESSONS;
+  const achCount = [ach1Done, ach2Done, ach3Done, ach4Done].filter(Boolean).length;
+
+  const goalsPercent = Math.round((completedUnits.length / TOTAL_LESSONS) * 100);
 
   const daysActiveLast28 = Array.from({ length: 28 }).filter((_, i) => {
     const date = new Date();
@@ -63,7 +84,7 @@ export default function ProfileScreen({
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-900">{t('nav.profile')}</h1>
-            
+
             {/* Language Switcher */}
             <button
               onClick={() => setLanguage(language === 'hy' ? 'ar' : 'hy')}
@@ -75,23 +96,49 @@ export default function ProfileScreen({
               </span>
             </button>
           </div>
+
           <div className="flex items-center gap-5">
             {/* Avatar */}
             <div className="relative">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
-                {language === 'hy' ? 'Ա' : 'أ'}
+                {userName.charAt(0).toUpperCase()}
               </div>
-              {/* Level badge on avatar */}
               <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
                 {levelBadge}
               </div>
             </div>
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold text-gray-900 truncate">Արամ</h1>
+              {/* Nom éditable */}
+              {editingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    autoFocus
+                    value={nameInput}
+                    onChange={e => setNameInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false); }}
+                    className="text-xl font-bold text-gray-900 border-b-2 border-blue-500 outline-none bg-transparent w-36"
+                    maxLength={30}
+                  />
+                  <button onClick={saveName} className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center shrink-0">
+                    <Check size={14} strokeWidth={3} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">{userName}</h2>
+                  <button
+                    onClick={() => { setNameInput(userName); setEditingName(true); }}
+                    className="text-gray-400 hover:text-blue-500 transition-colors shrink-0"
+                    aria-label={t('profile.edit_name')}
+                  >
+                    <Pencil size={15} />
+                  </button>
+                </div>
+              )}
+
               <p className="text-sm text-gray-500 mt-0.5">{t('profile.member_since')}</p>
 
-              {/* League badge */}
               <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">
                 <Star size={11} fill="currentColor" />
                 {t('profile.bronze_league')}
@@ -134,7 +181,7 @@ export default function ProfileScreen({
             <StatCard
               icon={<Target size={22} />}
               iconBg="bg-green-100 text-green-600"
-              value="45%"
+              value={`${goalsPercent}%`}
               label={t('profile.goals')}
             />
           </div>
@@ -144,9 +191,7 @@ export default function ProfileScreen({
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-gray-700">{t('profile.achievements')}</h2>
-            <button className="text-blue-600 text-sm font-bold active:opacity-60">
-              {t('profile.see_all')}
-            </button>
+            <span className="text-blue-600 text-sm font-bold">{achCount}/4</span>
           </div>
           <div className="space-y-3">
             <AchievementCard
@@ -163,7 +208,7 @@ export default function ProfileScreen({
               iconBg="bg-orange-100 text-orange-500"
               title={t('profile.ach2.title')}
               description={t('profile.ach2.desc')}
-              progress={Math.min(100, (streak / 3) * 100)}
+              progress={Math.min(100, Math.round((streak / 7) * 100))}
               completed={ach2Done}
               xp={100}
             />
@@ -172,16 +217,16 @@ export default function ProfileScreen({
               iconBg="bg-blue-100 text-blue-500"
               title={t('profile.ach3.title')}
               description={t('profile.ach3.desc')}
-              progress={Math.min(100, (completedUnits.length / 10) * 100)}
+              progress={Math.min(100, Math.round((completedUnits.length / 10) * 100))}
               completed={ach3Done}
               xp={200}
             />
             <AchievementCard
               icon={<Star size={22} />}
               iconBg="bg-green-100 text-green-500"
-              title="Ավարտել բոլորը"
-              description="Ավարտել բոլոր 20 դասերը"
-              progress={Math.min(100, (completedUnits.length / 20) * 100)}
+              title={t('profile.ach4.title')}
+              description={t('profile.ach4.desc')}
+              progress={Math.min(100, Math.round((completedUnits.length / TOTAL_LESSONS) * 100))}
               completed={ach4Done}
               xp={500}
             />
@@ -195,7 +240,6 @@ export default function ProfileScreen({
             {t('profile.calendar')}
           </h2>
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-            {/* Month label */}
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm font-bold text-gray-700">{t('profile.month_name')}</span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -206,22 +250,17 @@ export default function ProfileScreen({
               </div>
             </div>
 
-            {/* Day labels */}
             <div className="grid grid-cols-7 gap-1.5 text-center mb-1.5">
               {WEEKDAY_LABELS.map((d, i) => (
-                <div key={i} className="text-[10px] text-gray-400 font-bold">
-                  {d}
-                </div>
+                <div key={i} className="text-[10px] text-gray-400 font-bold">{d}</div>
               ))}
             </div>
 
-            {/* Day cells */}
             <div className="grid grid-cols-7 gap-1.5">
               {Array.from({ length: 28 }).map((_, i) => {
                 const date = new Date();
                 date.setDate(date.getDate() - (27 - i));
-                const dateStr = date.toDateString();
-                const isActive = studyDates.includes(dateStr);
+                const isActive = studyDates.includes(date.toDateString());
                 const isToday = i === 27;
 
                 return (
@@ -240,7 +279,6 @@ export default function ProfileScreen({
               })}
             </div>
 
-            {/* Streak summary */}
             <div className="mt-4 pt-3 border-t border-gray-100 flex justify-around text-center">
               <div>
                 <div className="text-lg font-bold text-gray-800">{daysActiveLast28}</div>
@@ -283,64 +321,31 @@ function StatCard({ icon, iconBg, value, label }: StatCardProps) {
 // ─── AchievementCard ──────────────────────────────────────────────────────────
 
 function AchievementCard({
-  icon,
-  iconBg,
-  title,
-  description,
-  progress,
-  completed = false,
-  xp,
+  icon, iconBg, title, description, progress, completed = false, xp,
 }: AchievementCardProps) {
   return (
-    <div
-      className={`bg-white rounded-2xl border shadow-sm p-4 flex items-center gap-4 ${
-        completed ? 'border-yellow-200' : 'border-gray-100'
-      }`}
-    >
-      {/* Icon */}
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg} ${
-          completed ? 'opacity-100' : 'opacity-50'
-        }`}
-      >
+    <div className={`bg-white rounded-2xl border shadow-sm p-4 flex items-center gap-4 ${completed ? 'border-yellow-200' : 'border-gray-100'}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg} ${completed ? 'opacity-100' : 'opacity-50'}`}>
         {icon}
       </div>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
           <h3 className="font-bold text-gray-800 text-sm truncate">{title}</h3>
           {xp !== undefined && (
-            <span
-              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
-                completed
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-gray-100 text-gray-500'
-              }`}
-            >
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${completed ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}`}>
               +{xp} XP
             </span>
           )}
         </div>
         <p className="text-[11px] text-gray-400 mb-2">{description}</p>
-
-        {/* Progress bar */}
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              completed ? 'bg-yellow-400' : 'bg-blue-500'
-            }`}
+            className={`h-full rounded-full transition-all duration-500 ${completed ? 'bg-yellow-400' : 'bg-blue-500'}`}
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
-
-      {/* Percent */}
-      <div
-        className={`text-sm font-bold shrink-0 ${
-          completed ? 'text-yellow-500' : 'text-gray-400'
-        }`}
-      >
+      <div className={`text-sm font-bold shrink-0 ${completed ? 'text-yellow-500' : 'text-gray-400'}`}>
         {progress}%
       </div>
     </div>
