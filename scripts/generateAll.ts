@@ -18,9 +18,9 @@ async function downloadAudio(text: string, filePath: string) {
   try {
     const res = await fetch(url);
     
-    // Si le serveur répond avec un code d'erreur (422, 400, etc.)
+    // Si le serveur répond avec un code d'erreur (422, 400, 500, etc.)
     if (!res.ok) {
-      console.warn(`⚠️  [Passé] Impossible de générer l'audio pour "${text}" (Code serveur : ${res.status})`);
+      console.warn(`⚠️  [Échec] Impossible de générer l'audio pour "${text}" (Code serveur : ${res.status})`);
       return false; // Signale qu'aucun fichier n'a été créé
     }
     
@@ -58,7 +58,7 @@ export async function generateAll() {
     }
   }
 
-  console.log(`🔍 Trouvé : ${allWords.size} phrases/mots arabes uniques à générer.`);
+  console.log(`🔍 Trouvé : ${allWords.size} phrases/mots arabes uniques à traiter.`);
 
   const manifest: Record<string, string> = {};
   const chunks = [];
@@ -72,20 +72,38 @@ export async function generateAll() {
     let requestsMade = false;
 
     await Promise.all(chunk.map(async (word) => {
-      const safeName = word.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
-      const fileName = `${safeName}.wav`;
-      const filePath = path.join(PUBLIC_AUDIO_DIR, fileName);
+      // 1. Nom de fichier standard (Garde les espaces et caractères arabes propres)
+      const cleanStandardName = word.replace(/[\/\\\:\*\?\"<>\|]/g, '_').trim(); 
+      const fileNameStandard = `${cleanStandardName}.wav`;
+      const filePathStandard = path.join(PUBLIC_AUDIO_DIR, fileNameStandard);
 
-      manifest[word] = `/audio/${fileName}`;
+      // 2. Nom de fichier de secours (Ancienne méthode avec uniquement des underscores)
+      const safeNameUnderscore = word.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
+      const fileNameUnderscore = `${safeNameUnderscore}.wav`;
+      const filePathUnderscore = path.join(PUBLIC_AUDIO_DIR, fileNameUnderscore);
 
-      if (fs.existsSync(filePath)) {
-        console.log(`⏭️  Déjà existant (passé) : ${word}`);
+      // --- VERIFICATION DE L'EXISTENCE PHYSIQUE ---
+      if (fs.existsSync(filePathStandard)) {
+        console.log(`⏭️  Déjà existant (Standard) : ${word}`);
+        manifest[word] = `/audio/${fileNameStandard}`;
+        return;
+      } 
+      
+      if (fs.existsSync(filePathUnderscore)) {
+        console.log(`⏭️  Déjà existant (Underscore) : ${word}`);
+        manifest[word] = `/audio/${fileNameUnderscore}`;
         return;
       }
 
-      // Marquer qu'on envoie au moins une requête au serveur sur ce chunk
+      // Si le fichier n'existe nulle part, on tente de le télécharger
       requestsMade = true;
-      await downloadAudio(word, filePath);
+      const success = await downloadAudio(word, filePathStandard);
+      
+      if (success) {
+        manifest[word] = `/audio/${fileNameStandard}`;
+      } else {
+        console.error(`❌ Non inclus dans le manifeste (Audio manquant) : ${word}`);
+      }
     }));
     
     // On fait la pause uniquement si on a réellement sollicité l'API
@@ -95,10 +113,10 @@ export async function generateAll() {
     }
   }
 
+  // Sauvegarde du manifeste
   const manifestPath = path.join(PUBLIC_AUDIO_DIR, 'manifest.json');
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-  console.log(`✅ Manifeste mis à jour et sauvegardé sous : ${manifestPath}`);
-
+  console.log(`\n✅ Manifeste mis à jour et sauvegardé sous : ${manifestPath}`);
   console.log('🎉 Génération et compilation de tous les fichiers audio terminée !');
 }
 
