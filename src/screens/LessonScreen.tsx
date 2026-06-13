@@ -607,17 +607,23 @@ export default function LessonScreen({
 
           setIsTranscribing(true);
           try {
-            const res = await fetch('/api/transcribe', {
+            const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
+            const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+            const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                audioData: base64Data,
-                mimeType: mediaRecorder.mimeType,
-                expectedLanguage: 'Arabic',
+                contents: [{
+                  parts: [
+                    { text: 'Please transcribe this audio. The expected language is Arabic. Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.' },
+                    { inline_data: { data: base64Data, mime_type: mediaRecorder.mimeType || 'audio/webm' } }
+                  ]
+                }]
               }),
             });
             if (!res.ok) throw new Error(`transcribe ${res.status}`);
-            const { text: transcript } = await res.json();
+            const data = await res.json();
+            const transcript = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
             const normalizedTranscript = normalize(transcript || '');
             const expected = normalize(step.arabic);
