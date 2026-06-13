@@ -85,10 +85,19 @@ const SYSTEM_PROMPT = `You are "Armin", a friendly and encouraging Arabic tutor 
 The user is learning Arabic through a gamified app. They have completed structured lessons.
 This chat is for free practice and questions.`;
 
+// Clé API Gemini exposée via Vite (VITE_ prefix)
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
+const GEMINI_API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
 const sendMessageToAI = async (
   userText: string,
   history: Message[]
 ): Promise<Omit<Message, 'id' | 'timestamp'>> => {
+  if (!GEMINI_API_KEY) {
+    throw new Error('VITE_GEMINI_API_KEY manquante dans le fichier .env');
+  }
+
   const contents = [
     ...history.filter(m => !m.isTyping).map(m => ({
       role: m.sender === 'user' ? 'user' : 'model',
@@ -97,22 +106,30 @@ const sendMessageToAI = async (
     { role: 'user', parts: [{ text: userText }] },
   ];
 
-  const res = await fetch('/api/chat', {
+  const body = {
+    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents,
+    generationConfig: { temperature: 1, maxOutputTokens: 1024 },
+  };
+
+  const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents, systemInstruction: SYSTEM_PROMPT }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
-    let errorMsg = `Server error ${res.status}`;
+    let errorMsg = `Gemini API error ${res.status}`;
     try {
       const errorData = await res.json();
-      if (errorData.error) errorMsg += `: ${errorData.error}`;
+      if (errorData.error?.message) errorMsg += `: ${errorData.error.message}`;
     } catch (e) {}
     throw new Error(errorMsg);
   }
+
   const data = await res.json();
-  let text = data.text || '...';
+  let text: string =
+    data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '...';
 
   let vocabulary: VocabWord[] | undefined;
   const vocabMatch = text.match(/\[VOCAB\]([\s\S]*?)\[\/VOCAB\]/);
@@ -441,14 +458,23 @@ export default function ChatScreen() {
 
           setIsTranscribing(true);
           try {
-             const res = await fetch('/api/transcribe', {
+             const transcribeBody = {
+               contents: [{
+                 parts: [
+                   { text: 'Please transcribe this audio. The expected language is Arabic or Armenian. Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.' },
+                   { inline_data: { data: base64Data, mime_type: mediaRecorder.mimeType || 'audio/webm' } }
+                 ]
+               }]
+             };
+             const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ audioData: base64Data, mimeType: mediaRecorder.mimeType, expectedLanguage: 'Arabic or Armenian' })
+               body: JSON.stringify(transcribeBody),
              });
              const data = await res.json();
-             if (data.text) {
-                 setInput(prev => (prev ? prev + ' ' : '') + data.text);
+             const transcribed = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+             if (transcribed) {
+                 setInput(prev => (prev ? prev + ' ' : '') + transcribed);
              }
           } catch(err) {
              console.error(err);
