@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Star, Lock, Check, HelpCircle } from 'lucide-react';
+import { Star, Check, HelpCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import AboutModal from '../components/AboutModal';
 import { lessonsData } from '../data/lessons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type NodeStatus = 'completed' | 'current' | 'locked';
+type NodeStatus = 'completed' | 'current';
 
 interface LessonNodeProps {
   title: string;
@@ -110,14 +110,8 @@ export default function HomeScreen({
   const [showAboutModal, setShowAboutModal] = useState(false);
 
   const getStatus = (id: string): NodeStatus => {
-    const ids = ['u1','u2','u3','u4','u5','u6','u7','u8',
-                 'u9','u10','u11','u12','u13','u14','u15','u16',
-                 'u17','u18','u19','u20','u21','u22'];
-    const idx = ids.indexOf(id);
     if (completedUnits.includes(id)) return 'completed';
-    const prev = ids[idx - 1];
-    if (idx === 0 || completedUnits.includes(prev)) return 'current';
-    return 'locked';
+    return 'current';
   };
 
   return (
@@ -461,28 +455,13 @@ function LessonNode({
   const { t } = useLanguage();
   const theme = COLOR_MAP[color];
 
-  // Button appearance
-  const buttonClass = (() => {
-    switch (status) {
-      case 'completed':
-        return `${theme.nodeBg} ${theme.nodeShadow} text-white active:shadow-none active:translate-y-1`;
-      case 'current':
-        return `bg-white border-2 ${theme.currentRing} ${theme.currentText} animate-bounce`;
-      case 'locked':
-        return 'bg-gray-200 text-gray-400 shadow-[0_4px_0_#d1d5db] cursor-not-allowed';
-    }
-  })();
+  const buttonClass = status === 'completed'
+    ? `${theme.nodeBg} ${theme.nodeShadow} text-white active:shadow-none active:translate-y-1`
+    : `bg-white border-2 ${theme.currentRing} ${theme.currentText} animate-bounce`;
 
-  const icon = (() => {
-    switch (status) {
-      case 'completed':
-        return <Check strokeWidth={3} size={26} />;
-      case 'current':
-        return <Star fill="currentColor" size={26} />;
-      case 'locked':
-        return <Lock size={20} />;
-    }
-  })();
+  const icon = status === 'completed'
+    ? <Check strokeWidth={3} size={26} />
+    : <Star fill="currentColor" size={26} />;
 
   return (
     <div
@@ -492,8 +471,7 @@ function LessonNode({
     >
       <div className="flex flex-col items-center gap-2">
         <button
-          onClick={status !== 'locked' ? onClick : undefined}
-          disabled={status === 'locked'}
+          onClick={onClick}
           aria-label={`${title} – ${status}`}
           className={`
             w-[60px] h-[60px] rounded-full flex items-center justify-center
@@ -506,11 +484,7 @@ function LessonNode({
           {icon}
         </button>
 
-        <span
-          className={`text-[11px] font-bold text-center leading-tight max-w-[80px] ${
-            status === 'locked' ? 'text-gray-400' : 'text-gray-700'
-          }`}
-        >
+        <span className="text-[11px] font-bold text-center leading-tight max-w-[80px] text-gray-700">
           {title}
         </span>
 
