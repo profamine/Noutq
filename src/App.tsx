@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import HomeScreen from './screens/HomeScreen';
 import LessonScreen from './screens/LessonScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -11,12 +11,24 @@ import ChatScreen from './screens/ChatScreen';
 import PracticeScreen from './screens/PracticeScreen';
 import BottomNav from './components/BottomNav';
 import { LanguageProvider } from './contexts/LanguageContext';
+import SpeechSetupScreen from './screens/SpeechSetupScreen';
+import { storageGet, storageSet } from './services/storage';
+import { requestNotificationPermission, scheduleDailyReminderNotification } from './services/notifications';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-import SpeechSetupScreen from './screens/SpeechSetupScreen';
-
 type Screen = 'home' | 'lesson' | 'profile' | 'chat' | 'practice';
+
+/** Pure function — keeps unit-testable; no side effects. */
+export function computeStreak(rawStreak: number, lastStudyDate: string | null): number {
+  if (!lastStudyDate) return rawStreak;
+  const today = new Date().toDateString();
+  if (lastStudyDate === today) return rawStreak;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (lastStudyDate === yesterday.toDateString()) return rawStreak;
+  return 0;
+}
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
@@ -29,79 +41,113 @@ export default function App() {
 }
 
 function AppContent() {
-  const [showSetup, setShowSetup] = useState(() =>
-    localStorage.getItem('speechSetupDone') !== 'true'
-  );
-
+  const [ready, setReady] = useState(false);
+  const [showSetup, setShowSetup] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  const [completedUnits, setCompletedUnits] = useState<string[]>([]);
+  const [totalXP, setTotalXP] = useState(0);
+  const [streak, setStreak] = useState(0);
 
-  const [completedUnits, setCompletedUnits] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem('completedUnits') || '[]'); }
-    catch { return []; }
-  });
-  
-  const [totalXP, setTotalXP] = useState<number>(() => {
-    return Number(localStorage.getItem('totalXP') || '0');
-  });
-  
-  const [streak, setStreak] = useState<number>(() => {
-    const rawStreak = Number(localStorage.getItem('streak') || '0');
-    const lastStudy = localStorage.getItem('lastStudyDate');
-    if (!lastStudy) return rawStreak;
-    const today = new Date().toDateString();
-    if (lastStudy === today) return rawStreak;
-    
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (lastStudy !== yesterday.toDateString()) {
-      localStorage.setItem('streak', '0');
-      return 0; // reset visually
-    }
-    return rawStreak;
-  });
+  // Keep lastStudyDate accessible synchronously in callbacks without re-render
+  const lastStudyDateRef = useRef<string>('');
 
+  // ── Load persisted state ──────────────────────────────────────────────────
   useEffect(() => {
-    // any initialization logic that doesn't conflict with setStreak
+    (async () => {
+      const [setupDone, units, xp, rawStreakStr, lastDate] = await Promise.all([
+        storageGet('speechSetupDone'),
+        storageGet('completedUnits'),
+        storageGet('totalXP'),
+        storageGet('streak'),
+        storageGet('lastStudyDate'),
+      ]);
+
+      setShowSetup(setupDone !== 'true');
+
+      try { setCompletedUnits(JSON.parse(units || '[]')); } catch { /* noop */ }
+      setTotalXP(Number(xp || '0'));
+
+      const rawStreak = Number(rawStreakStr || '0');
+      const computed = computeStreak(rawStreak, lastDate);
+      setStreak(computed);
+      // Persist corrected streak if it was reset
+      if (computed !== rawStreak) {
+        await storageSet('streak', String(computed));
+      }
+      lastStudyDateRef.current = lastDate || '';
+
+      setReady(true);
+
+      // Activer les rappels quotidiens si l'utilisateur les a précédemment activés
+      try {
+        const notifEnabled = await storageGet('notificationsEnabled');
+        if (notifEnabled === 'true') {
+          const granted = await requestNotificationPermission();
+          if (granted) await scheduleDailyReminderNotification();
+        }
+      } catch { /* ne pas bloquer l'app si les notifications échouent */ }
+    })();
   }, []);
 
+  // ── Android back button ───────────────────────────────────────────────────
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    (async () => {
+      try {
+        const { App: CapApp } = await import('@capacitor/app');
+        const handle = await CapApp.addListener('backButton', () => {
+          if (currentScreen === 'lesson') {
+            setActiveLesson(null);
+            setCurrentScreen('home');
+          } else if (currentScreen !== 'home') {
+            setCurrentScreen('home');
+          }
+          // On home screen, let Android handle back (minimize app)
+        });
+        cleanup = () => { handle.remove(); };
+      } catch { /* not running in Capacitor */ }
+    })();
+    return () => { cleanup?.(); };
+  }, [currentScreen]);
+
+  // ── Callbacks ─────────────────────────────────────────────────────────────
   const markUnitComplete = useCallback((lessonId: string, xpEarned: number) => {
     const today = new Date().toDateString();
-    
+
     setCompletedUnits(prev => {
       const alreadyDone = prev.includes(lessonId);
       const next = alreadyDone ? prev : [...prev, lessonId];
       if (!alreadyDone) {
-        localStorage.setItem('completedUnits', JSON.stringify(next));
+        storageSet('completedUnits', JSON.stringify(next));
         setTotalXP(xp => {
           const n = xp + xpEarned;
-          localStorage.setItem('totalXP', String(n));
+          storageSet('totalXP', String(n));
           return n;
         });
       }
       return next;
     });
 
-    const lastStudyDate = localStorage.getItem('lastStudyDate') || '';
-
-    if (lastStudyDate !== today) {
+    if (lastStudyDateRef.current !== today) {
       setStreak(prev => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const newStreak = lastStudyDate === yesterday.toDateString() ? prev + 1 : 1;
-        localStorage.setItem('streak', String(newStreak));
+        const newStreak = lastStudyDateRef.current === yesterday.toDateString() ? prev + 1 : 1;
+        storageSet('streak', String(newStreak));
         return newStreak;
       });
-      localStorage.setItem('lastStudyDate', today);
+      lastStudyDateRef.current = today;
+      storageSet('lastStudyDate', today);
     }
 
-    const studyHistory: string[] = JSON.parse(
-      localStorage.getItem('studyHistory') || '[]'
-    );
-    if (!studyHistory.includes(today)) {
-      studyHistory.push(today);
-      localStorage.setItem('studyHistory', JSON.stringify(studyHistory));
-    }
+    storageGet('studyHistory').then(raw => {
+      const history: string[] = JSON.parse(raw || '[]');
+      if (!history.includes(today)) {
+        history.push(today);
+        storageSet('studyHistory', JSON.stringify(history));
+      }
+    });
   }, []);
 
   const navigateToLesson = useCallback((lessonId: string) => {
@@ -115,9 +161,12 @@ function AppContent() {
   }, []);
 
   const handleSetupDone = useCallback(() => {
-    localStorage.setItem('speechSetupDone', 'true');
+    storageSet('speechSetupDone', 'true');
     setShowSetup(false);
   }, []);
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  if (!ready) return null;
 
   const showNav = currentScreen !== 'lesson';
 
@@ -134,12 +183,12 @@ function AppContent() {
       {showNav && (
         <BottomNav currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} />
       )}
-      
+
       <div className="flex-1 w-full flex flex-col h-full bg-white md:border-l border-gray-100 relative">
-        {currentScreen === 'home'    && <HomeScreen onStartLesson={navigateToLesson} completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
-        {currentScreen === 'lesson'  && <LessonScreen onBack={goBack} lessonId={activeLesson} onComplete={markUnitComplete} />}
-        {currentScreen === 'profile' && <ProfileScreen completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
-        {currentScreen === 'chat'    && <ChatScreen />}
+        {currentScreen === 'home'     && <HomeScreen onStartLesson={navigateToLesson} completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
+        {currentScreen === 'lesson'   && <LessonScreen onBack={goBack} lessonId={activeLesson} onComplete={markUnitComplete} />}
+        {currentScreen === 'profile'  && <ProfileScreen completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
+        {currentScreen === 'chat'     && <ChatScreen />}
         {currentScreen === 'practice' && <PracticeScreen />}
       </div>
     </div>

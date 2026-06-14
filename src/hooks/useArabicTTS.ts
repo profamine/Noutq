@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { isOnline, fetchWithTimeout } from '../utils/network';
 
 type Platform = 'android' | 'ios' | 'desktop';
 
@@ -55,6 +56,8 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export function useArabicTTS() {
   const [isPlaying, setIsPlaying] = useState(false);
+  // true quand le texte n'est ni dans le manifest ni prononçable (pas de voix arabe).
+  const [ttsUnavailable, setTtsUnavailable] = useState(false);
   const platform = useRef<Platform>('desktop');
   const audioCache = useRef<Map<string, string>>(new Map());
   const currentAudio = useRef<HTMLAudioElement | null>(null);
@@ -96,8 +99,8 @@ export function useArabicTTS() {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('touchstart', unlock);
     };
-    window.addEventListener('pointerdown', unlock, { once: false });
-    window.addEventListener('touchstart', unlock, { once: false });
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
 
     return () => {
       cancelled = true;
@@ -131,10 +134,13 @@ export function useArabicTTS() {
   /** Repli serveur : récupère un WAV depuis /api/tts puis le joue. */
   const playServerTTS = useCallback(async (text: string, speed: number) => {
     try {
+      // Vérifier la connectivité avant de tenter le fetch (évite une erreur réseau muette).
+      if (!(await isOnline())) { setIsPlaying(false); return; }
+
       const cacheKey = `${text}__server`;
       let url = audioCache.current.get(cacheKey);
       if (!url) {
-        const res = await fetch(`/api/tts?text=${encodeURIComponent(text)}&lang=ar`);
+        const res = await fetchWithTimeout(`/api/tts?text=${encodeURIComponent(text)}&lang=ar`, {}, 15000);
         if (!res.ok) throw new Error(`TTS serveur ${res.status}`);
         const blob = await res.blob();
         url = URL.createObjectURL(blob);
@@ -193,6 +199,7 @@ export function useArabicTTS() {
     if (!clean) return;
     stop();
     setIsPlaying(true);
+    setTtsUnavailable(false); // réinitialise l'alerte à chaque tentative
 
     const inCapacitor = isCapacitorApp();
 
@@ -221,8 +228,12 @@ export function useArabicTTS() {
     } else {
       console.warn('[TTS] Texte absent du manifest et pas de voix arabe installée :', clean);
       setIsPlaying(false);
+      // Signale à l'UI que le TTS n'est pas disponible (pas de voix arabe installée).
+      setTtsUnavailable(true);
+      // Masque automatiquement le bandeau après 5 secondes.
+      setTimeout(() => setTtsUnavailable(false), 5000);
     }
   }, [playNative, playServerTTS, playUrl, stop]);
 
-  return { speak, stop, isPlaying, platform: platform.current };
+  return { speak, stop, isPlaying, ttsUnavailable, platform: platform.current };
 }

@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
+import { isOnline, fetchWithTimeout } from '../utils/network';
+import { storageGet, storageSet } from '../services/storage';
 
 // ===== Types =====
 interface Message {
@@ -57,7 +59,30 @@ interface QuickReply {
 }
 
 // ===== AI Response Logic =====
-const SYSTEM_PROMPT = `You are "Armin", a friendly and encouraging Arabic tutor for Armenian speakers.
+
+// Mapping unité → sujet maîtrisé (pour enrichir le profil apprenant)
+const UNIT_TOPICS: Record<string, string> = {
+  u1: 'alphabet & letters', u2: 'greetings', u3: 'numbers',
+  u4: 'colors', u5: 'family', u6: 'body parts',
+  u7: 'greetings & introductions', u8: 'days & time',
+  u9: 'colors advanced', u10: 'family & relationships',
+  u11: 'food & drink', u12: 'prepositions & locations',
+  u13: 'verbs & actions', u14: 'weather', u15: 'school & education',
+  u16: 'language & communication', u17: 'shopping & prices',
+  u18: 'travel & transport', u19: 'daily routine',
+  u20: 'health & body', u21: 'grammar & sentences',
+  u22: 'advanced grammar',
+};
+
+/**
+ * Construit dynamiquement le system prompt en injectant le profil de l'apprenant.
+ * Appelé avant chaque requête API pour avoir toujours les données fraîches.
+ */
+function buildSystemPrompt(completedUnits: string[], totalXP: number): string {
+  const level = completedUnits.length < 4 ? 'A1' : completedUnits.length < 10 ? 'A2' : 'B1';
+  const topics = completedUnits.map(u => UNIT_TOPICS[u] || u).join(', ') || 'none yet';
+
+  return `You are "Armin", a friendly and encouraging Arabic tutor for Armenian speakers.
 
 ## Your Role
 - Teach Modern Standard Arabic (MSA) to Armenian-speaking beginners (A1 level).
@@ -81,9 +106,14 @@ const SYSTEM_PROMPT = `You are "Armin", a friendly and encouraging Arabic tutor 
 - If the user writes in Armenian, respond fully in Armenian + Arabic.
 - If the user writes in Arabic (even incorrectly), praise the attempt first.
 
-## Context
-The user is learning Arabic through a gamified app. They have completed structured lessons.
-This chat is for free practice and questions.`;
+## Learner Profile
+- Units completed: ${completedUnits.join(', ') || 'none yet'}
+- Total XP: ${totalXP}
+- Level: ${level}
+- Topics mastered: ${topics}
+- Adapt examples to the learner's level. Avoid re-teaching topics already mastered.
+- This chat is for free practice and questions beyond the structured lessons.`;
+}
 
 // Clé API Gemini exposée via Vite (VITE_ prefix)
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
@@ -92,7 +122,8 @@ const GEMINI_API_URL =
 
 const sendMessageToAI = async (
   userText: string,
-  history: Message[]
+  history: Message[],
+  systemPrompt: string,
 ): Promise<Omit<Message, 'id' | 'timestamp'>> => {
   if (!GEMINI_API_KEY) {
     throw new Error('VITE_GEMINI_API_KEY manquante dans le fichier .env');
@@ -107,16 +138,26 @@ const sendMessageToAI = async (
   ];
 
   const body = {
-    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
     generationConfig: { temperature: 1, maxOutputTokens: 1024 },
   };
 
-  const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  // Connectivité et timeout — vérifiés ici pour les appels depuis SpeechSetupScreen etc.
+  // Dans handleSend, isOnline() est vérifié avant d'appeler cette fonction.
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }, 15000);
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') {
+      throw new Error('Հարցումը չափազանց երկար տևեց։ Կրկին փորձեք։\nانتهت مهلة الطلب. يرجى المحاولة مجدداً.');
+    }
+    throw err;
+  }
 
   if (!res.ok) {
     let errorMsg = `Gemini API error ${res.status}`;
@@ -375,8 +416,18 @@ function MessageBubble({
 // ===== Main Chat Screen =====
 export default function ChatScreen() {
   const { t } = useLanguage();
-  const { speak } = useArabicTTS();
-  
+  const { speak, ttsUnavailable } = useArabicTTS();
+
+  // ── Profil apprenant — chargé async pour enrichir le system prompt ─────────
+  // Stocké dans un ref pour ne pas déclencher de re-render inutile.
+  const learnerProfileRef = React.useRef({ completedUnits: [] as string[], totalXP: 0 });
+  useEffect(() => {
+    Promise.all([storageGet('completedUnits'), storageGet('totalXP')]).then(([units, xp]) => {
+      try { learnerProfileRef.current.completedUnits = JSON.parse(units || '[]'); } catch { /* noop */ }
+      learnerProfileRef.current.totalXP = Number(xp || '0');
+    });
+  }, []);
+
   // ===== Quick Replies =====
   const quickReplies: QuickReply[] = [
     { text: t('chat.quick_hello'), arabic: 'مرحبا' },
@@ -407,10 +458,28 @@ export default function ChatScreen() {
   const [showQuickReplies, setShowQuickReplies] = useState(true);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [offline, setOffline] = useState(false);
+
+  // ── Charger l'historique persisté au montage ────────────────────────────
+  useEffect(() => {
+    storageGet('chatHistory').then(raw => {
+      if (!raw) return;
+      try {
+        const saved: Message[] = JSON.parse(raw).map((m: Message) => ({
+          ...m,
+          // Réhydrater les timestamps (JSON les sérialise en string)
+          timestamp: new Date(m.timestamp),
+        }));
+        if (saved.length > 0) setMessages(saved);
+      } catch { /* historique corrompu — on ignore */ }
+    });
+  }, []);
 
   const messagesRef = useRef<Message[]>(messages);
   useEffect(() => {
     messagesRef.current = messages;
+    // Persister les 20 derniers messages à chaque mise à jour.
+    storageSet('chatHistory', JSON.stringify(messages.slice(-20)));
   }, [messages]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -466,11 +535,11 @@ export default function ChatScreen() {
                  ]
                }]
              };
-             const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+             const res = await fetchWithTimeout(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify(transcribeBody),
-             });
+             }, 15000);
              const data = await res.json();
              const transcribed = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
              if (transcribed) {
@@ -531,8 +600,32 @@ export default function ChatScreen() {
 
     const currentMessages = [...messagesRef.current, userMsg];
 
+    // Vérification connectivité avant l'appel API
+    const connected = await isOnline();
+    if (!connected) {
+      setOffline(true);
+      setIsTyping(false);
+      setShowQuickReplies(true);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'ai' as const,
+          timestamp: new Date(),
+          text: '⚠️ Կապ չկա։ Ստուգեք ձեր ինտերնետ կապը։\n\nلا يوجد اتصال بالإنترنت. يرجى التحقق من اتصالك.',
+          type: 'text' as const,
+        },
+      ]);
+      return;
+    }
+    setOffline(false);
+
     try {
-      const aiMsg = await sendMessageToAI(trimmed, currentMessages);
+      const systemPrompt = buildSystemPrompt(
+        learnerProfileRef.current.completedUnits,
+        learnerProfileRef.current.totalXP,
+      );
+      const aiMsg = await sendMessageToAI(trimmed, currentMessages, systemPrompt);
       setMessages((prev) => [
         ...prev,
         { ...aiMsg, id: Date.now() + 2, timestamp: new Date() },
@@ -644,6 +737,18 @@ export default function ChatScreen() {
         </div>
       </div>
 
+      {/* Bandeau TTS indisponible — disparaît après 5 s (géré par le hook) */}
+      {ttsUnavailable && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center">
+          <p className="text-amber-800 text-xs font-medium">
+            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS հայկական ձայնով։
+          </p>
+          <p className="text-amber-700 text-xs mt-0.5" dir="rtl">
+            الصوت غير متاح. يرجى تثبيت Google TTS مع دعم اللغة العربية.
+          </p>
+        </div>
+      )}
+
       {/* Date Separator */}
       <div className="flex justify-center py-3">
         <span className="bg-white/80 backdrop-blur-sm text-[11px] text-gray-500 px-3 py-1 rounded-full border border-gray-200/50 shadow-sm flex items-center gap-1.5">
@@ -703,6 +808,15 @@ export default function ChatScreen() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Indicateur hors-ligne discret */}
+      {offline && messages.length > 1 && (
+        <div className="px-4 py-1.5 bg-amber-50 border-t border-amber-200 text-center">
+          <p className="text-amber-700 text-xs font-medium">
+            💾 Հաղորդագրությունները պահպանված են անցանց ռեժիմում
+          </p>
         </div>
       )}
 

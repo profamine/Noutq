@@ -24,7 +24,7 @@ type Platform = 'android' | 'ios' | 'desktop';
 export default function SpeechSetupScreen({ onDone }: Props) {
   const { language } = useLanguage();
   const ar = language === 'ar';
-  const { speak } = useArabicTTS();
+  const { speak, ttsUnavailable } = useArabicTTS();
 
   const [step, setStep]           = useState<StepId>('welcome');
   const [ttsState, setTtsState]   = useState<TestState>('idle');
@@ -277,6 +277,18 @@ export default function SpeechSetupScreen({ onDone }: Props) {
   // ─── Écrans d'étapes ──────────────────────────────────────────────────────
   return (
     <div className="flex flex-col h-full bg-white" dir={ar ? 'rtl' : 'ltr'}>
+
+      {/* Bandeau TTS indisponible — disparaît après 5 s (géré par le hook) */}
+      {ttsUnavailable && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center z-10">
+          <p className="text-amber-800 text-xs font-medium">
+            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS հայկական ձայնով։
+          </p>
+          <p className="text-amber-700 text-xs mt-0.5" dir="rtl">
+            الصوت غير متاح. يرجى تثبيت Google TTS مع دعم اللغة العربية.
+          </p>
+        </div>
+      )}
 
       {/* En-tête avec progression */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-5 pt-12 pb-8 text-white text-center">

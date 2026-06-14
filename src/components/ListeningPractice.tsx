@@ -1,0 +1,215 @@
+import React, { useState, useMemo, useCallback } from 'react';
+import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { lessonsData } from '../data/lessons';
+import { useArabicTTS } from '../hooks/useArabicTTS';
+
+interface Props {
+  onBack: () => void;
+}
+
+interface Question {
+  arabic: string;
+  armenian: string;
+  transliteration: string;
+  options: string[]; // 4 options arméniennes mélangées
+  correctIdx: number;
+}
+
+const QUESTION_COUNT = 10;
+
+function shuffle<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function buildQuestions(): Question[] {
+  // Collecter tous les mots courts des steps listen
+  const pool: { arabic: string; armenian: string; transliteration: string }[] = [];
+  Object.values(lessonsData).forEach(lesson => {
+    lesson.steps.forEach(step => {
+      if (step.type === 'listen' && step.arabic && step.armenian && step.arabic.length < 30) {
+        pool.push({
+          arabic: step.arabic,
+          armenian: step.armenian,
+          transliteration: step.transliteration || '',
+        });
+      }
+    });
+  });
+
+  const shuffled = shuffle(pool).slice(0, QUESTION_COUNT);
+  const allArmenian = pool.map(p => p.armenian);
+
+  return shuffled.map(item => {
+    // 3 distracteurs parmi les autres éléments
+    const distractors = shuffle(allArmenian.filter(a => a !== item.armenian)).slice(0, 3);
+    const opts = shuffle([item.armenian, ...distractors]);
+    return {
+      ...item,
+      options: opts,
+      correctIdx: opts.indexOf(item.armenian),
+    };
+  });
+}
+
+export default function ListeningPractice({ onBack }: Props) {
+  const { speak } = useArabicTTS();
+  const questions = useMemo(() => buildQuestions(), []);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const [played, setPlayed] = useState(false);
+
+  const q = questions[current];
+
+  const handleListen = useCallback(() => {
+    speak(q.arabic);
+    setPlayed(true);
+  }, [speak, q.arabic]);
+
+  const handleAnswer = (idx: number) => {
+    if (selected !== null) return;
+    setSelected(idx);
+    if (idx === q.correctIdx) setScore(s => s + 1);
+  };
+
+  const handleNext = () => {
+    if (current < questions.length - 1) {
+      setCurrent(c => c + 1);
+      setSelected(null);
+      setPlayed(false);
+    } else {
+      setDone(true);
+    }
+  };
+
+  const handleReplay = () => {
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setDone(false);
+    setPlayed(false);
+  };
+
+  // ── Écran score final ──────────────────────────────────────────────────────
+  if (done) {
+    const pct = Math.round((score / questions.length) * 100);
+    return (
+      <div className="flex-1 flex flex-col bg-gray-50 h-full w-full absolute inset-0 z-10">
+        <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
+          <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+            <ArrowLeft size={24} />
+          </button>
+          <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Լսողություն / استماع</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+          <div className={`w-28 h-28 rounded-full flex items-center justify-center text-4xl font-black text-white ${pct >= 70 ? 'bg-gradient-to-br from-emerald-400 to-teal-500' : 'bg-gradient-to-br from-orange-400 to-red-500'}`}>
+            {pct}%
+          </div>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-gray-800 mb-1">{score}/{questions.length} ճիշտ</h3>
+            <p className="text-gray-500 text-sm">{pct >= 70 ? '🌟 Հիանալի արդյունք!' : '💪 Շարունակի՛ր պարապե՛ল'}</p>
+          </div>
+          <div className="flex flex-col gap-3 w-full max-w-xs">
+            <button
+              onClick={handleReplay}
+              className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2"
+            >
+              <RotateCcw size={18} />
+              Կրկին խաղալ / إعادة اللعب
+            </button>
+            <button onClick={onBack} className="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold">
+              Վերադառնալ / العودة
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Question ───────────────────────────────────────────────────────────────
+  return (
+    <div className="flex-1 flex flex-col bg-gray-50 h-full w-full absolute inset-0 z-10 overflow-hidden">
+      {/* Header */}
+      <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
+        <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+          <ArrowLeft size={24} />
+        </button>
+        <div className="flex-1 text-center">
+          <h2 className="text-lg font-bold text-gray-800">Լսողություն / استماع</h2>
+          <p className="text-xs text-gray-500">{current + 1} / {questions.length}</p>
+        </div>
+        <div className="w-10 text-right text-sm font-bold text-emerald-600">{score} ✓</div>
+      </div>
+
+      {/* Barre de progression */}
+      <div className="h-1.5 bg-gray-200">
+        <div
+          className="h-full bg-gradient-to-r from-purple-400 to-indigo-500 transition-all duration-500"
+          style={{ width: `${((current + 1) / questions.length) * 100}%` }}
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-8">
+        {/* Bouton écouter */}
+        <div className="flex flex-col items-center gap-3">
+          <button
+            onClick={handleListen}
+            className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:from-purple-600 hover:to-indigo-700 active:scale-95 transition-all"
+          >
+            <Volume2 size={40} />
+          </button>
+          <p className="text-sm text-gray-500">
+            {played ? 'Սեղմե՛ք՝ կրկին լսելու / انقر للاستماع مرة أخرى' : 'Սեղմե՛ք՝ լսելու / انقر للاستماع'}
+          </p>
+        </div>
+
+        {/* Options arméniennes */}
+        <div className="w-full max-w-sm grid grid-cols-2 gap-3">
+          {q.options.map((opt, idx) => {
+            let cls = 'bg-white border-2 border-gray-200 text-gray-800';
+            if (selected !== null) {
+              if (idx === q.correctIdx) cls = 'bg-emerald-50 border-2 border-emerald-500 text-emerald-800';
+              else if (idx === selected) cls = 'bg-red-50 border-2 border-red-400 text-red-800';
+              else cls = 'bg-white border-2 border-gray-100 text-gray-400';
+            }
+            return (
+              <button
+                key={idx}
+                onClick={() => handleAnswer(idx)}
+                className={`p-4 rounded-2xl text-sm font-semibold transition-all active:scale-95 shadow-sm ${cls}`}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Feedback après réponse */}
+        {selected !== null && (
+          <div className={`w-full max-w-sm rounded-2xl p-4 flex flex-col gap-2 ${selected === q.correctIdx ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}>
+            <div className="flex items-center gap-2">
+              {selected === q.correctIdx
+                ? <CheckCircle size={20} className="text-emerald-600 shrink-0" />
+                : <XCircle size={20} className="text-red-500 shrink-0" />
+              }
+              <span className={`font-bold text-sm ${selected === q.correctIdx ? 'text-emerald-700' : 'text-red-600'}`}>
+                {selected === q.correctIdx ? 'Ճիշտ է! صحيح!' : 'Սխալ! خطأ!'}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800 text-center" dir="rtl">{q.arabic}</p>
+            {q.transliteration && <p className="text-sm text-gray-500 text-center italic">{q.transliteration}</p>}
+            <button
+              onClick={handleNext}
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold mt-1"
+            >
+              {current < questions.length - 1 ? 'Հաջորդ / التالي →' : 'Ավարտ / انتهى ✓'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -28,11 +28,13 @@ import {
   Hash,
   Edit3,
   Link2,
+  Info,
   type LucideIcon,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
 import { lessonsData, type LessonData, type LessonStep, type QuizOption } from '../data/lessons';
+import { Preferences } from '@capacitor/preferences';
 
 // ===== Sound Effects (Real Web Audio + Vibration) =====
 const lazyAudioContext = (() => {
@@ -471,7 +473,7 @@ export default function LessonScreen({
   const [streak, setStreak] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(true);
-  const { speak, isPlaying } = useArabicTTS();
+  const { speak, stop, isPlaying, ttsUnavailable } = useArabicTTS();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -481,6 +483,36 @@ export default function LessonScreen({
   const [shakeWrong, setShakeWrong] = useState(false);
   const [showStreakBonus, setShowStreakBonus] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [showDiag, setShowDiag] = useState(false);
+  const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Diagnostic data (mutable ref, no re-render needed)
+  const diagRef = useRef({ transcript: '—', mimeType: '—', permState: '—', lastError: '—' });
+
+  // ── Modale "Reprendre ?" — affichée si une progression partielle est sauvegardée ──
+  const [resumeModal, setResumeModal] = useState<{ stepIndex: number; lives: number } | null>(null);
+
+  // Au montage : vérifier si une progression partielle existe pour cette leçon
+  useEffect(() => {
+    if (!lessonId) return;
+    Preferences.get({ key: `lessonProgress_${lessonId}` }).then(({ value }) => {
+      if (!value) return;
+      try {
+        const saved = JSON.parse(value) as { stepIndex: number; lives: number };
+        // N'afficher que si l'utilisateur n'est pas à l'étape 0 avec 3 vies
+        if (saved.stepIndex > 0) setResumeModal(saved);
+      } catch { /* données corrompues — ignorer */ }
+    });
+  }, [lessonId]);
+
+  // À chaque changement d'étape ou de vies : persister la progression
+  useEffect(() => {
+    if (!lessonId || !lessonsData[lessonId] || showCompletion) return;
+    Preferences.set({
+      key: `lessonProgress_${lessonId}`,
+      value: JSON.stringify({ stepIndex: currentStep, lives }),
+    });
+  }, [currentStep, lives, lessonId, showCompletion]);
 
   // Match State
   const [matchSelected, setMatchSelected] = useState<{ arabic: string | null; armenian: string | null }>({ arabic: null, armenian: null });
@@ -501,6 +533,29 @@ export default function LessonScreen({
       onBack();
     }
   }, [isValidLesson, onBack]);
+
+  // Auto-play audio whenever a listen step becomes active.
+  useEffect(() => {
+    if (!isValidLesson) return;
+    const s = lessonsData[lessonId!].steps[currentStep];
+    if (!s || s.type !== 'listen') return;
+    const timer = setTimeout(() => speak(s.arabic), 700);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, isValidLesson]);
+
+  // Stop MediaRecorder and auto-stop timer on unmount.
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current?.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+      if (autoStopTimerRef.current) {
+        clearTimeout(autoStopTimerRef.current);
+        autoStopTimerRef.current = null;
+      }
+    };
+  }, []);
 
   if (!isValidLesson) return null;
 
@@ -548,6 +603,7 @@ export default function LessonScreen({
         } else {
           setFeedback('poor');
           setStreak(0);
+          setLives((prev) => Math.max(0, prev - 1)); // déduire une vie sur réponse vocale incorrecte
           playSound('wrong');
           setShakeWrong(true);
           setTimeout(() => setShakeWrong(false), 500);
@@ -562,128 +618,244 @@ export default function LessonScreen({
   };
 
   const handleRecord = async () => {
-    // Stop si déjà en cours d'enregistrement.
+    // ── Arrêt manuel ──────────────────────────────────────────────────────────
     if (recording) {
+      console.log('[record] Arrêt manuel');
       mediaRecorderRef.current?.stop();
+      if (autoStopTimerRef.current) {
+        clearTimeout(autoStopTimerRef.current);
+        autoStopTimerRef.current = null;
+      }
       return;
     }
-    if (isTranscribing) return; // évite le double-clic pendant l'analyse
+    if (isTranscribing) return;
 
-    // Vérifie le support du navigateur.
+    // ── Support navigateur ─────────────────────────────────────────────────────
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      setFeedback('poor');
-      playSound('wrong');
+      const msg = 'Microphone non supporté par ce navigateur';
+      console.warn('[record]', msg);
+      diagRef.current.lastError = msg;
+      setMicError(msg);
       return;
     }
+
+    // ── Vérification permission (non bloquante) ────────────────────────────────
+    try {
+      const perm = await navigator.permissions?.query({ name: 'microphone' as PermissionName });
+      diagRef.current.permState = perm?.state ?? 'unknown';
+      console.log('[record] Permission micro :', perm?.state);
+      if (perm?.state === 'denied') {
+        const msg = "Microphone refusé. Activez l'accès dans les paramètres du navigateur.";
+        diagRef.current.lastError = msg;
+        setMicError(msg);
+        return;
+      }
+    } catch { /* Permissions API non disponible (Firefox / iOS WebKit / Capacitor) */ }
+
+    // ── Arrêt de la lecture TTS pour éviter l'écho au micro ───────────────────
+    stop();
 
     setRecording(true);
     setFeedback(null);
+    setMicError(null);
     playSound('speak');
     audioChunksRef.current = [];
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      diagRef.current.permState = 'granted';
+      console.log('[record] Flux audio obtenu, pistes :', stream.getAudioTracks().length);
+
       const mimeType = pickMimeType();
+      diagRef.current.mimeType = mimeType ?? 'default';
+      console.log('[record] MIME type :', mimeType ?? 'navigateur par défaut');
+
       const mediaRecorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
-        : new MediaRecorder(stream); // laisse le navigateur choisir si rien n'est supporté
+        : new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+          console.log('[record] Chunk :', e.data.size, 'octets');
+        }
+      };
+
+      mediaRecorder.onerror = (e) => {
+        const msg = `Erreur MediaRecorder : ${(e as ErrorEvent).message ?? 'inconnue'}`;
+        console.error('[record]', msg);
+        diagRef.current.lastError = msg;
+        setMicError(msg);
+        setRecording(false);
       };
 
       mediaRecorder.onstop = () => {
+        console.log('[record] Arrêté. Chunks :', audioChunksRef.current.length);
         setRecording(false);
         stream.getTracks().forEach((t) => t.stop());
 
-        const blob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
+        const totalBytes = audioChunksRef.current.reduce(
+          (s, c) => s + (c as Blob).size, 0
+        );
+        if (totalBytes === 0) {
+          const msg = 'Aucune donnée audio capturée. Vérifiez que le microphone fonctionne.';
+          console.warn('[record]', msg);
+          diagRef.current.lastError = msg;
+          setMicError(msg);
+          return;
+        }
+
+        const blob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType || 'audio/webm',
+        });
+        console.log('[record] Blob :', blob.size, 'octets, type :', blob.type);
+
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onloadend = async () => {
-          const result = reader.result as string;
-          if (!result?.includes(',')) { setRecording(false); return; }
-          const base64Data = result.split(',')[1];
+          const raw = reader.result as string;
+          if (!raw?.includes(',')) {
+            const msg = 'Lecture audio échouée (FileReader vide)';
+            console.error('[record]', msg);
+            diagRef.current.lastError = msg;
+            setMicError(msg);
+            return;
+          }
+          const base64Data = raw.split(',')[1];
+          console.log('[record] Base64 prêt, longueur :', base64Data.length);
 
           setIsTranscribing(true);
+
+          // Affiche le résultat après 2,5 s pour laisser le temps de lire.
+          const applyFeedback = (kind: 'excellent' | 'good' | 'poor', bonusStreak: boolean) => {
+            setTimeout(() => {
+              setIsTranscribing(false);
+              if (kind === 'excellent') {
+                setFeedback('excellent');
+                setXp((p) => p + 15);
+                setStreak((p) => p + 1);
+                setCorrectAnswers((p) => p + 1);
+                playSound('correct');
+                if (bonusStreak) {
+                  setShowStreakBonus(true);
+                  setXp((p) => p + 5);
+                  setTimeout(() => setShowStreakBonus(false), 2000);
+                }
+              } else if (kind === 'good') {
+                setFeedback('good');
+                setXp((p) => p + 8);
+                setCorrectAnswers((p) => p + 1);
+                playSound('correct');
+              } else {
+                setFeedback('poor');
+                setStreak(0);
+                playSound('wrong');
+                setShakeWrong(true);
+                setTimeout(() => setShakeWrong(false), 500);
+              }
+              setTotalAnswered((p) => p + 1);
+            }, 2500);
+          };
+
           try {
             const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
-            const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+            const GEMINI_URL =
+              'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+            console.log('[transcribe] Envoi à Gemini…');
+
             const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 contents: [{
                   parts: [
-                    { text: 'Please transcribe this audio. The expected language is Arabic. Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.' },
-                    { inline_data: { data: base64Data, mime_type: mediaRecorder.mimeType || 'audio/webm' } }
-                  ]
-                }]
+                    {
+                      text:
+                        'Transcribe this Arabic (ar-SA) audio. Return ONLY the transcribed Arabic text. ' +
+                        'No explanation, no translation, no markdown. ' +
+                        'If the audio is silent, inaudible, or not in Arabic, reply with exactly "—".',
+                    },
+                    {
+                      inline_data: {
+                        data: base64Data,
+                        mime_type: mediaRecorder.mimeType || 'audio/webm',
+                      },
+                    },
+                  ],
+                }],
               }),
             });
-            if (!res.ok) throw new Error(`transcribe ${res.status}`);
-            const data = await res.json();
-            const transcript = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
-            const normalizedTranscript = normalize(transcript || '');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            const transcript = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
+            diagRef.current.transcript = transcript || '(vide)';
+            console.log('[transcribe] Résultat :', JSON.stringify(transcript));
+
+            // Audio silencieux ou non-arabe
+            if (!transcript || transcript === '—') {
+              console.warn('[transcribe] Audio inaudible ou vide');
+              applyFeedback('poor', false);
+              return;
+            }
+
+            const normalizedTranscript = normalize(transcript);
             const expected = normalize(step.arabic);
             const similarity = getSimilarity(normalizedTranscript, expected);
+            console.log(
+              '[transcribe] Similarité :', similarity.toFixed(2),
+              '| Attendu :', expected,
+              '| Reçu :', normalizedTranscript,
+            );
 
             if (similarity > 0.75 || (expected && normalizedTranscript.includes(expected))) {
-              setFeedback('excellent');
-              setXp((p) => p + 15);
-              setStreak((p) => p + 1);
-              setCorrectAnswers((p) => p + 1);
-              playSound('correct');
-              if (streak > 0 && (streak + 1) % 3 === 0) {
-                setShowStreakBonus(true);
-                setXp((p) => p + 5);
-                setTimeout(() => setShowStreakBonus(false), 2000);
-              }
+              const bonusStreak = streak > 0 && (streak + 1) % 3 === 0;
+              applyFeedback('excellent', bonusStreak);
             } else if (
               similarity > 0.4 ||
               expected.split(' ').some((w) => w.length > 2 && normalizedTranscript.includes(w))
             ) {
-              setFeedback('good');
-              setXp((p) => p + 8);
-              setCorrectAnswers((p) => p + 1);
-              playSound('correct');
+              applyFeedback('good', false);
             } else {
-              setFeedback('poor');
-              setStreak(0);
-              playSound('wrong');
-              setShakeWrong(true);
-              setTimeout(() => setShakeWrong(false), 500);
+              applyFeedback('poor', false);
             }
-            setTotalAnswered((p) => p + 1);
           } catch (err) {
-            console.error('[transcribe]', err);
-            setFeedback('poor');
-            setStreak(0);
-            playSound('wrong');
-            setShakeWrong(true);
-            setTimeout(() => setShakeWrong(false), 500);
-            setTotalAnswered((p) => p + 1);
-          } finally {
-            setIsTranscribing(false);
+            const msg = `Erreur Gemini : ${(err as Error).message ?? err}`;
+            console.error('[transcribe]', msg);
+            diagRef.current.lastError = msg;
+            applyFeedback('poor', false);
           }
         };
       };
 
       mediaRecorder.start();
-      // Arrêt automatique au bout de 5,5 s max.
-      setTimeout(() => {
+      console.log('[record] Démarré, état :', mediaRecorder.state);
+
+      // Arrêt automatique après 5,5 s.
+      autoStopTimerRef.current = setTimeout(() => {
         if (mediaRecorderRef.current?.state === 'recording') {
+          console.log('[record] Arrêt automatique (5,5 s)');
           mediaRecorderRef.current.stop();
         }
+        autoStopTimerRef.current = null;
       }, 5500);
-    } catch (err) {
-      // Permission refusée ou micro indisponible.
-      console.error('Micro inaccessible :', err);
+    } catch (err: unknown) {
+      const name = (err as DOMException)?.name ?? '';
+      console.error('[record] getUserMedia :', name, err);
       setRecording(false);
-      setFeedback('poor');
-      playSound('wrong');
-      // Optionnel : afficher un message « activez le micro dans les réglages ».
+      let msg: string;
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        msg = "Accès au microphone refusé. Vérifiez les permissions dans les paramètres.";
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        msg = 'Aucun microphone détecté sur cet appareil.';
+      } else if (name === 'NotReadableError') {
+        msg = 'Microphone occupé par une autre application.';
+      } else {
+        msg = `Microphone inaccessible : ${name || ((err as Error)?.message ?? 'erreur inconnue')}`;
+      }
+      diagRef.current.lastError = msg;
+      setMicError(msg);
     }
   };
 
@@ -785,6 +957,8 @@ export default function LessonScreen({
       setWriteCorrect(false);
       playSound('click');
     } else {
+      // Effacer la progression persistée : la leçon est terminée
+      if (lessonId) Preferences.remove({ key: `lessonProgress_${lessonId}` });
       setShowCompletion(true);
     }
   };
@@ -820,6 +994,46 @@ export default function LessonScreen({
           onBack();
         }}
       />
+    );
+  }
+
+  // ── Modale "Reprendre là où vous vous êtes arrêté ?" ─────────────────────
+  if (resumeModal) {
+    return (
+      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
+          <div className="text-center">
+            <div className="text-4xl mb-3">📖</div>
+            <h2 className="text-xl font-black text-gray-800 mb-1">Շարունակե՞լ</h2>
+            <p className="text-gray-500 text-sm">
+              Կա պահպանված առաջընթաց՝ {resumeModal.stepIndex + 1}-րդ քայլ,{' '}
+              {'❤️'.repeat(resumeModal.lives)}{'🖤'.repeat(3 - resumeModal.lives)}
+            </p>
+            <p className="text-gray-400 text-xs mt-1" dir="rtl">هل تريد المتابعة من حيث توقفت؟</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setCurrentStep(resumeModal.stepIndex);
+                setLives(resumeModal.lives);
+                setResumeModal(null);
+              }}
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold"
+            >
+              ✅ Շարունակել / متابعة
+            </button>
+            <button
+              onClick={() => {
+                if (lessonId) Preferences.remove({ key: `lessonProgress_${lessonId}` });
+                setResumeModal(null);
+              }}
+              className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold"
+            >
+              🔄 Սկսել նորից / البدء من جديد
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -1073,6 +1287,18 @@ export default function LessonScreen({
               </button>
             </div>
 
+            {/* TTS unavailable banner — disparaît après 5 s */}
+            {ttsUnavailable && (
+              <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-center animate-in fade-in duration-300">
+                <p className="text-amber-800 text-xs font-medium leading-relaxed">
+                  Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS հայկական ձայնով։
+                </p>
+                <p className="text-amber-700 text-xs mt-1" dir="rtl">
+                  الصوت غير متاح. يرجى تثبيت Google TTS مع دعم اللغة العربية.
+                </p>
+              </div>
+            )}
+
             {/* Hint */}
             {step.hint && (
               <div className="w-full">
@@ -1317,22 +1543,55 @@ export default function LessonScreen({
       {/* Bottom Actions */}
       <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-6 py-4 pb-6 space-y-3">
         <div className="max-w-2xl mx-auto w-full space-y-3">
-          {/* Record button for speak steps */}
+          {/* Record button + mic-error banner + diagnostic modal */}
         {step.type === 'speak' && (
-          <div className="flex justify-center pb-2">
-            <button
-              onClick={handleRecord}
-              disabled={isTranscribing}
-              className={`w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 ${
-                recording
-                  ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white scale-110 ring-4 ring-red-200 animate-pulse'
-                  : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 active:scale-95 shadow-purple-200'
-              } ${isTranscribing ? 'opacity-75 cursor-wait' : ''}`}
-            >
-              {isTranscribing ? (
-                 <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-              ) : recording ? <MicOff size={32} /> : <Mic size={32} />}
-            </button>
+          <div className="pb-2 space-y-2">
+            {/* Mic error banner */}
+            {micError && (
+              <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 text-xs text-orange-800 animate-in fade-in duration-300">
+                <AlertCircle size={14} className="text-orange-500 mt-0.5 flex-shrink-0" />
+                <span>{micError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-center gap-3">
+              {/* Mic button */}
+              <button
+                onClick={handleRecord}
+                disabled={isTranscribing}
+                className={`w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 ${
+                  recording
+                    ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white scale-110 ring-4 ring-red-200 animate-pulse'
+                    : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 active:scale-95 shadow-purple-200'
+                } ${isTranscribing ? 'opacity-75 cursor-wait' : ''}`}
+              >
+                {isTranscribing ? (
+                  <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                ) : recording ? <MicOff size={32} /> : <Mic size={32} />}
+              </button>
+
+              {/* Diagnostic toggle button */}
+              <button
+                onClick={() => setShowDiag((v) => !v)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+                title="Diagnostic microphone"
+              >
+                <Info size={16} />
+              </button>
+            </div>
+
+            {/* Diagnostic panel */}
+            {showDiag && (
+              <div className="bg-gray-900 text-gray-100 rounded-xl p-3 text-xs font-mono space-y-1 animate-in fade-in duration-200">
+                <p className="text-gray-400 font-sans font-semibold mb-2">Diagnostic microphone</p>
+                <p><span className="text-gray-400">Permission :</span> {diagRef.current.permState}</p>
+                <p><span className="text-gray-400">Format audio :</span> {diagRef.current.mimeType}</p>
+                <p><span className="text-gray-400">Dernière transcription :</span> {diagRef.current.transcript}</p>
+                <p><span className="text-gray-400">Dernière erreur :</span> {diagRef.current.lastError}</p>
+                <p><span className="text-gray-400">MediaRecorder :</span> {typeof MediaRecorder !== 'undefined' ? '✓ supporté' : '✗ non supporté'}</p>
+                <p><span className="text-gray-400">getUserMedia :</span> {navigator.mediaDevices?.getUserMedia ? '✓ disponible' : '✗ indisponible'}</p>
+              </div>
+            )}
           </div>
         )}
 

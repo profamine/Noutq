@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Flame, Zap, Calendar as CalendarIcon, Trophy, Target, BookOpen, Star, Globe, Pencil, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Flame, Zap, Calendar as CalendarIcon, Trophy, Target, BookOpen, Star, Globe, Pencil, Check, Bell, BellOff } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { storageGet, storageSet } from '../services/storage';
+import { requestNotificationPermission, scheduleDailyReminderNotification, cancelDailyReminder } from '../services/notifications';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,29 +41,58 @@ export default function ProfileScreen({
 }) {
   const { t, language, setLanguage } = useLanguage();
 
-  // ── Nom éditable ────────────────────────────────────────────────────────
-  const [userName, setUserName] = useState<string>(
-    () => localStorage.getItem('userName') || (language === 'hy' ? 'Արամ' : 'أحمد')
-  );
-  const [editingName, setEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(userName);
+  // ── Chargement async depuis le storage (remplace localStorage synchrone) ─
+  const [ready, setReady] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [studyDates, setStudyDates] = useState<string[]>([]);
+  const [notifEnabled, setNotifEnabled] = useState(false);
 
-  const saveName = () => {
+  useEffect(() => {
+    (async () => {
+      const [name, history, notif] = await Promise.all([
+        storageGet('userName'),
+        storageGet('studyHistory'),
+        storageGet('notificationsEnabled'),
+      ]);
+      setUserName(name || (language === 'hy' ? 'Արամ' : 'أحمد'));
+      try { setStudyDates(JSON.parse(history || '[]')); } catch { /* noop */ }
+      setNotifEnabled(notif === 'true');
+      setReady(true);
+    })();
+  }, [language]);
+
+  // ── Nom éditable ────────────────────────────────────────────────────────
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+
+  const saveName = async () => {
     const trimmed = nameInput.trim();
     if (trimmed) {
       setUserName(trimmed);
-      localStorage.setItem('userName', trimmed);
+      // Persisté dans @capacitor/preferences, pas localStorage
+      await storageSet('userName', trimmed);
     }
     setEditingName(false);
   };
 
-  // ── Données ─────────────────────────────────────────────────────────────
-  const levelBadge = completedUnits.length < 4 ? 'A1' : completedUnits.length < 10 ? 'A2' : 'B1';
+  // ── Toggle notifications ────────────────────────────────────────────────
+  const handleNotifToggle = async () => {
+    if (!notifEnabled) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        await scheduleDailyReminderNotification();
+        await storageSet('notificationsEnabled', 'true');
+        setNotifEnabled(true);
+      }
+    } else {
+      await cancelDailyReminder();
+      await storageSet('notificationsEnabled', 'false');
+      setNotifEnabled(false);
+    }
+  };
 
-  const studyDates: string[] = (() => {
-    try { return JSON.parse(localStorage.getItem('studyHistory') || '[]'); }
-    catch { return []; }
-  })();
+  // ── Données dérivées ─────────────────────────────────────────────────────
+  const levelBadge = completedUnits.length < 4 ? 'A1' : completedUnits.length < 10 ? 'A2' : 'B1';
 
   const ach1Done = completedUnits.length >= 1;
   const ach2Done = streak >= 7;
@@ -76,6 +107,9 @@ export default function ProfileScreen({
     date.setDate(date.getDate() - (27 - i));
     return studyDates.includes(date.toDateString());
   }).length;
+
+  // Éviter le flash de valeurs vides pendant le chargement async
+  if (!ready) return null;
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-50 pb-24 md:pb-6">
@@ -296,6 +330,29 @@ export default function ProfileScreen({
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ── Paramètres — Notifications ── */}
+        <section>
+          <h2 className="text-base font-bold text-gray-700 mb-3">Պարամետրեր / الإعدادات</h2>
+          <button
+            onClick={handleNotifToggle}
+            className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${notifEnabled ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
+                {notifEnabled ? <Bell size={20} /> : <BellOff size={20} />}
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-gray-800 text-sm">Ամենօրյա հիշեցումներ</p>
+                <p className="text-xs text-gray-500">التذكيرات اليومية — 19:00</p>
+              </div>
+            </div>
+            {/* Toggle visuel */}
+            <div className={`w-12 h-6 rounded-full transition-colors duration-300 relative ${notifEnabled ? 'bg-blue-500' : 'bg-gray-200'}`}>
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300 ${notifEnabled ? 'left-7' : 'left-1'}`} />
+            </div>
+          </button>
         </section>
       </div>
     </div>
