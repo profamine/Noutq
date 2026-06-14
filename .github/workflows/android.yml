@@ -28,18 +28,24 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21' # Remplacer 17 par 21 ici
+          java-version: '21'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # Créer le dossier android s'il n'existe pas, puis copier les fichiers du build web (dist/ ou build/)
-      - name: Sync Capacitor Android
+      - name: Sync Capacitor Android & Patch Manifest Conflict
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
           npx cap sync android
+          
+          # --- THE FIX ---
+          # 1. Add the tools namespace to the <manifest> tag if it isn't there
+          sed -i 's|<manifest|<manifest xmlns:tools="http://schemas.android.com/tools"|g' android/app/src/main/AndroidManifest.xml
+          
+          # 2. Inject tools:replace into the problematic receiver element
+          sed -i 's|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver" tools:replace="android:exported"|g' android/app/src/main/AndroidManifest.xml
 
       - name: Build APK with Gradle
         run: |
