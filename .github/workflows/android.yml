@@ -1,13 +1,10 @@
 name: Build Android APK
-
 on:
   push:
     branches: [ main ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -21,11 +18,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Create .env file        # ← AJOUTÉ
+        run: echo "VITE_GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+
       - name: Build Web Project (Vite/React)
         env:
-          # Injection sécurisée du secret GitHub sous les deux formats possibles
           VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
       - name: Set up JDK 21
@@ -43,12 +41,7 @@ jobs:
             npx cap add android
           fi
           npx cap sync android
-          
-          # --- THE FIX ---
-          # 1. Add the tools namespace to the <manifest> tag if it isn't there
           sed -i 's|<manifest|<manifest xmlns:tools="http://schemas.android.com/tools"|g' android/app/src/main/AndroidManifest.xml
-          
-          # 2. Inject tools:replace into the problematic receiver element
           sed -i 's|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver" tools:replace="android:exported"|g' android/app/src/main/AndroidManifest.xml
 
       - name: Build APK with Gradle
