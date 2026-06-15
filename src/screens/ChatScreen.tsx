@@ -118,7 +118,7 @@ function buildSystemPrompt(completedUnits: string[], totalXP: number): string {
 // Clé API Gemini exposée via Vite (VITE_ prefix)
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 const sendMessageToAI = async (
   userText: string,
