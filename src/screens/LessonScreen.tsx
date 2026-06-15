@@ -534,15 +534,9 @@ export default function LessonScreen({
     }
   }, [isValidLesson, onBack]);
 
-  // Auto-play audio whenever a listen step becomes active.
-  useEffect(() => {
-    if (!isValidLesson) return;
-    const s = lessonsData[lessonId!].steps[currentStep];
-    if (!s || s.type !== 'listen') return;
-    const timer = setTimeout(() => speak(s.arabic), 700);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, isValidLesson]);
+  // ✅ Auto-play DÉSACTIVÉ
+  // La lecture démarre uniquement sur clic utilisateur
+  // (bouton Écouter → handlePlayAudio, ou bouton Lent → handlePlaySlow)
 
   // Stop MediaRecorder and auto-stop timer on unmount.
   useEffect(() => {
