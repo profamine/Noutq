@@ -80,7 +80,7 @@ export default function GrammarPractice({ onBack }: Props) {
   if (done) {
     const pct = Math.round((score / questions.length) * 100);
     return (
-      <div className="flex-1 flex flex-col bg-gray-50 h-full w-full absolute inset-0 z-10">
+      <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
         <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
           <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
             <ArrowLeft size={24} />
@@ -116,7 +116,7 @@ export default function GrammarPractice({ onBack }: Props) {
 
   // ── Question ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 h-full w-full absolute inset-0 z-10 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 z-20 overflow-hidden">
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
         <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
