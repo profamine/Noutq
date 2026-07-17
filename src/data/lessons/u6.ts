@@ -36,9 +36,9 @@ export const u6: LessonData = {
     {
       id: 4,
       type: "quiz",
-      arabic: "هِيَ تَدْرُسُ",
-      armenian: "Նա (իգական) սովորում է",
-      transliteration: "hiya tadrusu",
+      arabic: "هِيَ",
+      armenian: "Նա (իգական)",
+      transliteration: "hiya",
       meaning: "Ո՞ր ձևն է 'دَرَسَ' բայի 'هِيَ' դերանվան համար (ներկա ժամանակ):",
       options: [
         { text: "تَدْرُسُ", correct: true },
@@ -49,9 +49,9 @@ export const u6: LessonData = {
     {
       id: 41,
       type: "quiz",
-      arabic: "هِيَ تَدْرُسُ",
-      armenian: "Նա (իգական) սովորում է",
-      transliteration: "hiya tadrusu",
+      arabic: "هِيَ",
+      armenian: "Նա (իգական)",
+      transliteration: "hiya",
       meaning: "Կրկնություն: Ո՞ր ձևն է 'هِيَ' դերանվան համար:",
       options: [
         { text: "تَدْرُسُ", correct: true },

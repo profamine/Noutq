@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
+import { fetchWithTimeout } from '../utils/network';
 import { lessonsData, type LessonData, type LessonStep, type QuizOption } from '../data/lessons';
 import { Preferences } from '@capacitor/preferences';
 
@@ -758,7 +759,7 @@ export default function LessonScreen({
               'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
             console.log('[transcribe] Envoi à Gemini…');
 
-            const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
+            const res = await fetchWithTimeout(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -779,7 +780,7 @@ export default function LessonScreen({
                   ],
                 }],
               }),
-            });
+            }, 20000);
 
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
