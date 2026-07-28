@@ -1,0 +1,15 @@
+Le workflow android.yml se déclenche automatiquement à chaque push sur main et produit l'APK en artefact. Voici les commandes dans l'ordre :
+
+1. Committer les modifications actuelles (tout le travail d'audit est encore non commité) :
+
+git add -A
+git commit -m "Audit: clé Gemini côté serveur, corrections XP/localisation, robustesse hors-ligne"
+2. Pousser sur main — c'est ce qui déclenche le build :
+
+git push origin main
+3. Suivre le build en direct (~5 à 10 min) :
+
+gh run watch
+4. Télécharger l'APK une fois le build terminé :
+
+gh run download --name Noutq-Debug-APK
