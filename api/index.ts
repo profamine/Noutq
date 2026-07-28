@@ -52,6 +52,18 @@ function encodeWAV(pcmBytes: Buffer, sampleRate = 24000): Buffer {
 }
 
 const app = express();
+
+// CORS : l'app Capacitor (origine capacitor://localhost ou https://localhost)
+// appelle cette API depuis un déploiement public distinct. Endpoints sans
+// cookies/session, un accès large ne pose pas de risque de vol de session.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 
 app.get('/api/status', (_req: Request, res: Response): void => {

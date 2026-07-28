@@ -6,8 +6,9 @@
  *   2. Web Speech API native — avec lang='ar-SA'. Sur Android, fonctionne même
  *      sans voix arabe explicite si Google TTS est installé (cas courant).
  *      Correctifs Android intégrés (anti-race cancel/speak + resume).
- *   3. Repli serveur /api/tts (WAV) — DÉSACTIVÉ dans Capacitor (pas de serveur).
- *      Actif uniquement en mode web.
+ *   3. Repli serveur /api/tts (WAV) — actif en web (même origine) et dans
+ *      Capacitor si VITE_API_BASE_URL pointe vers le déploiement public
+ *      (voir apiUrl() dans utils/network.ts). Sinon, ignoré silencieusement.
  *
  * Correctifs Android intégrés :
  *   - Pas de cancel() juste avant speak() (sinon Android ignore speak silencieusement).
@@ -17,7 +18,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { isOnline, fetchWithTimeout } from '../utils/network';
+import { isOnline, fetchWithTimeout, apiUrl } from '../utils/network';
 
 type Platform = 'android' | 'ios' | 'desktop';
 
@@ -145,7 +146,7 @@ export function useArabicTTS() {
       const cacheKey = `${text}__server`;
       let url = audioCache.current.get(cacheKey);
       if (!url) {
-        const res = await fetchWithTimeout(`/api/tts?text=${encodeURIComponent(text)}&lang=ar`, {}, 15000);
+        const res = await fetchWithTimeout(apiUrl(`/api/tts?text=${encodeURIComponent(text)}&lang=ar`), {}, 15000);
         if (!res.ok) throw new Error(`TTS serveur ${res.status}`);
         const blob = await res.blob();
         url = URL.createObjectURL(blob);
@@ -172,8 +173,6 @@ export function useArabicTTS() {
     if (arabicVoice.current) u.voice = arabicVoice.current;
 
     const inCapacitor = isCapacitorApp();
-    // Sur Android, on réduit le délai de garde : si le moteur TTS ne répond pas
-    // rapidement dans Capacitor, on ne peut pas tomber sur le serveur (absent).
     const guardMs = inCapacitor ? 4000 : 2500;
 
     let fellBack = false;
@@ -181,8 +180,7 @@ export function useArabicTTS() {
       if (!fellBack) {
         fellBack = true;
         window.speechSynthesis.cancel();
-        if (!inCapacitor) playServerTTS(text, speed);
-        else setIsPlaying(false);
+        playServerTTS(text, speed);
       }
     }, guardMs);
 
@@ -192,8 +190,7 @@ export function useArabicTTS() {
       clearTimeout(guard);
       if (!fellBack) {
         fellBack = true;
-        if (!inCapacitor) playServerTTS(text, speed);
-        else setIsPlaying(false);
+        playServerTTS(text, speed);
       }
     };
 
@@ -237,18 +234,10 @@ export function useArabicTTS() {
       catch (err) { console.error('[TTS] native échouée :', err); setIsPlaying(false); }
     }
 
-    // 3) Repli serveur — DÉSACTIVÉ dans Capacitor (aucun serveur Express dans l'APK).
-    if (!inCapacitor) {
-      return playServerTTS(clean, speed);
-    } else {
-      console.warn('[TTS] Texte absent du manifest et pas de voix arabe installée :', clean);
-      setIsPlaying(false);
-      // Signale à l'UI que le TTS n'est pas disponible (pas de voix arabe installée).
-      setTtsUnavailable(true);
-      // Masque automatiquement le bandeau après 5 secondes.
-      setTimeout(() => setTtsUnavailable(false), 5000);
-      return false;
-    }
+    // 3) Repli serveur — fonctionne en web (même origine) et dans Capacitor
+    //    si une URL de production est configurée (apiUrl() renvoie alors une
+    //    URL absolue au lieu d'un chemin relatif inutilisable dans l'APK).
+    return playServerTTS(clean, speed);
   }, [playNative, playServerTTS, playUrl, stop]);
 
   return { speak, stop, isPlaying, ttsUnavailable, platform: platform.current };

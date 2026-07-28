@@ -13,3 +13,9 @@ gh run watch
 4. Télécharger l'APK une fois le build terminé :
 
 gh run download --name Noutq-Debug-APK
+
+
+
+git add .
+git commit -m "Ajout du workflow de build APK"
+git push origin main

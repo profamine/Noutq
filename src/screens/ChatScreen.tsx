@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
-import { isOnline, fetchWithTimeout } from '../utils/network';
+import { isOnline, fetchWithTimeout, apiUrl } from '../utils/network';
 import { storageGet, storageSet } from '../services/storage';
 import { formatFullDate } from '../utils/locale';
 
@@ -130,7 +130,7 @@ const sendMessageToAI = async (
   // Dans handleSend, isOnline() est vérifié avant d'appeler cette fonction.
   let res: Response;
   try {
-    res = await fetchWithTimeout('/api/chat', {
+    res = await fetchWithTimeout(apiUrl('/api/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents, systemInstruction: systemPrompt }),
@@ -458,7 +458,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchWithTimeout('/api/status', { headers: { Accept: 'application/json' } }, 3000)
+    fetchWithTimeout(apiUrl('/api/status'), { headers: { Accept: 'application/json' } }, 3000)
       .then(async (response) => {
         if (!response.ok) throw new Error('STATUS_UNAVAILABLE');
         const data = await response.json();
@@ -537,7 +537,7 @@ export default function ChatScreen() {
 
           setIsTranscribing(true);
           try {
-             const res = await fetchWithTimeout('/api/transcribe', {
+             const res = await fetchWithTimeout(apiUrl('/api/transcribe'), {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({

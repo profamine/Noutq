@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
-import { fetchWithTimeout } from '../utils/network';
+import { fetchWithTimeout, apiUrl } from '../utils/network';
 import { lessonsData, type LessonData, type LessonStep, type QuizOption } from '../data/lessons';
 import { Preferences } from '@capacitor/preferences';
 
@@ -757,7 +757,7 @@ export default function LessonScreen({
             console.log('[transcribe] Envoi au serveur…');
 
             // La clé Gemini reste côté serveur : le client passe par /api/transcribe.
-            const res = await fetchWithTimeout('/api/transcribe', {
+            const res = await fetchWithTimeout(apiUrl('/api/transcribe'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

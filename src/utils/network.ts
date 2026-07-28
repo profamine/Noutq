@@ -1,6 +1,19 @@
 import { Network } from '@capacitor/network';
 
 /**
+ * URL de base du serveur API. Vide (chemins relatifs) en web, où le front
+ * et l'API sont servis par la même origine. Dans l'APK Capacitor, les fichiers
+ * sont embarqués localement (aucun serveur au même endroit) : VITE_API_BASE_URL
+ * doit alors pointer vers le déploiement public (ex. Vercel) au moment du build.
+ */
+const API_BASE_URL = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').replace(/\/$/, '');
+
+/** Construit l'URL complète d'un endpoint API (`apiUrl('/api/chat')`). */
+export function apiUrl(path: string): string {
+  return `${API_BASE_URL}${path}`;
+}
+
+/**
  * Vérifie la connectivité via Capacitor Network (Android/iOS)
  * avec repli sur navigator.onLine pour le navigateur web.
  */
