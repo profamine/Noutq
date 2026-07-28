@@ -3,6 +3,7 @@ import { ArrowLeft, Volume2, RotateCcw, BarChart2 } from 'lucide-react';
 import { lessonsData } from '../data/lessons';
 import { useArabicTTS } from '../hooks/useArabicTTS';
 import { storageGet, storageSet } from '../services/storage';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface VocabularyPracticeProps {
   onBack: () => void;
@@ -42,6 +43,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) {
+  const { language } = useLanguage();
   // ── Données ──────────────────────────────────────────────────────────────
   const allVocab = useMemo(() => buildAllVocab(), []);
   const units = useMemo(() => [ALL_UNIT, ...Object.keys(lessonsData)], []);
@@ -139,7 +141,11 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
     return (
       <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
         <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
-          <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+          <button
+            onClick={onBack}
+            aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+          >
             <ArrowLeft size={24} />
           </button>
           <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Արդյունք / النتيجة</h2>
@@ -176,7 +182,11 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-3 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
-          <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+          <button
+            onClick={onBack}
+            aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+          >
             <ArrowLeft size={24} />
           </button>
           <div className="flex-1 text-center">
@@ -226,33 +236,54 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
         <div
           className="relative w-full max-w-sm aspect-[4/3] perspective-1000 cursor-pointer"
           onClick={() => mode === 'train' && setIsFlipped(!isFlipped)}
+          onKeyDown={(event) => {
+            if (mode === 'train' && (event.key === 'Enter' || event.key === ' ')) {
+              event.preventDefault();
+              setIsFlipped((flipped) => !flipped);
+            }
+          }}
+          role={mode === 'train' ? 'button' : undefined}
+          tabIndex={mode === 'train' ? 0 : undefined}
+          aria-label={
+            mode === 'train'
+              ? (language === 'ar' ? 'قلب بطاقة المفردات' : 'Շրջել բառապաշարի քարտը')
+              : undefined
+          }
         >
           <div className={`w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
 
             {/* Face avant — Arabe */}
-            <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center justify-center p-8">
+            <div
+              aria-hidden={isFlipped}
+              className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center justify-center p-8"
+            >
               <span className="text-5xl font-bold text-gray-800 leading-tight text-center" dir="rtl">
                 {currentWord.arabic}
               </span>
               {mode === 'train' && (
-                <p className="text-sm text-gray-400 mt-8">Սեղمե՛ք՝ շրջելու / انقر للقلب</p>
+                <p className="text-sm text-gray-400 mt-8">Սեղմե՛ք՝ շրջելու / انقر للقلب</p>
               )}
               {mode === 'test' && (
                 <p className="text-xs text-blue-600 mt-6 font-medium">Ի՞նչ է նշանակում / ما معنى هذه الكلمة؟</p>
               )}
             </div>
 
-            {/* Face arrière — Arménien + Translittération */}
-            <div className="absolute w-full h-full backface-hidden bg-blue-50 rounded-3xl shadow-lg border border-blue-100 flex flex-col items-center justify-center p-8 rotate-y-180">
-              <span className="text-3xl font-bold text-blue-900 text-center mb-4">
-                {currentWord.armenian}
-              </span>
-              {currentWord.transliteration && (
-                <span className="text-lg text-blue-700 bg-white px-4 py-2 rounded-full shadow-sm">
-                  {currentWord.transliteration}
+            {/* Face arrière — uniquement en entraînement pour ne pas révéler la réponse du test */}
+            {mode === 'train' && (
+              <div
+                aria-hidden={!isFlipped}
+                className="absolute w-full h-full backface-hidden bg-blue-50 rounded-3xl shadow-lg border border-blue-100 flex flex-col items-center justify-center p-8 rotate-y-180"
+              >
+                <span className="text-3xl font-bold text-blue-900 text-center mb-4">
+                  {currentWord.armenian}
                 </span>
-              )}
-            </div>
+                {currentWord.transliteration && (
+                  <span className="text-lg text-blue-700 bg-white px-4 py-2 rounded-full shadow-sm">
+                    {currentWord.transliteration}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -263,6 +294,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
             <button
               className="w-16 h-16 rounded-full bg-blue-500 shadow-md flex items-center justify-center text-white hover:bg-blue-600 active:scale-95 transition-all"
               onClick={e => { e.stopPropagation(); speak(currentWord.arabic); }}
+              aria-label={language === 'ar' ? 'تشغيل نطق الكلمة' : 'Լսել բառի արտասանությունը'}
             >
               <Volume2 size={28} />
             </button>
@@ -280,6 +312,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
             <button
               className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 active:scale-95 transition-all self-center shrink-0"
               onClick={() => speak(currentWord.arabic)}
+              aria-label={language === 'ar' ? 'تشغيل نطق الكلمة' : 'Լսել բառի արտասանությունը'}
             >
               <Volume2 size={22} />
             </button>
@@ -297,7 +330,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
           onClick={resetPile}
           className="mt-6 flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <RotateCcw size={13} /> Մխոտ / خلط مجدد
+          <RotateCcw size={13} /> Խառնել / خلط مجدد
         </button>
       </div>
     </div>

@@ -16,13 +16,14 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { isOnline, fetchWithTimeout } from '../utils/network';
 
 type Platform = 'android' | 'ios' | 'desktop';
 
 /** Détecte si l'app tourne dans un conteneur Capacitor (APK natif). */
 function isCapacitorApp(): boolean {
-  return !!(window as unknown as Record<string, unknown>)['Capacitor'];
+  return Capacitor.isNativePlatform();
 }
 
 function detectPlatform(): Platform {
@@ -132,10 +133,14 @@ export function useArabicTTS() {
   }, []);
 
   /** Repli serveur : récupère un WAV depuis /api/tts puis le joue. */
-  const playServerTTS = useCallback(async (text: string, speed: number) => {
+  const playServerTTS = useCallback(async (text: string, speed: number): Promise<boolean> => {
     try {
       // Vérifier la connectivité avant de tenter le fetch (évite une erreur réseau muette).
-      if (!(await isOnline())) { setIsPlaying(false); return; }
+      if (!(await isOnline())) {
+        setIsPlaying(false);
+        setTtsUnavailable(true);
+        return false;
+      }
 
       const cacheKey = `${text}__server`;
       let url = audioCache.current.get(cacheKey);
@@ -147,9 +152,13 @@ export function useArabicTTS() {
         audioCache.current.set(cacheKey, url);
       }
       await playUrl(url, speed);
+      return true;
     } catch (err) {
       console.error('[TTS] repli serveur échoué :', err);
       setIsPlaying(false);
+      setTtsUnavailable(true);
+      setTimeout(() => setTtsUnavailable(false), 5000);
+      return false;
     }
   }, [playUrl]);
 
@@ -194,9 +203,9 @@ export function useArabicTTS() {
     setTimeout(() => { try { window.speechSynthesis.resume(); } catch { /* noop */ } }, 80);
   }, [playServerTTS]);
 
-  const speak = useCallback(async (text: string, speed = 1.0) => {
+  const speak = useCallback(async (text: string, speed = 1.0): Promise<boolean> => {
     const clean = text?.trim();
-    if (!clean) return;
+    if (!clean) return false;
     stop();
     setIsPlaying(true);
     setTtsUnavailable(false); // réinitialise l'alerte à chaque tentative
@@ -206,7 +215,10 @@ export function useArabicTTS() {
     // 1) Audio pré-généré (le plus fiable, surtout sur Android).
     const preGen = manifest.current[clean];
     if (preGen) {
-      try { await playUrl(preGen, speed); return; } catch { /* on continue */ }
+      try {
+        await playUrl(preGen, speed);
+        return true;
+      } catch { /* on continue */ }
     }
 
     // 2) Voix native Web Speech API.
@@ -218,13 +230,16 @@ export function useArabicTTS() {
       (arabicVoice.current !== null || (inCapacitor && platform.current === 'android'));
 
     if (canUseNative) {
-      try { playNative(clean, speed); return; }
+      try {
+        playNative(clean, speed);
+        return true;
+      }
       catch (err) { console.error('[TTS] native échouée :', err); setIsPlaying(false); }
     }
 
     // 3) Repli serveur — DÉSACTIVÉ dans Capacitor (aucun serveur Express dans l'APK).
     if (!inCapacitor) {
-      await playServerTTS(clean, speed);
+      return playServerTTS(clean, speed);
     } else {
       console.warn('[TTS] Texte absent du manifest et pas de voix arabe installée :', clean);
       setIsPlaying(false);
@@ -232,6 +247,7 @@ export function useArabicTTS() {
       setTtsUnavailable(true);
       // Masque automatiquement le bandeau après 5 secondes.
       setTimeout(() => setTtsUnavailable(false), 5000);
+      return false;
     }
   }, [playNative, playServerTTS, playUrl, stop]);
 

@@ -65,10 +65,17 @@ function AppContent() {
 
       setShowSetup(setupDone !== 'true');
 
-      try { setCompletedUnits(JSON.parse(units || '[]')); } catch { /* noop */ }
-      setTotalXP(Number(xp || '0'));
+      try {
+        const parsedUnits = JSON.parse(units || '[]');
+        if (Array.isArray(parsedUnits)) {
+          setCompletedUnits(parsedUnits.filter((id): id is string => typeof id === 'string'));
+        }
+      } catch { /* données corrompues — conserver la valeur initiale */ }
+      const parsedXp = Number(xp || '0');
+      setTotalXP(Number.isFinite(parsedXp) && parsedXp >= 0 ? parsedXp : 0);
 
-      const rawStreak = Number(rawStreakStr || '0');
+      const parsedStreak = Number(rawStreakStr || '0');
+      const rawStreak = Number.isFinite(parsedStreak) && parsedStreak >= 0 ? parsedStreak : 0;
       const computed = computeStreak(rawStreak, lastDate);
       setStreak(computed);
       // Persist corrected streak if it was reset
@@ -115,19 +122,16 @@ function AppContent() {
   const markUnitComplete = useCallback((lessonId: string, xpEarned: number) => {
     const today = new Date().toDateString();
 
-    setCompletedUnits(prev => {
-      const alreadyDone = prev.includes(lessonId);
-      const next = alreadyDone ? prev : [...prev, lessonId];
-      if (!alreadyDone) {
-        storageSet('completedUnits', JSON.stringify(next));
-        setTotalXP(xp => {
-          const n = xp + xpEarned;
-          storageSet('totalXP', String(n));
-          return n;
-        });
-      }
-      return next;
-    });
+    if (!completedUnits.includes(lessonId)) {
+      const nextUnits = [...completedUnits, lessonId];
+      setCompletedUnits(nextUnits);
+      storageSet('completedUnits', JSON.stringify(nextUnits));
+      setTotalXP((currentXp) => {
+        const nextXp = currentXp + xpEarned;
+        storageSet('totalXP', String(nextXp));
+        return nextXp;
+      });
+    }
 
     if (lastStudyDateRef.current !== today) {
       setStreak(prev => {
@@ -142,13 +146,17 @@ function AppContent() {
     }
 
     storageGet('studyHistory').then(raw => {
-      const history: string[] = JSON.parse(raw || '[]');
+      let history: string[] = [];
+      try {
+        const parsed = JSON.parse(raw || '[]');
+        if (Array.isArray(parsed)) history = parsed.filter((date): date is string => typeof date === 'string');
+      } catch { /* données corrompues — repartir d'un historique vide */ }
       if (!history.includes(today)) {
         history.push(today);
         storageSet('studyHistory', JSON.stringify(history));
       }
     });
-  }, []);
+  }, [completedUnits]);
 
   const navigateToLesson = useCallback((lessonId: string) => {
     setActiveLesson(lessonId);

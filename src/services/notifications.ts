@@ -20,7 +20,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
  * Planifie un rappel quotidien à 19h00.
  * Annule d'abord toute notification existante (id=42) pour éviter les doublons.
  */
-export async function scheduleDailyReminderNotification(): Promise<void> {
+export async function scheduleDailyReminderNotification(): Promise<boolean> {
   try {
     // Annuler l'ancienne notification avant de replanifier
     await LocalNotifications.cancel({ notifications: [{ id: DAILY_NOTIF_ID }] });
@@ -29,7 +29,7 @@ export async function scheduleDailyReminderNotification(): Promise<void> {
       notifications: [{
         id: DAILY_NOTIF_ID,
         title: '📚 Noutq — Ժամանակն է արաբերեն սովորել',
-        body: 'Շarbunakir qo streak-ə. Sovorir 5 ropje aysor! 🔥\nواصل تعلمك اليوم لمدة 5 دقائق!',
+        body: 'Պահպանի՛ր ուսուցման շարունակականությունը։ Սովորի՛ր այսօր 5 րոպե։ 🔥\nواصل تعلمك اليوم لمدة 5 دقائق!',
         schedule: {
           on: { hour: 19, minute: 0 },
           repeats: true,
@@ -38,8 +38,10 @@ export async function scheduleDailyReminderNotification(): Promise<void> {
         smallIcon: 'ic_launcher_foreground',
       }],
     });
+    return true;
   } catch (err) {
     console.warn('[Notifications] Impossible de planifier :', err);
+    return false;
   }
 }
 

@@ -13,9 +13,6 @@ import {
   ChevronDown,
   Smile,
   MoreVertical,
-  Phone,
-  Video,
-  ArrowLeft,
   ThumbsUp,
   ThumbsDown,
   Lightbulb,
@@ -30,6 +27,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
 import { isOnline, fetchWithTimeout } from '../utils/network';
 import { storageGet, storageSet } from '../services/storage';
+import { formatFullDate } from '../utils/locale';
 
 // ===== Types =====
 interface Message {
@@ -115,62 +113,49 @@ function buildSystemPrompt(completedUnits: string[], totalXP: number): string {
 - This chat is for free practice and questions beyond the structured lessons.`;
 }
 
-// Clé API Gemini exposée via Vite (VITE_ prefix)
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
-const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
 const sendMessageToAI = async (
   userText: string,
   history: Message[],
   systemPrompt: string,
 ): Promise<Omit<Message, 'id' | 'timestamp'>> => {
-  if (!GEMINI_API_KEY) {
-    throw new Error('VITE_GEMINI_API_KEY manquante dans le fichier .env');
-  }
-
   const contents = [
-    ...history.filter(m => !m.isTyping).map(m => ({
+    ...history.filter(m => !m.isTyping).slice(-40).map(m => ({
       role: m.sender === 'user' ? 'user' : 'model',
       parts: [{ text: m.text }],
     })),
     { role: 'user', parts: [{ text: userText }] },
   ];
 
-  const body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents,
-    generationConfig: { temperature: 1, maxOutputTokens: 1024 },
-  };
-
-  // Connectivité et timeout — vérifiés ici pour les appels depuis SpeechSetupScreen etc.
+  // La clé Gemini reste côté serveur : le client passe par /api/chat.
   // Dans handleSend, isOnline() est vérifié avant d'appeler cette fonction.
   let res: Response;
   try {
-    res = await fetchWithTimeout(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    res = await fetchWithTimeout('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ contents, systemInstruction: systemPrompt }),
     }, 15000);
   } catch (err) {
     if ((err as Error).name === 'AbortError') {
-      throw new Error('Հարցումը չափազանց երկար տևեց։ Կրկին փորձեք։\nانتهت مهلة الطلب. يرجى المحاولة مجدداً.');
+      throw new Error('REQUEST_TIMEOUT');
     }
-    throw err;
+    throw new Error('NETWORK_ERROR');
   }
 
   if (!res.ok) {
-    let errorMsg = `Gemini API error ${res.status}`;
+    let errorCode = `HTTP_${res.status}`;
     try {
       const errorData = await res.json();
-      if (errorData.error?.message) errorMsg += `: ${errorData.error.message}`;
+      if (typeof errorData.error === 'string') errorCode = errorData.error;
     } catch (e) {}
-    throw new Error(errorMsg);
+    throw new Error(errorCode);
   }
 
   const data = await res.json();
-  let text: string =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '...';
+  if (typeof data?.text !== 'string' || !data.text.trim()) {
+    throw new Error('INVALID_AI_RESPONSE');
+  }
+  let text: string = data.text;
 
   let vocabulary: VocabWord[] | undefined;
   const vocabMatch = text.match(/\[VOCAB\]([\s\S]*?)\[\/VOCAB\]/);
@@ -269,7 +254,7 @@ function MessageBubble({
 }) {
   const [copied, setCopied] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const isUser = message.sender === 'user';
 
   const handleCopy = () => {
@@ -377,29 +362,31 @@ function MessageBubble({
 
             {/* Action buttons for AI messages */}
             {!isUser && (
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                 <button
                   onClick={handleCopy}
+                  aria-label={language === 'ar' ? 'نسخ الرسالة' : 'Պատճենել հաղորդագրությունը'}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  title="Copy"
                 >
                   {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-400" />}
                 </button>
                 <button
                   onClick={() => onSpeak(message.text)}
+                  aria-label={language === 'ar' ? 'الاستماع إلى الرسالة' : 'Լսել հաղորդագրությունը'}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  title="Listen"
                 >
                   <Volume2 size={12} className="text-gray-400" />
                 </button>
                 <button
                   onClick={() => onRate(message.id, 'up')}
+                  aria-label={language === 'ar' ? 'إجابة مفيدة' : 'Օգտակար պատասխան'}
                   className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${message.rating === 'up' ? 'text-green-500' : 'text-gray-400'}`}
                 >
                   <ThumbsUp size={12} />
                 </button>
                 <button
                   onClick={() => onRate(message.id, 'down')}
+                  aria-label={language === 'ar' ? 'إجابة غير مفيدة' : 'Ոչ օգտակար պատասխան'}
                   className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${message.rating === 'down' ? 'text-red-500' : 'text-gray-400'}`}
                 >
                   <ThumbsDown size={12} />
@@ -415,7 +402,7 @@ function MessageBubble({
 
 // ===== Main Chat Screen =====
 export default function ChatScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { speak, ttsUnavailable } = useArabicTTS();
 
   // ── Profil apprenant — chargé async pour enrichir le system prompt ─────────
@@ -423,8 +410,16 @@ export default function ChatScreen() {
   const learnerProfileRef = React.useRef({ completedUnits: [] as string[], totalXP: 0 });
   useEffect(() => {
     Promise.all([storageGet('completedUnits'), storageGet('totalXP')]).then(([units, xp]) => {
-      try { learnerProfileRef.current.completedUnits = JSON.parse(units || '[]'); } catch { /* noop */ }
-      learnerProfileRef.current.totalXP = Number(xp || '0');
+      try {
+        const parsedUnits = JSON.parse(units || '[]');
+        if (Array.isArray(parsedUnits)) {
+          learnerProfileRef.current.completedUnits = parsedUnits.filter(
+            (id): id is string => typeof id === 'string',
+          );
+        }
+      } catch { /* noop */ }
+      const parsedXp = Number(xp || '0');
+      learnerProfileRef.current.totalXP = Number.isFinite(parsedXp) && parsedXp >= 0 ? parsedXp : 0;
     });
   }, []);
 
@@ -459,6 +454,21 @@ export default function ChatScreen() {
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [offline, setOffline] = useState(false);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchWithTimeout('/api/status', { headers: { Accept: 'application/json' } }, 3000)
+      .then(async (response) => {
+        if (!response.ok) throw new Error('STATUS_UNAVAILABLE');
+        const data = await response.json();
+        if (!cancelled) setAiAvailable(data?.aiAvailable === true);
+      })
+      .catch(() => {
+        if (!cancelled) setAiAvailable(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   // ── Charger l'historique persisté au montage ────────────────────────────
   useEffect(() => {
@@ -527,21 +537,17 @@ export default function ChatScreen() {
 
           setIsTranscribing(true);
           try {
-             const transcribeBody = {
-               contents: [{
-                 parts: [
-                   { text: 'Please transcribe this audio. The expected language is Arabic or Armenian. Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.' },
-                   { inline_data: { data: base64Data, mime_type: mediaRecorder.mimeType || 'audio/webm' } }
-                 ]
-               }]
-             };
-             const res = await fetchWithTimeout(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+             const res = await fetchWithTimeout('/api/transcribe', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify(transcribeBody),
+               body: JSON.stringify({
+                 audioData: base64Data,
+                 mimeType: mediaRecorder.mimeType || 'audio/webm',
+                 expectedLanguage: 'Arabic or Armenian',
+               }),
              }, 15000);
              const data = await res.json();
-             const transcribed = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+             const transcribed = (data?.text ?? '').trim();
              if (transcribed) {
                  setInput(prev => (prev ? prev + ' ' : '') + transcribed);
              }
@@ -598,8 +604,6 @@ export default function ChatScreen() {
     setShowQuickReplies(false);
     setIsTyping(true);
 
-    const currentMessages = [...messagesRef.current, userMsg];
-
     // Vérification connectivité avant l'appel API
     const connected = await isOnline();
     if (!connected) {
@@ -620,25 +624,50 @@ export default function ChatScreen() {
     }
     setOffline(false);
 
+    if (aiAvailable === false) {
+      setIsTyping(false);
+      setShowQuickReplies(true);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'ai',
+          timestamp: new Date(),
+          text: `⚠️ ${t('chat.error_unavailable')}`,
+          type: 'text',
+        },
+      ]);
+      return;
+    }
+
     try {
       const systemPrompt = buildSystemPrompt(
         learnerProfileRef.current.completedUnits,
         learnerProfileRef.current.totalXP,
       );
-      const aiMsg = await sendMessageToAI(trimmed, currentMessages, systemPrompt);
+      const aiMsg = await sendMessageToAI(trimmed, messagesRef.current, systemPrompt);
+      setAiAvailable(true);
       setMessages((prev) => [
         ...prev,
         { ...aiMsg, id: Date.now() + 2, timestamp: new Date() },
       ]);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Կներեք, խնդիր առաջացավ: Խնդրում ենք փորձել կրկին:';
+      const errorCode = err instanceof Error ? err.message : 'UNKNOWN_ERROR';
+      const unavailable = errorCode === 'AI_NOT_CONFIGURED' || errorCode === 'HTTP_503';
+      if (unavailable) setAiAvailable(false);
+      const errorMessage =
+        unavailable
+          ? t('chat.error_unavailable')
+          : errorCode === 'REQUEST_TIMEOUT'
+            ? t('chat.error_timeout')
+            : t('chat.error_generic');
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 2,
           sender: 'ai',
           timestamp: new Date(),
-          text: `⚠️ Սխալ: ${errorMsg}`,
+          text: `⚠️ ${errorMessage}`,
           type: 'text',
         },
       ]);
@@ -673,15 +702,22 @@ export default function ChatScreen() {
     setShowMenu(false);
   };
 
+  const statusText = offline
+    ? t('chat.status_offline')
+    : aiAvailable === null
+      ? t('chat.status_checking')
+      : aiAvailable
+        ? t('chat.status')
+        : t('chat.status_unavailable');
+
+  const statusColor = offline || aiAvailable === false ? 'text-amber-600' : 'text-green-500';
+
   return (
     <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden pb-24 md:pb-0">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-md px-4 py-3 border-b border-gray-200/50 shadow-sm sticky top-0 z-30 w-full">
         <div className="flex items-center justify-between max-w-2xl mx-auto">
           <div className="flex items-center gap-3">
-          <button className="p-1.5 rounded-full hover:bg-gray-100 transition-colors lg:hidden">
-            <ArrowLeft size={20} className="text-gray-600" />
-          </button>
           <div className="relative">
             <div className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md">
               <Bot size={22} className="text-white" />
@@ -693,19 +729,14 @@ export default function ChatScreen() {
               {t('chat.title')}
               <Sparkles size={14} className="text-amber-500" />
             </h1>
-            <p className="text-[11px] text-green-500 font-medium">{t('chat.status')}</p>
+            <p className={`text-[11px] font-medium ${statusColor}`}>{statusText}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Phone size={18} className="text-gray-500" />
-          </button>
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Video size={18} className="text-gray-500" />
-          </button>
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
+              aria-label={t('chat.settings')}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
               <MoreVertical size={18} className="text-gray-500" />
@@ -741,7 +772,7 @@ export default function ChatScreen() {
       {ttsUnavailable && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center">
           <p className="text-amber-800 text-xs font-medium">
-            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS հայկական ձայնով։
+            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS արաբական ձայնով։
           </p>
           <p className="text-amber-700 text-xs mt-0.5" dir="rtl">
             الصوت غير متاح. يرجى تثبيت Google TTS مع دعم اللغة العربية.
@@ -753,12 +784,7 @@ export default function ChatScreen() {
       <div className="flex justify-center py-3">
         <span className="bg-white/80 backdrop-blur-sm text-[11px] text-gray-500 px-3 py-1 rounded-full border border-gray-200/50 shadow-sm flex items-center gap-1.5">
           <Clock size={11} />
-          {new Date().toLocaleDateString('hy-AM', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+          {formatFullDate(new Date(), language)}
         </span>
       </div>
 
@@ -815,7 +841,7 @@ export default function ChatScreen() {
       {offline && messages.length > 1 && (
         <div className="px-4 py-1.5 bg-amber-50 border-t border-amber-200 text-center">
           <p className="text-amber-700 text-xs font-medium">
-            💾 Հաղորդագրությունները պահպանված են անցանց ռեժիմում
+            💾 {t('chat.offline_saved')}
           </p>
         </div>
       )}
@@ -848,6 +874,7 @@ export default function ChatScreen() {
             <button
               onClick={() => handleSend()}
               disabled={isTyping}
+              aria-label={t('chat.send')}
               className={`w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full flex items-center justify-center transition-all shadow-md flex-shrink-0 ${isTyping ? 'opacity-50 cursor-not-allowed' : 'hover:from-emerald-600 hover:to-teal-700 shadow-emerald-200 active:scale-95'}`}
             >
               <Send size={18} className="ml-0.5" />
@@ -856,6 +883,7 @@ export default function ChatScreen() {
             <button 
               onClick={handleRecord}
               disabled={isTyping || isTranscribing} 
+              aria-label={isRecording ? t('chat.stop_recording') : t('chat.record')}
               className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md flex-shrink-0 ${isTyping || isTranscribing ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : isRecording ? 'bg-red-500 hover:bg-red-600 animate-pulse text-white' : 'bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-200 active:scale-95'}`}>
               {isTranscribing ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

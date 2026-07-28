@@ -462,7 +462,7 @@ export default function LessonScreen({
   lessonId: string | null;
   onComplete: (lessonId: string, xpEarned: number) => void;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [recording, setRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -754,37 +754,22 @@ export default function LessonScreen({
           };
 
           try {
-            const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
-            const GEMINI_URL =
-              'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-            console.log('[transcribe] Envoi à Gemini…');
+            console.log('[transcribe] Envoi au serveur…');
 
-            const res = await fetchWithTimeout(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
+            // La clé Gemini reste côté serveur : le client passe par /api/transcribe.
+            const res = await fetchWithTimeout('/api/transcribe', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                contents: [{
-                  parts: [
-                    {
-                      text:
-                        'Transcribe this Arabic (ar-SA) audio. Return ONLY the transcribed Arabic text. ' +
-                        'No explanation, no translation, no markdown. ' +
-                        'If the audio is silent, inaudible, or not in Arabic, reply with exactly "—".',
-                    },
-                    {
-                      inline_data: {
-                        data: base64Data,
-                        mime_type: mediaRecorder.mimeType || 'audio/webm',
-                      },
-                    },
-                  ],
-                }],
+                audioData: base64Data,
+                mimeType: mediaRecorder.mimeType || 'audio/webm',
+                expectedLanguage: 'Arabic (ar-SA)',
               }),
             }, 20000);
 
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            const transcript = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
+            const transcript = (data?.text ?? '').trim();
             diagRef.current.transcript = transcript || '(vide)';
             console.log('[transcribe] Résultat :', JSON.stringify(transcript));
 
@@ -841,13 +826,21 @@ export default function LessonScreen({
       setRecording(false);
       let msg: string;
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        msg = "Accès au microphone refusé. Vérifiez les permissions dans les paramètres.";
+        msg = language === 'ar'
+          ? 'تم رفض الوصول إلى الميكروفون. تحقق من الأذونات في الإعدادات.'
+          : 'Խոսափողի հասանելիությունը մերժվել է։ Ստուգեք թույլտվությունները կարգավորումներում։';
       } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-        msg = 'Aucun microphone détecté sur cet appareil.';
+        msg = language === 'ar'
+          ? 'لم يتم العثور على ميكروفون في هذا الجهاز.'
+          : 'Այս սարքում խոսափող չի հայտնաբերվել։';
       } else if (name === 'NotReadableError') {
-        msg = 'Microphone occupé par une autre application.';
+        msg = language === 'ar'
+          ? 'الميكروفون مستخدم من تطبيق آخر.'
+          : 'Խոսափողն օգտագործվում է մեկ այլ հավելվածի կողմից։';
       } else {
-        msg = `Microphone inaccessible : ${name || ((err as Error)?.message ?? 'erreur inconnue')}`;
+        msg = language === 'ar'
+          ? 'تعذّر الوصول إلى الميكروفون.'
+          : 'Խոսափողը հասանելի չէ։';
       }
       diagRef.current.lastError = msg;
       setMicError(msg);
@@ -883,36 +876,38 @@ export default function LessonScreen({
   const handleMatchSelect = (type: 'arabic' | 'armenian', value: string) => {
     if (matchedPairs.includes(value)) return;
 
-    setMatchSelected((prev) => {
-      const next = { ...prev, [type]: value };
+    const next = { ...matchSelected, [type]: value };
+    setMatchSelected(next);
 
-      if (next.arabic && next.armenian) {
-        // Evaluate the pair
-        const isPair = step.pairs?.some((p) => p.arabic === next.arabic && p.armenian === next.armenian);
-        if (isPair) {
-          setXp((prevXp) => prevXp + 5);
-          playSound('correct');
-          setMatchedPairs((mp) => {
-            const updated = [...mp, next.arabic!, next.armenian!];
-            if (step.pairs && updated.length >= step.pairs.length * 2) {
-              setStreak((prevStreak) => prevStreak + 1);
-              setCorrectAnswers((prevCA) => prevCA + 1);
-              setTotalAnswered((prevTA) => prevTA + 1);
-            }
-            return updated;
-          });
-        } else {
-          setLives((prevLives) => Math.max(0, prevLives - 1));
-          setStreak(0);
-          playSound('wrong');
-          setShakeWrong(true);
-          setTimeout(() => setShakeWrong(false), 500);
-        }
-        return { arabic: null, armenian: null }; // Reset selection
-      }
+    if (!next.arabic || !next.armenian) {
       playSound('click');
-      return next;
-    });
+      return;
+    }
+
+    const isPair = step.pairs?.some(
+      (pair) => pair.arabic === next.arabic && pair.armenian === next.armenian,
+    );
+
+    if (isPair) {
+      const updated = [...matchedPairs, next.arabic, next.armenian];
+      setMatchedPairs(updated);
+      setXp((prevXp) => prevXp + 5);
+      playSound('correct');
+
+      if (step.pairs && updated.length === step.pairs.length * 2) {
+        setStreak((prevStreak) => prevStreak + 1);
+        setCorrectAnswers((prevCA) => prevCA + 1);
+        setTotalAnswered((prevTA) => prevTA + 1);
+      }
+    } else {
+      setLives((prevLives) => Math.max(0, prevLives - 1));
+      setStreak(0);
+      playSound('wrong');
+      setShakeWrong(true);
+      setTimeout(() => setShakeWrong(false), 500);
+    }
+
+    setMatchSelected({ arabic: null, armenian: null });
   };
 
   const handleWriteSubmit = () => {
@@ -999,12 +994,14 @@ export default function LessonScreen({
         <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
           <div className="text-center">
             <div className="text-4xl mb-3">📖</div>
-            <h2 className="text-xl font-black text-gray-800 mb-1">Շարունակե՞լ</h2>
+            <h2 className="text-xl font-black text-gray-800 mb-1">{t('lesson.resume_title')}</h2>
             <p className="text-gray-500 text-sm">
-              Կա պահպանված առաջընթաց՝ {resumeModal.stepIndex + 1}-րդ քայլ,{' '}
+              {language === 'ar'
+                ? `يوجد تقدم محفوظ عند الخطوة ${resumeModal.stepIndex + 1}`
+                : `Պահպանված առաջընթաց՝ ${resumeModal.stepIndex + 1}-րդ քայլ`},{' '}
               {'❤️'.repeat(resumeModal.lives)}{'🖤'.repeat(3 - resumeModal.lives)}
             </p>
-            <p className="text-gray-400 text-xs mt-1" dir="rtl">هل تريد المتابعة من حيث توقفت؟</p>
+            <p className="text-gray-400 text-xs mt-1">{t('lesson.resume_question')}</p>
           </div>
           <div className="flex flex-col gap-2">
             <button
@@ -1015,7 +1012,7 @@ export default function LessonScreen({
               }}
               className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold"
             >
-              ✅ Շարունակել / متابعة
+              ✅ {t('lesson.continue')}
             </button>
             <button
               onClick={() => {
@@ -1024,7 +1021,7 @@ export default function LessonScreen({
               }}
               className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold"
             >
-              🔄 Սկսել նորից / البدء من جديد
+              🔄 {t('lesson.restart')}
             </button>
           </div>
         </div>
@@ -1120,6 +1117,7 @@ export default function LessonScreen({
         <div className="flex items-center gap-3">
           <button
             onClick={handleExit}
+            aria-label={t('lesson.go_back')}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
           >
             <X size={22} />
@@ -1256,6 +1254,7 @@ export default function LessonScreen({
               <button
                 onClick={handlePlayAudio}
                 disabled={isPlaying}
+                aria-label={language === 'ar' ? 'تشغيل الصوت' : 'Լսել ձայնը'}
                 className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
                   isPlaying
                     ? 'bg-blue-400 scale-95'
@@ -1275,8 +1274,8 @@ export default function LessonScreen({
               <button
                 onClick={handlePlaySlow}
                 disabled={isPlaying}
+                aria-label={language === 'ar' ? 'تشغيل الصوت ببطء' : 'Լսել դանդաղ'}
                 className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all active:scale-95 border border-gray-200"
-                title="Slow"
               >
                 <Turtle size={22} />
               </button>
@@ -1554,6 +1553,11 @@ export default function LessonScreen({
               <button
                 onClick={handleRecord}
                 disabled={isTranscribing}
+                aria-label={
+                  language === 'ar'
+                    ? (recording ? 'إيقاف التسجيل' : 'بدء التسجيل')
+                    : (recording ? 'Դադարեցնել ձայնագրումը' : 'Սկսել ձայնագրումը')
+                }
                 className={`w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 ${
                   recording
                     ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white scale-110 ring-4 ring-red-200 animate-pulse'
@@ -1568,8 +1572,8 @@ export default function LessonScreen({
               {/* Diagnostic toggle button */}
               <button
                 onClick={() => setShowDiag((v) => !v)}
+                aria-label={language === 'ar' ? 'معلومات الميكروفون' : 'Խոսափողի տեղեկություններ'}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
-                title="Diagnostic microphone"
               >
                 <Info size={16} />
               </button>
@@ -1578,13 +1582,15 @@ export default function LessonScreen({
             {/* Diagnostic panel */}
             {showDiag && (
               <div className="bg-gray-900 text-gray-100 rounded-xl p-3 text-xs font-mono space-y-1 animate-in fade-in duration-200">
-                <p className="text-gray-400 font-sans font-semibold mb-2">Diagnostic microphone</p>
-                <p><span className="text-gray-400">Permission :</span> {diagRef.current.permState}</p>
-                <p><span className="text-gray-400">Format audio :</span> {diagRef.current.mimeType}</p>
-                <p><span className="text-gray-400">Dernière transcription :</span> {diagRef.current.transcript}</p>
-                <p><span className="text-gray-400">Dernière erreur :</span> {diagRef.current.lastError}</p>
-                <p><span className="text-gray-400">MediaRecorder :</span> {typeof MediaRecorder !== 'undefined' ? '✓ supporté' : '✗ non supporté'}</p>
-                <p><span className="text-gray-400">getUserMedia :</span> {navigator.mediaDevices?.getUserMedia ? '✓ disponible' : '✗ indisponible'}</p>
+                <p className="text-gray-400 font-sans font-semibold mb-2">
+                  {language === 'ar' ? 'معلومات الميكروفون' : 'Խոսափողի տեղեկություններ'}
+                </p>
+                <p><span className="text-gray-400">{language === 'ar' ? 'الإذن' : 'Թույլտվություն'}:</span> {diagRef.current.permState}</p>
+                <p><span className="text-gray-400">{language === 'ar' ? 'صيغة الصوت' : 'Ձայնի ձևաչափ'}:</span> {diagRef.current.mimeType}</p>
+                <p><span className="text-gray-400">{language === 'ar' ? 'آخر تفريغ' : 'Վերջին վերծանում'}:</span> {diagRef.current.transcript}</p>
+                <p><span className="text-gray-400">{language === 'ar' ? 'آخر خطأ' : 'Վերջին սխալ'}:</span> {diagRef.current.lastError}</p>
+                <p><span className="text-gray-400">MediaRecorder:</span> {typeof MediaRecorder !== 'undefined' ? '✓' : '✗'}</p>
+                <p><span className="text-gray-400">getUserMedia:</span> {navigator.mediaDevices?.getUserMedia ? '✓' : '✗'}</p>
               </div>
             )}
           </div>

@@ -8,10 +8,14 @@ function createGenAIClient(): GoogleGenAI {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 }
 
-function extractErrorMessage(err: unknown): string {
-  if (!(err instanceof Error)) return 'Une erreur inconnue est survenue.';
-  return err.message || 'Une erreur inconnue est survenue.';
-}
+const MAX_CHAT_MESSAGES = 50;
+const MAX_CHAT_PARTS = 10;
+const MAX_CHAT_TEXT_LENGTH = 8_000;
+const MAX_CHAT_TOTAL_LENGTH = 50_000;
+const MAX_SYSTEM_INSTRUCTION_LENGTH = 12_000;
+const MAX_TTS_TEXT_LENGTH = 500;
+const MAX_AUDIO_DATA_LENGTH = 8 * 1024 * 1024;
+const AUDIO_MIME_TYPE_PATTERN = /^audio\/(webm|ogg|wav|mp4|mpeg)(;\s*codecs=[\w.-]+)?$/i;
 
 interface ChatMessage {
   role: 'user' | 'model';
@@ -50,15 +54,60 @@ function encodeWAV(pcmBytes: Buffer, sampleRate = 24000): Buffer {
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 
+app.get('/api/status', (_req: Request, res: Response): void => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ aiAvailable: Boolean(process.env.GEMINI_API_KEY) });
+});
+
 function validateChatBody(
   req: Request<{}, {}, ChatRequestBody>,
   res: Response,
   next: NextFunction
 ): void {
-  if (!req.body?.contents || !Array.isArray(req.body.contents)) {
-    res.status(400).json({ error: '`contents` est requis et doit être un tableau.' });
+  const { contents, systemInstruction } = req.body ?? {};
+  if (
+    !Array.isArray(contents) ||
+    contents.length === 0 ||
+    contents.length > MAX_CHAT_MESSAGES
+  ) {
+    res.status(400).json({ error: 'INVALID_CHAT_CONTENTS' });
     return;
   }
+
+  let totalLength = 0;
+  const contentsAreValid = contents.every((message) => {
+    if (
+      !message ||
+      (message.role !== 'user' && message.role !== 'model') ||
+      !Array.isArray(message.parts) ||
+      message.parts.length === 0 ||
+      message.parts.length > MAX_CHAT_PARTS
+    ) {
+      return false;
+    }
+
+    return message.parts.every((part) => {
+      if (!part || typeof part.text !== 'string') return false;
+      const textLength = part.text.trim().length;
+      totalLength += textLength;
+      return textLength > 0 && textLength <= MAX_CHAT_TEXT_LENGTH;
+    });
+  });
+
+  if (!contentsAreValid || totalLength > MAX_CHAT_TOTAL_LENGTH) {
+    res.status(400).json({ error: 'INVALID_CHAT_CONTENTS' });
+    return;
+  }
+
+  if (
+    systemInstruction !== undefined &&
+    (typeof systemInstruction !== 'string' ||
+      systemInstruction.length > MAX_SYSTEM_INSTRUCTION_LENGTH)
+  ) {
+    res.status(400).json({ error: 'INVALID_SYSTEM_INSTRUCTION' });
+    return;
+  }
+
   next();
 }
 
@@ -67,6 +116,10 @@ app.post(
   validateChatBody,
   async (req: Request<{}, {}, ChatRequestBody>, res: Response): Promise<void> => {
     try {
+      if (!process.env.GEMINI_API_KEY) {
+        res.status(503).json({ error: 'AI_NOT_CONFIGURED' });
+        return;
+      }
       const { contents, systemInstruction } = req.body;
       const ai = createGenAIClient();
       
@@ -84,7 +137,7 @@ app.post(
       res.json({ text: response.text });
     } catch (err) {
       console.error('Chat API Error:', err);
-      res.status(500).json({ error: extractErrorMessage(err) });
+      res.status(502).json({ error: 'AI_PROVIDER_ERROR' });
     }
   }
 );
@@ -93,11 +146,19 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
   try {
     const { text, lang } = req.query;
     if (!text || typeof text !== 'string') {
-      res.status(400).json({ error: '`text` is required.' });
+      res.status(400).json({ error: 'INVALID_TTS_TEXT' });
+      return;
+    }
+    if (text.length > MAX_TTS_TEXT_LENGTH) {
+      res.status(413).json({ error: 'TTS_TEXT_TOO_LONG' });
+      return;
+    }
+    if (lang !== undefined && lang !== 'ar') {
+      res.status(400).json({ error: 'INVALID_TTS_LANGUAGE' });
       return;
     }
     if (!process.env.GEMINI_API_KEY) {
-      res.status(503).json({ error: 'GEMINI_API_KEY non configurée sur le serveur.' });
+      res.status(503).json({ error: 'AI_NOT_CONFIGURED' });
       return;
     }
 
@@ -112,7 +173,7 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
 
     // Si après nettoyage le texte est vide (ex: juste un point d'interrogation envoyé)
     if (!cleanText) {
-      res.status(400).json({ error: "Le texte ne contient aucun caractère prononçable après nettoyage." });
+      res.status(400).json({ error: 'INVALID_TTS_TEXT' });
       return;
     }
 
@@ -150,8 +211,7 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
       console.warn(`⚠️ Pas de flux audio généré pour "${cleanText}". Réponse texte :`, textResponse);
       
       res.status(422).json({ 
-        error: "Le modèle n'a pas retourné de flux audio.",
-        details: textResponse 
+        error: 'AUDIO_NOT_GENERATED',
       });
       return;
     }
@@ -164,7 +224,7 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
     res.send(wavBuffer);
   } catch (err) {
     console.error('TTS API Error:', err);
-    res.status(500).json({ error: extractErrorMessage(err) });
+    res.status(502).json({ error: 'AI_PROVIDER_ERROR' });
   }
 });
 
@@ -172,19 +232,44 @@ app.post('/api/transcribe', async (req: Request, res: Response): Promise<void> =
   try {
     const { audioData, mimeType, expectedLanguage } = req.body;
     if (!audioData || typeof audioData !== 'string') {
-      res.status(400).json({ error: 'audioData is required and must be a string' });
+      res.status(400).json({ error: 'INVALID_AUDIO_DATA' });
       return;
     }
 
-    if (audioData.length > 15 * 1024 * 1024) {
-      res.status(413).json({ error: 'audioData base64 payload is too large' });
+    if (audioData.length > MAX_AUDIO_DATA_LENGTH) {
+      res.status(413).json({ error: 'INVALID_AUDIO_DATA' });
+      return;
+    }
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(audioData)) {
+      res.status(400).json({ error: 'INVALID_AUDIO_DATA' });
       return;
     }
 
-    let prompt = 'Please carefully transcribe this audio.';
-    if (expectedLanguage) {
-      prompt += ` The expected language is ${expectedLanguage}. Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.`;
+    const safeMimeType = typeof mimeType === 'string' ? mimeType : 'audio/webm';
+    if (!AUDIO_MIME_TYPE_PATTERN.test(safeMimeType)) {
+      res.status(400).json({ error: 'INVALID_AUDIO_FORMAT' });
+      return;
     }
+
+    const languageGuidance =
+      expectedLanguage === 'Arabic (ar-SA)'
+        ? ' The expected language is Arabic (ar-SA).'
+        : expectedLanguage === 'Arabic or Armenian'
+          ? ' The expected language is Arabic or Armenian.'
+          : '';
+    if (expectedLanguage !== undefined && !languageGuidance) {
+      res.status(400).json({ error: 'INVALID_EXPECTED_LANGUAGE' });
+      return;
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      res.status(503).json({ error: 'AI_NOT_CONFIGURED' });
+      return;
+    }
+
+    const prompt =
+      `Please carefully transcribe this audio.${languageGuidance}` +
+      ' Only output the exact transcription text, with no extra formatting, markdown, or conversational filler.';
 
     const ai = createGenAIClient();
     const response = await ai.models.generateContent({
@@ -193,7 +278,7 @@ app.post('/api/transcribe', async (req: Request, res: Response): Promise<void> =
         {
           parts: [
             { text: prompt },
-            { inlineData: { data: audioData, mimeType: mimeType || 'audio/webm' } }
+            { inlineData: { data: audioData, mimeType: safeMimeType } }
           ]
         }
       ]
@@ -202,7 +287,7 @@ app.post('/api/transcribe', async (req: Request, res: Response): Promise<void> =
     res.json({ text: (response.text || "").trim() });
   } catch (err) {
     console.error('STT API Error:', err);
-    res.status(500).json({ error: extractErrorMessage(err) });
+    res.status(502).json({ error: 'AI_PROVIDER_ERROR' });
   }
 });
 

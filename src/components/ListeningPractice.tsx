@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
 import { lessonsData } from '../data/lessons';
 import { useArabicTTS } from '../hooks/useArabicTTS';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   onBack: () => void;
@@ -52,6 +53,7 @@ function buildQuestions(): Question[] {
 }
 
 export default function ListeningPractice({ onBack }: Props) {
+  const { language } = useLanguage();
   const { speak } = useArabicTTS();
   const questions = useMemo(() => buildQuestions(), []);
   const [current, setCurrent] = useState(0);
@@ -97,7 +99,11 @@ export default function ListeningPractice({ onBack }: Props) {
     return (
       <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
         <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
-          <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+          <button
+            onClick={onBack}
+            aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+          >
             <ArrowLeft size={24} />
           </button>
           <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Լսողություն / استماع</h2>
@@ -110,7 +116,7 @@ export default function ListeningPractice({ onBack }: Props) {
           </div>
           <div className="text-center">
             <h3 className="text-2xl font-bold text-gray-800 mb-1">{score}/{questions.length} ճիշտ</h3>
-            <p className="text-gray-500 text-sm">{pct >= 70 ? '🌟 Հիանալի արդյունք!' : '💪 Շարունակի՛ր պարապե՛ল'}</p>
+            <p className="text-gray-500 text-sm">{pct >= 70 ? '🌟 Հիանալի արդյունք!' : '💪 Շարունակի՛ր պարապել'}</p>
           </div>
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <button
@@ -134,7 +140,11 @@ export default function ListeningPractice({ onBack }: Props) {
     <div className="fixed inset-0 flex flex-col bg-gray-50 z-20 overflow-hidden">
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
-        <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+        <button
+          onClick={onBack}
+          aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+        >
           <ArrowLeft size={24} />
         </button>
         <div className="flex-1 text-center">
@@ -157,6 +167,7 @@ export default function ListeningPractice({ onBack }: Props) {
         <div className="flex flex-col items-center gap-3">
           <button
             onClick={handleListen}
+            aria-label={language === 'ar' ? 'تشغيل سؤال الاستماع' : 'Լսել առաջադրանքը'}
             className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:from-purple-600 hover:to-indigo-700 active:scale-95 transition-all"
           >
             <Volume2 size={40} />

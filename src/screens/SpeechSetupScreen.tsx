@@ -11,6 +11,12 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useArabicTTS } from '../hooks/useArabicTTS';
+import { Capacitor } from '@capacitor/core';
+import { storageSet } from '../services/storage';
+import {
+  requestNotificationPermission,
+  scheduleDailyReminderNotification,
+} from '../services/notifications';
 
 interface Props {
   onDone: () => void;
@@ -55,8 +61,8 @@ export default function SpeechSetupScreen({ onDone }: Props) {
   const testTTS = useCallback(async () => {
     setTtsState('testing');
     try {
-      await speak('مرحباً، أهلاً وسهلاً', 1.0);
-      setTimeout(() => setTtsState('ok'), 1500);
+      const worked = await speak('مَرْحَبًا', 1.0);
+      setTtsState(worked ? 'ok' : 'fail');
     } catch {
       setTtsState('fail');
     }
@@ -80,22 +86,28 @@ export default function SpeechSetupScreen({ onDone }: Props) {
 
   // ─── Demander notifications ───────────────────────────────────────────────
   const requestNotifications = useCallback(async () => {
-    if (!('Notification' in window)) {
-      setNotifState('fail');
-      return;
-    }
     setNotifState('testing');
     try {
-      const result = await Notification.requestPermission();
-      if (result === 'granted') {
+      let granted = false;
+      if (Capacitor.isNativePlatform()) {
+        granted = await requestNotificationPermission();
+      } else if ('Notification' in window) {
+        granted = (await Notification.requestPermission()) === 'granted';
+      } else {
+        setNotifState('fail');
+        return;
+      }
+
+      if (granted) {
+        if (Capacitor.isNativePlatform()) {
+          const scheduled = await scheduleDailyReminderNotification();
+          if (!scheduled) {
+            setNotifState('fail');
+            return;
+          }
+          await storageSet('notificationsEnabled', 'true');
+        }
         setNotifState('ok');
-        // Envoyer une notification de bienvenue
-        new Notification(ar ? 'نوتق — مرحباً بك! 🎉' : 'Noutq — Բարի գալուստ! 🎉', {
-          body: ar
-            ? 'سنرسل لك تذكيرات يومية للمراجعة'
-            : 'Մենք կուղարկենք ձեզ ամենօրյա կրկնության հիշեցումներ',
-          icon: '/icons/icon-192x192.png',
-        });
       } else {
         setNotifState('denied');
       }
@@ -282,7 +294,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
       {ttsUnavailable && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center z-10">
           <p className="text-amber-800 text-xs font-medium">
-            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS հայկական ձայնով։
+            Ձայնային արտաբերումը հասանելի չէ։ Տեղադրեք Google TTS արաբական ձայնով։
           </p>
           <p className="text-amber-700 text-xs mt-0.5" dir="rtl">
             الصوت غير متاح. يرجى تثبيت Google TTS مع دعم اللغة العربية.

@@ -3,6 +3,7 @@ import { Flame, Zap, Calendar as CalendarIcon, Trophy, Target, BookOpen, Star, G
 import { useLanguage } from '../contexts/LanguageContext';
 import { storageGet, storageSet } from '../services/storage';
 import { requestNotificationPermission, scheduleDailyReminderNotification, cancelDailyReminder } from '../services/notifications';
+import { formatMonthYear, getWeekdayInitial } from '../utils/locale';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,7 +26,6 @@ interface StatCardProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const WEEKDAY_LABELS = ['Կ', 'Ե', 'Ե', 'Չ', 'Հ', 'Ո', 'Շ'];
 const TOTAL_LESSONS = 22;
 
 // ─── ProfileScreen ────────────────────────────────────────────────────────────
@@ -55,7 +55,12 @@ export default function ProfileScreen({
         storageGet('notificationsEnabled'),
       ]);
       setUserName(name || (language === 'hy' ? 'Արամ' : 'أحمد'));
-      try { setStudyDates(JSON.parse(history || '[]')); } catch { /* noop */ }
+      try {
+        const parsedHistory = JSON.parse(history || '[]');
+        if (Array.isArray(parsedHistory)) {
+          setStudyDates(parsedHistory.filter((date): date is string => typeof date === 'string'));
+        }
+      } catch { /* données corrompues — conserver un historique vide */ }
       setNotifEnabled(notif === 'true');
       setReady(true);
     })();
@@ -80,9 +85,11 @@ export default function ProfileScreen({
     if (!notifEnabled) {
       const granted = await requestNotificationPermission();
       if (granted) {
-        await scheduleDailyReminderNotification();
-        await storageSet('notificationsEnabled', 'true');
-        setNotifEnabled(true);
+        const scheduled = await scheduleDailyReminderNotification();
+        if (scheduled) {
+          await storageSet('notificationsEnabled', 'true');
+          setNotifEnabled(true);
+        }
       }
     } else {
       await cancelDailyReminder();
@@ -102,11 +109,14 @@ export default function ProfileScreen({
 
   const goalsPercent = Math.round((completedUnits.length / TOTAL_LESSONS) * 100);
 
-  const daysActiveLast28 = Array.from({ length: 28 }).filter((_, i) => {
+  const historyDates = Array.from({ length: 28 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (27 - i));
-    return studyDates.includes(date.toDateString());
-  }).length;
+    return date;
+  });
+  const daysActiveLast28 = historyDates.filter((date) =>
+    studyDates.includes(date.toDateString()),
+  ).length;
 
   // Éviter le flash de valeurs vides pendant le chargement async
   if (!ready) return null;
@@ -122,6 +132,7 @@ export default function ProfileScreen({
             {/* Language Switcher */}
             <button
               onClick={() => setLanguage(language === 'hy' ? 'ar' : 'hy')}
+              aria-label={language === 'hy' ? 'Փոխել լեզուն արաբերենի' : 'تغيير اللغة إلى الأرمنية'}
               className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition-colors"
             >
               <Globe size={16} className="text-gray-600" />
@@ -275,7 +286,9 @@ export default function ProfileScreen({
           </h2>
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-bold text-gray-700">{t('profile.month_name')}</span>
+              <span className="text-sm font-bold text-gray-700">
+                {formatMonthYear(new Date(), language)}
+              </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500">
                 <div className="w-3 h-3 rounded-sm bg-green-500" />
                 <span>{t('profile.learned')}</span>
@@ -285,15 +298,15 @@ export default function ProfileScreen({
             </div>
 
             <div className="grid grid-cols-7 gap-1.5 text-center mb-1.5">
-              {WEEKDAY_LABELS.map((d, i) => (
-                <div key={i} className="text-[10px] text-gray-400 font-bold">{d}</div>
+              {historyDates.slice(0, 7).map((date) => (
+                <div key={date.toDateString()} className="text-[10px] text-gray-400 font-bold">
+                  {getWeekdayInitial(date, language)}
+                </div>
               ))}
             </div>
 
             <div className="grid grid-cols-7 gap-1.5">
-              {Array.from({ length: 28 }).map((_, i) => {
-                const date = new Date();
-                date.setDate(date.getDate() - (27 - i));
+              {historyDates.map((date, i) => {
                 const isActive = studyDates.includes(date.toDateString());
                 const isToday = i === 27;
 
@@ -334,18 +347,21 @@ export default function ProfileScreen({
 
         {/* ── Paramètres — Notifications ── */}
         <section>
-          <h2 className="text-base font-bold text-gray-700 mb-3">Պարամետրեր / الإعدادات</h2>
+          <h2 className="text-base font-bold text-gray-700 mb-3">{t('profile.settings')}</h2>
           <button
             onClick={handleNotifToggle}
+            role="switch"
+            aria-checked={notifEnabled}
+            aria-label={t('profile.toggle_reminders')}
             className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${notifEnabled ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
                 {notifEnabled ? <Bell size={20} /> : <BellOff size={20} />}
               </div>
-              <div className="text-left">
-                <p className="font-semibold text-gray-800 text-sm">Ամենօրյա հիշեցումներ</p>
-                <p className="text-xs text-gray-500">التذكيرات اليومية — 19:00</p>
+              <div className={language === 'ar' ? 'text-right' : 'text-left'}>
+                <p className="font-semibold text-gray-800 text-sm">{t('profile.daily_reminders')}</p>
+                <p className="text-xs text-gray-500">{t('profile.reminder_time')}</p>
               </div>
             </div>
             {/* Toggle visuel */}

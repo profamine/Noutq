@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ArrowLeft, CheckCircle, XCircle, RotateCcw, Lightbulb } from 'lucide-react';
 import { lessonsData } from '../data/lessons';
 import type { LessonStep, QuizOption } from '../data/lessons';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   onBack: () => void;
@@ -43,6 +44,7 @@ function buildQuestions(): GrammarQuestion[] {
 }
 
 export default function GrammarPractice({ onBack }: Props) {
+  const { language } = useLanguage();
   const questions = useMemo(() => buildQuestions(), []);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -82,7 +84,11 @@ export default function GrammarPractice({ onBack }: Props) {
     return (
       <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
         <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
-          <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+          <button
+            onClick={onBack}
+            aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+          >
             <ArrowLeft size={24} />
           </button>
           <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Քերականություն / قواعد</h2>
@@ -119,7 +125,11 @@ export default function GrammarPractice({ onBack }: Props) {
     <div className="fixed inset-0 flex flex-col bg-gray-50 z-20 overflow-hidden">
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
-        <button onClick={onBack} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
+        <button
+          onClick={onBack}
+          aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+        >
           <ArrowLeft size={24} />
         </button>
         <div className="flex-1 text-center">

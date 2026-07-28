@@ -6,7 +6,7 @@ import { lessonsData } from '../data/lessons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type NodeStatus = 'completed' | 'current';
+type NodeStatus = 'completed' | 'current' | 'available';
 
 interface LessonNodeProps {
   title: string;
@@ -108,10 +108,11 @@ export default function HomeScreen({
 }) {
   const { t } = useLanguage();
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const nextLessonId = Object.keys(lessonsData).find((id) => !completedUnits.includes(id));
 
   const getStatus = (id: string): NodeStatus => {
     if (completedUnits.includes(id)) return 'completed';
-    return 'current';
+    return id === nextLessonId ? 'current' : 'available';
   };
 
   return (
@@ -129,7 +130,7 @@ export default function HomeScreen({
             <button 
               onClick={() => setShowAboutModal(true)}
               className="mt-1 flex items-center justify-center w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-              aria-label="About the App"
+              aria-label={t('about.title')}
             >
               <HelpCircle size={18} className="text-white" />
             </button>
@@ -457,7 +458,9 @@ function LessonNode({
 
   const buttonClass = status === 'completed'
     ? `${theme.nodeBg} ${theme.nodeShadow} text-white active:shadow-none active:translate-y-1`
-    : `bg-white border-2 ${theme.currentRing} ${theme.currentText} animate-bounce`;
+    : status === 'current'
+      ? `bg-white border-2 ${theme.currentRing} ${theme.currentText} animate-bounce`
+      : `bg-white border-2 border-gray-200 ${theme.currentText} shadow-sm`;
 
   const icon = status === 'completed'
     ? <Check strokeWidth={3} size={26} />
@@ -472,7 +475,13 @@ function LessonNode({
       <div className="flex flex-col items-center gap-2">
         <button
           onClick={onClick}
-          aria-label={`${title} – ${status}`}
+          aria-label={`${title} – ${
+            status === 'completed'
+              ? t('home.completed')
+              : status === 'current'
+                ? t('home.current_lesson')
+                : t('home.available')
+          }`}
           className={`
             w-[60px] h-[60px] rounded-full flex items-center justify-center
             transition-transform duration-150
