@@ -82,16 +82,16 @@ export default function GrammarPractice({ onBack }: Props) {
   if (done) {
     const pct = Math.round((score / questions.length) * 100);
     return (
-      <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
-        <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-gray-950 z-20">
+        <div className="bg-white dark:bg-gray-900 px-4 pt-6 pb-4 flex items-center shadow-sm">
           <button
             onClick={onBack}
             aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+            className="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-50 rounded-full hover:bg-gray-100 dark:bg-gray-800"
           >
             <ArrowLeft size={24} />
           </button>
-          <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Քերականություն / قواعد</h2>
+          <h2 className="flex-1 text-center text-lg font-bold text-gray-800 dark:text-gray-100">Քերականություն / قواعد</h2>
           <div className="w-10" />
         </div>
 
@@ -100,8 +100,8 @@ export default function GrammarPractice({ onBack }: Props) {
             {pct}%
           </div>
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-1">{score}/{questions.length} ճիշտ</h3>
-            <p className="text-gray-500 text-sm">{pct >= 70 ? '🌟 Հիանալի արդյունք!' : '💪 Կրկնի՛ր քերականությունը'}</p>
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">{score}/{questions.length} ճիշտ</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{pct >= 70 ? '🌟 Հիանալի արդյունք!' : '💪 Կրկնի՛ր քերականությունը'}</p>
           </div>
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <button
@@ -111,7 +111,7 @@ export default function GrammarPractice({ onBack }: Props) {
               <RotateCcw size={18} />
               Կրկին խաղալ / إعادة
             </button>
-            <button onClick={onBack} className="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold">
+            <button onClick={onBack} className="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl font-bold">
               Վերադառնալ / العودة
             </button>
           </div>
@@ -122,19 +122,19 @@ export default function GrammarPractice({ onBack }: Props) {
 
   // ── Question ───────────────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 z-20 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-gray-950 z-20 overflow-hidden">
       {/* Header */}
-      <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-6 pb-4 flex items-center shadow-sm">
         <button
           onClick={onBack}
           aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+          className="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-50 rounded-full hover:bg-gray-100 dark:bg-gray-800"
         >
           <ArrowLeft size={24} />
         </button>
         <div className="flex-1 text-center">
-          <h2 className="text-lg font-bold text-gray-800">Քերականություն / قواعد</h2>
-          <p className="text-xs text-gray-500">{current + 1} / {questions.length}</p>
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Քերականություն / قواعد</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{current + 1} / {questions.length}</p>
         </div>
         <div className="w-10 text-right text-sm font-bold text-orange-600">{score} ✓</div>
       </div>
@@ -149,10 +149,10 @@ export default function GrammarPractice({ onBack }: Props) {
 
       <div className="flex-1 overflow-y-auto flex flex-col p-5 gap-5">
         {/* Question */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-          <p className="text-base font-semibold text-gray-700 text-center">{q.meaning}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 flex flex-col gap-3">
+          <p className="text-base font-semibold text-gray-700 dark:text-gray-200 text-center">{q.meaning}</p>
           <div className="bg-orange-50 rounded-xl px-4 py-3 text-center">
-            <span className="text-3xl font-bold text-gray-900" dir="rtl">{q.arabic}</span>
+            <span className="text-3xl font-bold text-gray-900 dark:text-gray-50" dir="rtl">{q.arabic}</span>
           </div>
         </div>
 
@@ -175,11 +175,11 @@ export default function GrammarPractice({ onBack }: Props) {
         {/* Options */}
         <div className="flex flex-col gap-3">
           {q.options.map((opt, idx) => {
-            let cls = 'bg-white border-2 border-gray-200 text-gray-800';
+            let cls = 'bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100';
             if (selected !== null) {
               if (opt.correct) cls = 'bg-emerald-50 border-2 border-emerald-500 text-emerald-800';
               else if (idx === selected) cls = 'bg-red-50 border-2 border-red-400 text-red-700';
-              else cls = 'bg-white border-2 border-gray-100 text-gray-400';
+              else cls = 'bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500';
             }
             return (
               <button

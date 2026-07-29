@@ -10,7 +10,55 @@ export type StorageKey =
   | 'chatHistory'
   | 'userName'
   | 'vocabScores'
-  | 'notificationsEnabled';
+  | 'notificationsEnabled'
+  | 'srsState'
+  | 'streakFreezes'
+  | 'dailyGoalXP'
+  | 'xpAtDayStart'
+  | 'xpAtDayStartDate'
+  | 'placementTestDone'
+  | 'themePreference';
+
+/** Toutes les clés incluses dans l'export/import de sauvegarde locale. */
+export const BACKUP_KEYS: StorageKey[] = [
+  'completedUnits', 'totalXP', 'streak', 'lastStudyDate', 'studyHistory',
+  'speechSetupDone', 'userName', 'vocabScores', 'notificationsEnabled',
+  'srsState', 'streakFreezes', 'dailyGoalXP', 'xpAtDayStart',
+  'xpAtDayStartDate', 'placementTestDone', 'themePreference',
+];
+
+const BACKUP_FORMAT_VERSION = 1;
+
+export interface BackupPayload {
+  version: number;
+  exportedAt: string;
+  data: Partial<Record<StorageKey, string>>;
+}
+
+/** Rassemble toutes les données locales dans un objet exportable en JSON. */
+export async function exportBackup(): Promise<BackupPayload> {
+  const data: Partial<Record<StorageKey, string>> = {};
+  for (const key of BACKUP_KEYS) {
+    const value = await storageGet(key);
+    if (value !== null) data[key] = value;
+  }
+  return { version: BACKUP_FORMAT_VERSION, exportedAt: new Date().toISOString(), data };
+}
+
+/** Restaure une sauvegarde précédemment exportée. Rejette si le format est invalide. */
+export async function importBackup(payload: unknown): Promise<void> {
+  if (
+    typeof payload !== 'object' || payload === null ||
+    !('data' in payload) || typeof (payload as BackupPayload).data !== 'object'
+  ) {
+    throw new Error('INVALID_BACKUP_FORMAT');
+  }
+  const { data } = payload as BackupPayload;
+  for (const key of BACKUP_KEYS) {
+    const value = data[key];
+    if (typeof value === 'string') await storageSet(key, value);
+  }
+}
 
 let migrated = false;
 

@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { ArrowLeft, Volume2, RotateCcw, BarChart2 } from 'lucide-react';
+import { ArrowLeft, Volume2, RotateCcw, BarChart2, Clock } from 'lucide-react';
 import { lessonsData } from '../data/lessons';
 import { useArabicTTS } from '../hooks/useArabicTTS';
 import { storageGet, storageSet } from '../services/storage';
 import { useLanguage } from '../contexts/LanguageContext';
+import { type SrsStateMap, reviewCard, sortByPriority, countDue } from '../services/srs';
 
 interface VocabularyPracticeProps {
   onBack: () => void;
@@ -43,7 +44,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   // ── Données ──────────────────────────────────────────────────────────────
   const allVocab = useMemo(() => buildAllVocab(), []);
   const units = useMemo(() => [ALL_UNIT, ...Object.keys(lessonsData)], []);
@@ -52,6 +53,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
   const [selectedUnit, setSelectedUnit] = useState<string>(ALL_UNIT);
   const [mode, setMode] = useState<Mode>('train');
   const [vocabScores, setVocabScores] = useState<Record<string, number>>({});
+  const [srsState, setSrsState] = useState<SrsStateMap>({});
   // Pile courante mélangée
   const [pile, setPile] = useState<VocabItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -63,11 +65,16 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
 
   const { speak } = useArabicTTS();
 
-  // ── Chargement des scores persistés ───────────────────────────────────────
+  // ── Chargement des scores et de l'état de répétition espacée persistés ────
   useEffect(() => {
     storageGet('vocabScores').then(raw => {
       if (raw) {
         try { setVocabScores(JSON.parse(raw)); } catch { /* noop */ }
+      }
+    });
+    storageGet('srsState').then(raw => {
+      if (raw) {
+        try { setSrsState(JSON.parse(raw)); } catch { /* noop */ }
       }
     });
   }, []);
@@ -79,16 +86,25 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
       : allVocab.filter(v => v.unit === selectedUnit),
   [allVocab, selectedUnit]);
 
+  // Priorise les mots dus (jamais vus ou à réviser) plutôt qu'un ordre aléatoire pur.
   const resetPile = useCallback(() => {
-    setPile(shuffle(filtered));
+    setPile(sortByPriority<VocabItem>(filtered, (v) => v.arabic, srsState));
     setCurrentIndex(0);
     setIsFlipped(false);
     setTestResult(null);
     setKnownCount(0);
     setUnknownCount(0);
+  }, [filtered, srsState]);
+
+  const shufflePile = useCallback(() => {
+    setPile(shuffle(filtered));
+    setCurrentIndex(0);
+    setIsFlipped(false);
   }, [filtered]);
 
-  useEffect(() => { resetPile(); }, [resetPile]);
+  useEffect(() => { resetPile(); }, [selectedUnit, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const dueCount = useMemo(() => countDue(filtered.map(v => v.arabic), srsState), [filtered, srsState]);
 
   const currentWord = pile[currentIndex];
 
@@ -107,6 +123,11 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
   const handleKnown = async (known: boolean) => {
     const newKnown = knownCount + (known ? 1 : 0);
     const newUnknown = unknownCount + (known ? 0 : 1);
+
+    // Répétition espacée : met à jour l'intervalle de révision de ce mot.
+    const nextSrs = { ...srsState, [currentWord.arabic]: reviewCard(srsState[currentWord.arabic], known) };
+    setSrsState(nextSrs);
+    storageSet('srsState', JSON.stringify(nextSrs));
 
     if (currentIndex < pile.length - 1) {
       setCurrentIndex(c => c + 1);
@@ -129,7 +150,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
   if (!currentWord) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <p className="text-gray-500 text-center mb-4">Այս բաժնում բառեր չկան / لا توجد كلمات في هذه الوحدة</p>
+        <p className="text-gray-500 dark:text-gray-400 text-center mb-4">Այս բաժնում բառեր չկան / لا توجد كلمات في هذه الوحدة</p>
         <button onClick={onBack} className="px-4 py-2 bg-blue-500 text-white rounded-xl">Վերադառնալ</button>
       </div>
     );
@@ -139,16 +160,16 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
   if (mode === 'test' && testResult) {
     const pct = Math.round((testResult.known / pile.length) * 100);
     return (
-      <div className="fixed inset-0 flex flex-col bg-gray-50 z-20">
-        <div className="bg-white px-4 pt-6 pb-4 flex items-center shadow-sm">
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-gray-950 z-20">
+        <div className="bg-white dark:bg-gray-900 px-4 pt-6 pb-4 flex items-center shadow-sm">
           <button
             onClick={onBack}
             aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+            className="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-50 rounded-full hover:bg-gray-100 dark:bg-gray-800"
           >
             <ArrowLeft size={24} />
           </button>
-          <h2 className="flex-1 text-center text-lg font-bold text-gray-800">Արդյունք / النتيجة</h2>
+          <h2 className="flex-1 text-center text-lg font-bold text-gray-800 dark:text-gray-100">Արդյունք / النتيجة</h2>
           <div className="w-10" />
         </div>
 
@@ -157,16 +178,16 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
             {pct}%
           </div>
           <div className="text-center">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
               ✅ {testResult.known}  ❌ {testResult.unknown}
             </h3>
-            <p className="text-gray-500 text-sm">{pct >= 70 ? '🌟 Հիանալի!' : '💪 Շարունակի՛ր'}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{pct >= 70 ? '🌟 Հիանալի!' : '💪 Շարունակի՛ր'}</p>
           </div>
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <button onClick={resetPile} className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2">
               <RotateCcw size={18} /> Կրկին / مرة أخرى
             </button>
-            <button onClick={onBack} className="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold">
+            <button onClick={onBack} className="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl font-bold">
               Վերադառնալ / العودة
             </button>
           </div>
@@ -177,22 +198,22 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
 
   // ── Interface principale ───────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 z-20 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-gray-950 z-20 overflow-hidden">
 
       {/* Header */}
-      <div className="bg-white px-4 pt-6 pb-3 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-6 pb-3 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <button
             onClick={onBack}
             aria-label={language === 'ar' ? 'العودة' : 'Վերադառնալ'}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100"
+            className="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-50 rounded-full hover:bg-gray-100 dark:bg-gray-800"
           >
             <ArrowLeft size={24} />
           </button>
           <div className="flex-1 text-center">
-            <h2 className="text-lg font-bold text-gray-800">Բառապաշար (مراجعة)</h2>
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Բառապաշար (مراجعة)</h2>
             {/* Indicateur de progression */}
-            <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
               <span>{currentIndex + 1} / {pile.length}</span>
               {vocabScores[selectedUnit] !== undefined && (
                 <span className="ml-2 bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5">
@@ -203,12 +224,18 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
           </div>
           {/* Toggle mode */}
           <button
-            onClick={() => { setMode(m => m === 'train' ? 'test' : 'train'); resetPile(); }}
-            className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors ${mode === 'test' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-blue-600 border-blue-300'}`}
+            onClick={() => setMode(m => m === 'train' ? 'test' : 'train')}
+            className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors ${mode === 'test' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white dark:bg-gray-900 text-blue-600 border-blue-300'}`}
           >
             {mode === 'train' ? 'Test' : 'Train'}
           </button>
         </div>
+
+        {dueCount > 0 && (
+          <div className="flex items-center gap-1.5 text-[11px] text-orange-600 font-semibold mb-2">
+            <Clock size={12} /> {dueCount} {t('vocab.review_due')}
+          </div>
+        )}
 
         {/* Sélecteur d'unité — défilable horizontalement */}
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
@@ -219,7 +246,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
               <button
                 key={u}
                 onClick={() => { setSelectedUnit(u); }}
-                className={`flex-shrink-0 flex flex-col items-center px-3 py-1.5 rounded-full text-xs font-bold transition-colors border ${isActive ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'}`}
+                className={`flex-shrink-0 flex flex-col items-center px-3 py-1.5 rounded-full text-xs font-bold transition-colors border ${isActive ? 'bg-blue-500 text-white border-blue-500' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-blue-300'}`}
               >
                 <span>{u === ALL_UNIT ? 'Բոլոր / الكل' : u.toUpperCase()}</span>
                 {score !== undefined && (
@@ -255,13 +282,13 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
             {/* Face avant — Arabe */}
             <div
               aria-hidden={isFlipped}
-              className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center justify-center p-8"
+              className="absolute w-full h-full backface-hidden bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 flex flex-col items-center justify-center p-8"
             >
-              <span className="text-5xl font-bold text-gray-800 leading-tight text-center" dir="rtl">
+              <span className="text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight text-center" dir="rtl">
                 {currentWord.arabic}
               </span>
               {mode === 'train' && (
-                <p className="text-sm text-gray-400 mt-8">Սեղմե՛ք՝ շրջելու / انقر للقلب</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-8">Սեղմե՛ք՝ շրջելու / انقر للقلب</p>
               )}
               {mode === 'test' && (
                 <p className="text-xs text-blue-600 mt-6 font-medium">Ի՞նչ է նշանակում / ما معنى هذه الكلمة؟</p>
@@ -278,7 +305,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
                   {currentWord.armenian}
                 </span>
                 {currentWord.transliteration && (
-                  <span className="text-lg text-blue-700 bg-white px-4 py-2 rounded-full shadow-sm">
+                  <span className="text-lg text-blue-700 bg-white dark:bg-gray-900 px-4 py-2 rounded-full shadow-sm">
                     {currentWord.transliteration}
                   </span>
                 )}
@@ -290,7 +317,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
         {/* Contrôles selon le mode */}
         {mode === 'train' ? (
           <div className="flex items-center justify-center gap-6 mt-10 w-full max-w-sm">
-            <button onClick={prevWord} className="w-14 h-14 rounded-full bg-white shadow flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all text-xl font-bold">←</button>
+            <button onClick={prevWord} className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-950 active:scale-95 transition-all text-xl font-bold">←</button>
             <button
               className="w-16 h-16 rounded-full bg-blue-500 shadow-md flex items-center justify-center text-white hover:bg-blue-600 active:scale-95 transition-all"
               onClick={e => { e.stopPropagation(); speak(currentWord.arabic); }}
@@ -298,7 +325,7 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
             >
               <Volume2 size={28} />
             </button>
-            <button onClick={nextWord} className="w-14 h-14 rounded-full bg-white shadow flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all text-xl font-bold">→</button>
+            <button onClick={nextWord} className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-950 active:scale-95 transition-all text-xl font-bold">→</button>
           </div>
         ) : (
           /* Mode Test : Je sais / Je ne sais pas */
@@ -325,10 +352,10 @@ export default function VocabularyPractice({ onBack }: VocabularyPracticeProps) 
           </div>
         )}
 
-        {/* Bouton reset */}
+        {/* Bouton mélanger (ordre aléatoire, hors priorité de révision) */}
         <button
-          onClick={resetPile}
-          className="mt-6 flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          onClick={shufflePile}
+          className="mt-6 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 transition-colors"
         >
           <RotateCcw size={13} /> Խառնել / خلط مجدد
         </button>

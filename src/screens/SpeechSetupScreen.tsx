@@ -243,18 +243,18 @@ export default function SpeechSetupScreen({ onDone }: Props) {
   // ─── Écran de bienvenue ───────────────────────────────────────────────────
   if (step === 'welcome') {
     return (
-      <div className="flex flex-col h-full bg-white" dir={ar ? 'rtl' : 'ltr'}>
+      <div className="flex flex-col h-full bg-white dark:bg-gray-900" dir={ar ? 'rtl' : 'ltr'}>
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-6">
           <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-lg">
             <Shield size={44} className="text-white" />
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">{T.welcome_title}</h1>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{T.welcome_title}</h1>
             <p className="text-blue-600 font-medium text-sm">{T.welcome_sub}</p>
           </div>
 
-          <p className="text-gray-600 text-sm leading-relaxed max-w-xs">{T.welcome_desc}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-xs">{T.welcome_desc}</p>
 
           {/* Résumé des permissions demandées */}
           <div className="w-full bg-blue-50 rounded-2xl p-4 space-y-3">
@@ -265,7 +265,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 {item.icon}
-                <span className="text-sm text-gray-700">{item.label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-200">{item.label}</span>
               </div>
             ))}
           </div>
@@ -288,7 +288,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
 
   // ─── Écrans d'étapes ──────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-full bg-white" dir={ar ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900" dir={ar ? 'rtl' : 'ltr'}>
 
       {/* Bandeau TTS indisponible — disparaît après 5 s (géré par le hook) */}
       {ttsUnavailable && (
@@ -315,7 +315,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
             <div
               key={s.id}
               className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all
-                ${s.id === step        ? 'bg-white text-blue-700'
+                ${s.id === step        ? 'bg-white dark:bg-gray-900 text-blue-700'
                 : i < currentIdx      ? 'bg-white/40 text-white'
                 :                       'bg-white/10 text-white/50'}`}
             >
@@ -337,9 +337,9 @@ export default function SpeechSetupScreen({ onDone }: Props) {
                 <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
                   <Volume2 className="text-blue-600" size={20} />
                 </div>
-                <h2 className="font-bold text-gray-800">{T.tts_title}</h2>
+                <h2 className="font-bold text-gray-800 dark:text-gray-100">{T.tts_title}</h2>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{T.tts_desc}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{T.tts_desc}</p>
             </div>
 
             <button
@@ -390,9 +390,9 @@ export default function SpeechSetupScreen({ onDone }: Props) {
                 <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center shrink-0">
                   <Mic className="text-purple-600" size={20} />
                 </div>
-                <h2 className="font-bold text-gray-800">{T.mic_title}</h2>
+                <h2 className="font-bold text-gray-800 dark:text-gray-100">{T.mic_title}</h2>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{T.mic_desc}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{T.mic_desc}</p>
             </div>
 
             <button
@@ -432,9 +432,9 @@ export default function SpeechSetupScreen({ onDone }: Props) {
                 <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
                   <Bell className="text-amber-600" size={20} />
                 </div>
-                <h2 className="font-bold text-gray-800">{T.notif_title}</h2>
+                <h2 className="font-bold text-gray-800 dark:text-gray-100">{T.notif_title}</h2>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{T.notif_desc}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{T.notif_desc}</p>
             </div>
 
             {notifState !== 'ok' && (
@@ -474,17 +474,17 @@ export default function SpeechSetupScreen({ onDone }: Props) {
             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="text-green-500" size={48} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">{T.done_title}</h2>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-xs">{T.done_desc}</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{T.done_title}</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-xs">{T.done_desc}</p>
 
-            <div className="w-full bg-gray-50 rounded-2xl p-4 space-y-3">
+            <div className="w-full bg-gray-50 dark:bg-gray-950 rounded-2xl p-4 space-y-3">
               {[
                 { icon: <Volume2 size={16} />, label: T.tts_title,   state: ttsState },
                 { icon: <Mic size={16} />,     label: T.mic_title,   state: micState },
                 { icon: <Bell size={16} />,    label: T.notif_title, state: notifState },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                     {item.icon}<span>{item.label}</span>
                   </div>
                   <StateIcon state={item.state} />
@@ -496,7 +496,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
       </div>
 
       {/* Pied de page — boutons de navigation */}
-      <div className="px-5 pb-8 pt-3 border-t border-gray-100 space-y-3">
+      <div className="px-5 pb-8 pt-3 border-t border-gray-100 dark:border-gray-800 space-y-3">
         {step === 'synthesis' && (
           <div className="space-y-2">
             <button
@@ -504,7 +504,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
               disabled={ttsState === 'testing'}
               className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
                 ttsState === 'testing'
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-white active:scale-95'
               }`}
             >
@@ -527,7 +527,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
               disabled={micState === 'testing'}
               className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
                 micState === 'testing'
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-white active:scale-95'
               }`}
             >
@@ -550,7 +550,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
               disabled={notifState === 'testing'}
               className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all ${
                 notifState === 'testing'
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-white active:scale-95'
               }`}
             >
@@ -559,7 +559,7 @@ export default function SpeechSetupScreen({ onDone }: Props) {
             {notifState !== 'ok' && notifState !== 'testing' && (
               <button
                 onClick={() => setStep('done')}
-                className="w-full py-3 text-gray-400 text-sm font-medium active:scale-95 transition-transform"
+                className="w-full py-3 text-gray-400 dark:text-gray-500 text-sm font-medium active:scale-95 transition-transform"
               >
                 {T.notif_skip}
               </button>

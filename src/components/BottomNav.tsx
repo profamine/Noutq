@@ -129,7 +129,7 @@ function NavButton({
       className={`relative flex flex-col md:flex-row md:justify-start md:px-5 md:py-3 items-center justify-center py-1 px-3 rounded-2xl transition-all duration-300 overflow-hidden group min-w-[64px] md:w-full md:min-h-12 ${
         isActive
           ? 'text-emerald-600 bg-emerald-50 ml-0 mr-0 md:bg-emerald-50'
-          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50 active:scale-95'
+          : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95'
       }`}
       aria-label={item.label}
       aria-current={isActive ? 'page' : undefined}
@@ -276,7 +276,7 @@ export default function BottomNav({
       `}</style>
 
       <nav
-        className="md:relative md:w-64 md:h-full md:border-r border-gray-200/60 flex-shrink-0 bg-white/95 md:bg-white fixed bottom-0 left-0 right-0 z-40 max-w-full"
+        className="md:relative md:w-64 md:h-full md:border-r border-gray-200/60 dark:border-gray-800 flex-shrink-0 bg-white/95 dark:bg-gray-900/95 md:bg-white dark:md:bg-gray-900 fixed bottom-0 left-0 right-0 z-40 max-w-full"
         role="navigation"
         aria-label="Main navigation"
       >

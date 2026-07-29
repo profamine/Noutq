@@ -11,11 +11,11 @@ export default function AboutModal({ onClose }: { onClose: () => void }) {
       <div className="absolute inset-0" onClick={onClose} />
       
       <div 
-        className="relative bg-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-300"
+        className="relative bg-white dark:bg-gray-900 rounded-3xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-300"
         dir={language === 'ar' ? 'rtl' : 'ltr'}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-emerald-50">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800 bg-emerald-50">
           <div className="flex items-center gap-2 text-emerald-700">
             <Info size={24} />
             <h2 className="text-xl font-bold">{t('about.title')}</h2>
@@ -29,7 +29,7 @@ export default function AboutModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-5 text-gray-700 text-sm leading-relaxed">
+        <div className="p-6 overflow-y-auto space-y-5 text-gray-700 dark:text-gray-200 text-sm leading-relaxed">
           <p>{t('about.p1')}</p>
           <p>{t('about.p2')}</p>
           <p>{t('about.p3')}</p>
@@ -46,7 +46,7 @@ export default function AboutModal({ onClose }: { onClose: () => void }) {
 
           <p className="font-bold text-center text-emerald-600 text-base">{t('about.goal')}</p>
 
-          <hr className="border-gray-200" />
+          <hr className="border-gray-200 dark:border-gray-700" />
 
           <div className="space-y-4 pt-2">
             <div className="flex items-center gap-2 text-blue-600">

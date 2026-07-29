@@ -385,7 +385,7 @@ function CompletionScreen({
 
             <button
               onClick={onContinue}
-              className="w-full py-4 bg-white text-emerald-600 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all active:scale-98 shadow-xl shadow-black/10"
+              className="w-full py-4 bg-white dark:bg-gray-900 text-emerald-600 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all active:scale-98 shadow-xl shadow-black/10"
             >
               {t('lesson.continue')}
             </button>
@@ -404,6 +404,47 @@ const normalize = (s: string) =>
    .replace(/[.,!?؟'"]/g, '')               // remove punctuation
    .replace(/\s+/g, ' ')
    .toLowerCase();
+
+/**
+ * Compare mot à mot la phrase attendue à la transcription pour un feedback
+ * précis (quel mot a été mal prononcé), plutôt qu'un score global unique.
+ */
+function diffWords(
+  originalExpected: string,
+  normalizedExpected: string,
+  normalizedTranscript: string,
+): { word: string; matched: boolean }[] {
+  const originalWords = originalExpected.trim().split(/\s+/).filter(Boolean);
+  const normalizedWords = normalizedExpected.trim().split(/\s+/).filter(Boolean);
+  const transcriptWords = normalizedTranscript.trim().split(/\s+/).filter(Boolean);
+
+  return originalWords.map((word, i) => {
+    const normWord = normalizedWords[i] || '';
+    const matched = transcriptWords.some(
+      (tw) => tw === normWord || (normWord.length > 1 && getSimilarity(tw, normWord) > 0.7),
+    );
+    return { word, matched };
+  });
+}
+
+/** Affiche quel(s) mot(s) de la phrase attendue ont été reconnus ou non. */
+function PronunciationDiffRow({ diff }: { diff: { word: string; matched: boolean }[] }) {
+  if (diff.length < 2) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-black/5" dir="rtl">
+      {diff.map((d, i) => (
+        <span
+          key={i}
+          className={`px-2 py-0.5 rounded-lg text-sm font-semibold ${
+            d.matched ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+          }`}
+        >
+          {d.matched ? '✓' : '✗'} {d.word}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function getSimilarity(s1: string, s2: string): number {
   let longer = s1;
@@ -469,6 +510,7 @@ export default function LessonScreen({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<BlobPart[]>([]);
   const [feedback, setFeedback] = useState<'excellent' | 'good' | 'poor' | null>(null);
+  const [pronunciationDiff, setPronunciationDiff] = useState<{ word: string; matched: boolean }[] | null>(null);
   const [lives, setLives] = useState(3);
   const [xp, setXp] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -652,6 +694,7 @@ export default function LessonScreen({
 
     setRecording(true);
     setFeedback(null);
+    setPronunciationDiff(null);
     setMicError(null);
     playSound('speak');
     audioChunksRef.current = [];
@@ -723,9 +766,15 @@ export default function LessonScreen({
           setIsTranscribing(true);
 
           // Affiche le résultat après 2,5 s pour laisser le temps de lire.
-          const applyFeedback = (kind: 'excellent' | 'good' | 'poor', bonusStreak: boolean) => {
+          const applyFeedback = (
+            kind: 'excellent' | 'good' | 'poor',
+            bonusStreak: boolean,
+            diff: { word: string; matched: boolean }[] | null = null,
+          ) => {
             setTimeout(() => {
               setIsTranscribing(false);
+              // Un diff mot-à-mot n'apporte rien quand la prononciation est déjà excellente.
+              setPronunciationDiff(kind === 'excellent' ? null : diff);
               if (kind === 'excellent') {
                 setFeedback('excellent');
                 setXp((p) => p + 15);
@@ -789,6 +838,11 @@ export default function LessonScreen({
               '| Reçu :', normalizedTranscript,
             );
 
+            const expectedWordCount = expected.split(' ').filter(Boolean).length;
+            const diff = expectedWordCount > 1
+              ? diffWords(step.arabic, expected, normalizedTranscript)
+              : null;
+
             if (similarity > 0.75 || (expected && normalizedTranscript.includes(expected))) {
               const bonusStreak = streak > 0 && (streak + 1) % 3 === 0;
               applyFeedback('excellent', bonusStreak);
@@ -796,9 +850,9 @@ export default function LessonScreen({
               similarity > 0.4 ||
               expected.split(' ').some((w) => w.length > 2 && normalizedTranscript.includes(w))
             ) {
-              applyFeedback('good', false);
+              applyFeedback('good', false, diff);
             } else {
-              applyFeedback('poor', false);
+              applyFeedback('poor', false, diff);
             }
           } catch (err) {
             const msg = `Erreur Gemini : ${(err as Error).message ?? err}`;
@@ -991,17 +1045,17 @@ export default function LessonScreen({
   if (resumeModal) {
     return (
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
           <div className="text-center">
             <div className="text-4xl mb-3">📖</div>
-            <h2 className="text-xl font-black text-gray-800 mb-1">{t('lesson.resume_title')}</h2>
-            <p className="text-gray-500 text-sm">
+            <h2 className="text-xl font-black text-gray-800 dark:text-gray-100 mb-1">{t('lesson.resume_title')}</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
               {language === 'ar'
                 ? `يوجد تقدم محفوظ عند الخطوة ${resumeModal.stepIndex + 1}`
                 : `Պահպանված առաջընթաց՝ ${resumeModal.stepIndex + 1}-րդ քայլ`},{' '}
               {'❤️'.repeat(resumeModal.lives)}{'🖤'.repeat(3 - resumeModal.lives)}
             </p>
-            <p className="text-gray-400 text-xs mt-1">{t('lesson.resume_question')}</p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">{t('lesson.resume_question')}</p>
           </div>
           <div className="flex flex-col gap-2">
             <button
@@ -1019,7 +1073,7 @@ export default function LessonScreen({
                 if (lessonId) Preferences.remove({ key: `lessonProgress_${lessonId}` });
                 setResumeModal(null);
               }}
-              className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold"
+              className="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-2xl font-bold"
             >
               🔄 {t('lesson.restart')}
             </button>
@@ -1056,7 +1110,7 @@ export default function LessonScreen({
                 setWriteAnswered(false);
                 setWriteCorrect(false);
               }}
-              className="w-full py-4 bg-white text-red-600 rounded-2xl font-bold text-lg"
+              className="w-full py-4 bg-white dark:bg-gray-900 text-red-600 rounded-2xl font-bold text-lg"
             >
               <RotateCcw size={20} className="inline mr-2" />
               {t('lesson.try_again')}
@@ -1075,13 +1129,13 @@ export default function LessonScreen({
       {/* Exit Confirmation Modal */}
       {exitConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
                 <AlertCircle size={32} className="text-amber-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">{t('lesson.quit_title')}</h3>
-              <p className="text-gray-500 text-sm">{t('lesson.quit_desc')}</p>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t('lesson.quit_title')}</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{t('lesson.quit_desc')}</p>
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setExitConfirm(false)}
@@ -1091,7 +1145,7 @@ export default function LessonScreen({
                 </button>
                 <button
                   onClick={onBack}
-                  className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-200 transition-colors"
                 >
                   {t('lesson.quit')}
                 </button>
@@ -1113,12 +1167,12 @@ export default function LessonScreen({
       )}
 
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 sticky top-0 z-30">
+      <div className="bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={handleExit}
             aria-label={t('lesson.go_back')}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 rounded-full transition-all"
           >
             <X size={22} />
           </button>
@@ -1134,10 +1188,10 @@ export default function LessonScreen({
               </div>
             </div>
             <div className="flex justify-between mt-1">
-              <span className="text-[10px] text-gray-400 font-medium">
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
                 {currentStep + 1}/{steps.length}
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">{Math.round(progress)}%</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{Math.round(progress)}%</span>
             </div>
           </div>
 
@@ -1202,7 +1256,7 @@ export default function LessonScreen({
         `}</style>
 
         {/* Instruction */}
-        <h2 className="text-lg font-bold text-gray-800 text-center mt-4">
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 text-center mt-4">
           {step.type === 'listen' && t('lesson.listen_and_read')}
           {step.type === 'speak' && t('lesson.pronounce_sentence')}
           {step.type === 'quiz' && step.meaning}
@@ -1214,8 +1268,8 @@ export default function LessonScreen({
         {(step.type === 'listen' || step.type === 'speak') && (
           <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-6">
             {/* Arabic Word Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100 w-full text-center">
-              <div className="text-5xl font-arabic leading-loose text-gray-900 mb-4" dir="rtl">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100 dark:border-gray-800 w-full text-center">
+              <div className="text-5xl font-arabic leading-loose text-gray-900 dark:text-gray-50 mb-4" dir="rtl">
                 {step.highlightChar
                   ? step.arabic.split('').map((char, i) => {
                       if (step.arabic[i] === step.highlightChar) {
@@ -1233,16 +1287,16 @@ export default function LessonScreen({
 
               {/* Transliteration */}
               {showTransliteration && (
-                <p className="text-base text-gray-400 font-mono mb-2">{step.transliteration}</p>
+                <p className="text-base text-gray-400 dark:text-gray-500 font-mono mb-2">{step.transliteration}</p>
               )}
 
               {/* Armenian meaning */}
-              <p className="text-sm text-gray-500">{step.armenian}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{step.armenian}</p>
 
               {/* Toggle transliteration */}
               <button
                 onClick={() => setShowTransliteration(!showTransliteration)}
-                className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 mx-auto transition-colors"
+                className="mt-3 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 mx-auto transition-colors"
               >
                 {showTransliteration ? <EyeOff size={14} /> : <Eye size={14} />}
                 {showTransliteration ? t('lesson.hide_transliteration') : t('lesson.show_transliteration')}
@@ -1263,9 +1317,9 @@ export default function LessonScreen({
               >
                 {isPlaying ? (
                   <div className="flex items-center gap-0.5">
-                    <div className="w-1 h-5 bg-white rounded-full animate-pulse" />
-                    <div className="w-1 h-7 bg-white rounded-full animate-pulse delay-75" />
-                    <div className="w-1 h-4 bg-white rounded-full animate-pulse delay-150" />
+                    <div className="w-1 h-5 bg-white dark:bg-gray-900 rounded-full animate-pulse" />
+                    <div className="w-1 h-7 bg-white dark:bg-gray-900 rounded-full animate-pulse delay-75" />
+                    <div className="w-1 h-4 bg-white dark:bg-gray-900 rounded-full animate-pulse delay-150" />
                   </div>
                 ) : (
                   <Play size={30} fill="white" className="text-white ml-1" />
@@ -1275,7 +1329,7 @@ export default function LessonScreen({
                 onClick={handlePlaySlow}
                 disabled={isPlaying}
                 aria-label={language === 'ar' ? 'تشغيل الصوت ببطء' : 'Լսել դանդաղ'}
-                className="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all active:scale-95 border border-gray-200"
+                className="w-12 h-12 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all active:scale-95 border border-gray-200 dark:border-gray-700"
               >
                 <Turtle size={22} />
               </button>
@@ -1323,17 +1377,17 @@ export default function LessonScreen({
         {step.type === 'quiz' && step.options && (
           <div className="flex-1 flex flex-col justify-center py-6 space-y-4">
             {/* Arabic word being quizzed */}
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center mb-4">
-              <p className="text-4xl font-arabic text-gray-900" dir="rtl">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md border border-gray-100 dark:border-gray-800 text-center mb-4">
+              <p className="text-4xl font-arabic text-gray-900 dark:text-gray-50" dir="rtl">
                 {step.arabic}
               </p>
-              <p className="text-sm text-gray-400 mt-2 font-mono">{step.transliteration}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 font-mono">{step.transliteration}</p>
             </div>
 
             {/* Options */}
             <div className="space-y-3">
               {step.options.map((option, idx) => {
-                let optionStyle = 'bg-white border-gray-200 text-gray-800 hover:border-emerald-300 hover:bg-emerald-50';
+                let optionStyle = 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 hover:border-emerald-300 hover:bg-emerald-50';
 
                 if (quizAnswered) {
                   if (option.correct) {
@@ -1341,7 +1395,7 @@ export default function LessonScreen({
                   } else if (idx === selectedAnswer && !option.correct) {
                     optionStyle = 'bg-red-50 border-red-500 text-red-800 ring-2 ring-red-200';
                   } else {
-                    optionStyle = 'bg-gray-50 border-gray-200 text-gray-400';
+                    optionStyle = 'bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500';
                   }
                 } else if (idx === selectedAnswer) {
                   optionStyle = 'bg-emerald-50 border-emerald-400 text-emerald-800';
@@ -1356,7 +1410,7 @@ export default function LessonScreen({
                       !quizAnswered ? 'active:scale-[0.98]' : ''
                     }`}
                   >
-                    <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                    <span className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {String.fromCharCode(1329 + idx)}
                     </span>
                     <span className="flex-1">{option.text}</span>
@@ -1386,10 +1440,10 @@ export default function LessonScreen({
                       onClick={() => handleMatchSelect('arabic', ar)}
                       className={`h-24 p-4 rounded-2xl border-2 text-center font-bold text-2xl font-arabic transition-all flex items-center justify-center ${
                         isMatched
-                          ? 'bg-gray-100 border-gray-200 text-gray-300 opacity-50'
+                          ? 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-300 opacity-50'
                           : isSelected
                           ? 'bg-blue-50 border-blue-400 text-blue-700 w-[105%] z-10 shadow-md'
-                          : 'bg-white border-gray-200 text-gray-800 hover:border-blue-300 hover:bg-slate-50 shadow-sm'
+                          : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 hover:border-blue-300 hover:bg-slate-50 shadow-sm'
                       }`}
                       dir="rtl"
                     >
@@ -1409,10 +1463,10 @@ export default function LessonScreen({
                       onClick={() => handleMatchSelect('armenian', am)}
                       className={`h-24 p-4 rounded-2xl border-2 text-center font-medium text-base transition-all flex items-center justify-center ${
                         isMatched
-                          ? 'bg-gray-100 border-gray-200 text-gray-300 opacity-50'
+                          ? 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-300 opacity-50'
                           : isSelected
                           ? 'bg-blue-50 border-blue-400 text-blue-700 w-[105%] ml-[5%] z-10 shadow-md'
-                          : 'bg-white border-gray-200 text-gray-800 hover:border-blue-300 hover:bg-slate-50 shadow-sm'
+                          : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 hover:border-blue-300 hover:bg-slate-50 shadow-sm'
                       }`}
                     >
                       {am}
@@ -1424,7 +1478,7 @@ export default function LessonScreen({
             
             {/* Hint */}
             {step.hint && (
-              <div className="mt-8 text-center text-sm font-medium text-gray-400">
+              <div className="mt-8 text-center text-sm font-medium text-gray-400 dark:text-gray-500">
                 {step.hint}
               </div>
             )}
@@ -1435,8 +1489,8 @@ export default function LessonScreen({
         {step.type === 'write' && (
           <div className="flex-1 flex flex-col justify-center py-6 space-y-8">
             <div className="text-center">
-              <p className="text-gray-500 mb-2">{t('lesson.translate_this')}</p>
-              <h3 className="text-2xl font-bold text-gray-800">{step.armenian}</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-2">{t('lesson.translate_this')}</p>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{step.armenian}</h3>
             </div>
 
             <div className="space-y-4">
@@ -1451,7 +1505,7 @@ export default function LessonScreen({
                     ? writeCorrect
                       ? 'border-emerald-500 bg-emerald-50 text-emerald-800 ring-emerald-200'
                       : 'border-red-500 bg-red-50 text-red-800 ring-red-200'
-                    : 'border-gray-300 bg-white hover:border-blue-300 focus:border-blue-500 focus:ring-blue-100 shadow-inner'
+                    : 'border-gray-300 bg-white dark:bg-gray-900 hover:border-blue-300 focus:border-blue-500 focus:ring-blue-100 shadow-inner'
                 }`}
               />
 
@@ -1510,32 +1564,38 @@ export default function LessonScreen({
             </div>
           )}
           {feedback === 'good' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <CheckCircle size={22} className="text-amber-500" />
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <CheckCircle size={22} className="text-amber-500" />
+                </div>
+                <div>
+                  <p className="font-bold text-amber-800">{t('lesson.good')}</p>
+                  <p className="text-xs text-amber-600 mt-0.5">{t('lesson.good_desc')}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-amber-800">{t('lesson.good')}</p>
-                <p className="text-xs text-amber-600 mt-0.5">{t('lesson.good_desc')}</p>
-              </div>
+              {pronunciationDiff && <PronunciationDiffRow diff={pronunciationDiff} />}
             </div>
           )}
           {feedback === 'poor' && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <AlertCircle size={22} className="text-red-500" />
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertCircle size={22} className="text-red-500" />
+                </div>
+                <div>
+                  <p className="font-bold text-red-800">{t('lesson.poor')}</p>
+                  <p className="text-xs text-red-600 mt-0.5">{t('lesson.poor_desc')}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-red-800">{t('lesson.poor')}</p>
-                <p className="text-xs text-red-600 mt-0.5">{t('lesson.poor_desc')}</p>
-              </div>
+              {pronunciationDiff && <PronunciationDiffRow diff={pronunciationDiff} />}
             </div>
           )}
         </div>
       </div>
 
       {/* Bottom Actions */}
-      <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-6 py-4 pb-6 space-y-3">
+      <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 px-6 py-4 pb-6 space-y-3">
         <div className="max-w-2xl mx-auto w-full space-y-3">
           {/* Record button + mic-error banner + diagnostic modal */}
         {step.type === 'speak' && (
@@ -1573,7 +1633,7 @@ export default function LessonScreen({
               <button
                 onClick={() => setShowDiag((v) => !v)}
                 aria-label={language === 'ar' ? 'معلومات الميكروفون' : 'Խոսափողի տեղեկություններ'}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 transition-all"
               >
                 <Info size={16} />
               </button>
@@ -1582,15 +1642,15 @@ export default function LessonScreen({
             {/* Diagnostic panel */}
             {showDiag && (
               <div className="bg-gray-900 text-gray-100 rounded-xl p-3 text-xs font-mono space-y-1 animate-in fade-in duration-200">
-                <p className="text-gray-400 font-sans font-semibold mb-2">
+                <p className="text-gray-400 dark:text-gray-500 font-sans font-semibold mb-2">
                   {language === 'ar' ? 'معلومات الميكروفون' : 'Խոսափողի տեղեկություններ'}
                 </p>
-                <p><span className="text-gray-400">{language === 'ar' ? 'الإذن' : 'Թույլտվություն'}:</span> {diagRef.current.permState}</p>
-                <p><span className="text-gray-400">{language === 'ar' ? 'صيغة الصوت' : 'Ձայնի ձևաչափ'}:</span> {diagRef.current.mimeType}</p>
-                <p><span className="text-gray-400">{language === 'ar' ? 'آخر تفريغ' : 'Վերջին վերծանում'}:</span> {diagRef.current.transcript}</p>
-                <p><span className="text-gray-400">{language === 'ar' ? 'آخر خطأ' : 'Վերջին սխալ'}:</span> {diagRef.current.lastError}</p>
-                <p><span className="text-gray-400">MediaRecorder:</span> {typeof MediaRecorder !== 'undefined' ? '✓' : '✗'}</p>
-                <p><span className="text-gray-400">getUserMedia:</span> {navigator.mediaDevices?.getUserMedia ? '✓' : '✗'}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">{language === 'ar' ? 'الإذن' : 'Թույլտվություն'}:</span> {diagRef.current.permState}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">{language === 'ar' ? 'صيغة الصوت' : 'Ձայնի ձևաչափ'}:</span> {diagRef.current.mimeType}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">{language === 'ar' ? 'آخر تفريغ' : 'Վերջին վերծանում'}:</span> {diagRef.current.transcript}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">{language === 'ar' ? 'آخر خطأ' : 'Վերջին սխալ'}:</span> {diagRef.current.lastError}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">MediaRecorder:</span> {typeof MediaRecorder !== 'undefined' ? '✓' : '✗'}</p>
+                <p><span className="text-gray-400 dark:text-gray-500">getUserMedia:</span> {navigator.mediaDevices?.getUserMedia ? '✓' : '✗'}</p>
               </div>
             )}
           </div>
@@ -1603,7 +1663,7 @@ export default function LessonScreen({
           className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
             canProceed
               ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98]'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
           }`}
         >
           {currentStep < steps.length - 1 ? (
@@ -1623,7 +1683,7 @@ export default function LessonScreen({
         {step.type === 'listen' && (
           <button
             onClick={handleNext}
-            className="w-full py-2 text-gray-400 text-sm font-medium hover:text-gray-600 transition-colors"
+            className="w-full py-2 text-gray-400 dark:text-gray-500 text-sm font-medium hover:text-gray-600 dark:text-gray-300 transition-colors"
           >
             {t('lesson.skip')}
           </button>

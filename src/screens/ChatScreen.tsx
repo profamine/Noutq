@@ -72,11 +72,43 @@ const UNIT_TOPICS: Record<string, string> = {
   u22: 'advanced grammar',
 };
 
+// Scénarios de jeu de rôle : chaque entrée injecte une consigne supplémentaire
+// dans le system prompt pour que l'IA reste dans le personnage.
+export interface ChatScenario {
+  id: string;
+  labelKey: string;
+  instruction: string;
+}
+
+const SCENARIOS: ChatScenario[] = [
+  {
+    id: 'restaurant',
+    labelKey: 'chat.scenarios.restaurant',
+    instruction: 'You are now role-playing as an Arabic waiter/waitress at a restaurant. Stay in character: greet the learner, ask what they want to order, react to their choices, and gently correct their Arabic within the scene. Keep it realistic and conversational.',
+  },
+  {
+    id: 'directions',
+    labelKey: 'chat.scenarios.directions',
+    instruction: 'You are now role-playing as a local Arabic speaker giving directions on the street. The learner will ask you how to get somewhere. Stay in character, describe simple directions in Arabic, and correct their Arabic within the scene.',
+  },
+  {
+    id: 'shopping',
+    labelKey: 'chat.scenarios.shopping',
+    instruction: 'You are now role-playing as a shopkeeper in an Arabic market (souk). The learner is a customer. Stay in character: discuss prices, items, and haggle a little, correcting their Arabic within the scene.',
+  },
+  {
+    id: 'introduce',
+    labelKey: 'chat.scenarios.introduce',
+    instruction: 'You are now role-playing as a new Arabic-speaking acquaintance meeting the learner for the first time. Stay in character: introduce yourself, ask their name and where they are from, and keep a friendly first-meeting conversation, correcting their Arabic within the scene.',
+  },
+];
+
 /**
- * Construit dynamiquement le system prompt en injectant le profil de l'apprenant.
+ * Construit dynamiquement le system prompt en injectant le profil de l'apprenant
+ * et, le cas échéant, le scénario de jeu de rôle actif.
  * Appelé avant chaque requête API pour avoir toujours les données fraîches.
  */
-function buildSystemPrompt(completedUnits: string[], totalXP: number): string {
+function buildSystemPrompt(completedUnits: string[], totalXP: number, scenario?: ChatScenario | null): string {
   const level = completedUnits.length < 4 ? 'A1' : completedUnits.length < 10 ? 'A2' : 'B1';
   const topics = completedUnits.map(u => UNIT_TOPICS[u] || u).join(', ') || 'none yet';
 
@@ -110,7 +142,13 @@ function buildSystemPrompt(completedUnits: string[], totalXP: number): string {
 - Level: ${level}
 - Topics mastered: ${topics}
 - Adapt examples to the learner's level. Avoid re-teaching topics already mastered.
-- This chat is for free practice and questions beyond the structured lessons.`;
+- This chat is for free practice and questions beyond the structured lessons.${
+    scenario ? `
+
+## Active Role-Play Scenario
+${scenario.instruction}
+- Keep following the Response Format above (Arabic, Armenian, transliteration, vocabulary) even while in character.` : ''
+  }`;
 }
 
 const sendMessageToAI = async (
@@ -190,7 +228,7 @@ function TypingIndicator() {
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md flex-shrink-0">
           <Bot size={16} className="text-white" />
         </div>
-        <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-5 py-3.5 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl rounded-bl-sm px-5 py-3.5 shadow-sm">
           <div className="flex gap-1.5 items-center">
             <div className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
             <div className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -322,7 +360,7 @@ function MessageBubble({
             className={`relative px-4 py-3 rounded-2xl transition-all duration-200 ${
               isUser
                 ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-br-sm shadow-md shadow-blue-200'
-                : 'bg-white border border-gray-100 text-gray-800 rounded-bl-sm shadow-sm'
+                : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-100 rounded-bl-sm shadow-sm'
             }`}
           >
             {!isUser && getTypeBadge()}
@@ -340,10 +378,10 @@ function MessageBubble({
             )}
 
             {showTranslation && message.translation && (
-              <div className="mt-2 pt-2 border-t border-gray-100">
-                <p className="text-xs text-gray-500 italic">{message.translation}</p>
+              <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <p className="text-xs text-gray-500 dark:text-gray-400 italic">{message.translation}</p>
                 {message.transliteration && (
-                  <p className="text-[11px] text-gray-400 mt-1 font-mono">{message.transliteration}</p>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 font-mono">{message.transliteration}</p>
                 )}
               </div>
             )}
@@ -356,7 +394,7 @@ function MessageBubble({
 
           {/* Timestamp & Actions */}
           <div className={`flex items-center gap-2 px-1 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            <span className="text-[10px] text-gray-400">
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">
               {message.timestamp.toLocaleTimeString('hy-AM', { hour: '2-digit', minute: '2-digit' })}
             </span>
 
@@ -366,28 +404,28 @@ function MessageBubble({
                 <button
                   onClick={handleCopy}
                   aria-label={language === 'ar' ? 'نسخ الرسالة' : 'Պատճենել հաղորդագրությունը'}
-                  className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors"
                 >
-                  {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-400" />}
+                  {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-400 dark:text-gray-500" />}
                 </button>
                 <button
                   onClick={() => onSpeak(message.text)}
                   aria-label={language === 'ar' ? 'الاستماع إلى الرسالة' : 'Լսել հաղորդագրությունը'}
-                  className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors"
                 >
-                  <Volume2 size={12} className="text-gray-400" />
+                  <Volume2 size={12} className="text-gray-400 dark:text-gray-500" />
                 </button>
                 <button
                   onClick={() => onRate(message.id, 'up')}
                   aria-label={language === 'ar' ? 'إجابة مفيدة' : 'Օգտակար պատասխան'}
-                  className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${message.rating === 'up' ? 'text-green-500' : 'text-gray-400'}`}
+                  className={`p-1 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors ${message.rating === 'up' ? 'text-green-500' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                   <ThumbsUp size={12} />
                 </button>
                 <button
                   onClick={() => onRate(message.id, 'down')}
                   aria-label={language === 'ar' ? 'إجابة غير مفيدة' : 'Ոչ օգտակար պատասխան'}
-                  className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${message.rating === 'down' ? 'text-red-500' : 'text-gray-400'}`}
+                  className={`p-1 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors ${message.rating === 'down' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                   <ThumbsDown size={12} />
                 </button>
@@ -451,6 +489,9 @@ export default function ChatScreen() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(true);
+  const [activeScenario, setActiveScenario] = useState<ChatScenario | null>(null);
+  // Ref miroir : évite une closure obsolète dans handleSend juste après avoir démarré un scénario.
+  const activeScenarioRef = useRef<ChatScenario | null>(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [offline, setOffline] = useState(false);
@@ -644,6 +685,7 @@ export default function ChatScreen() {
       const systemPrompt = buildSystemPrompt(
         learnerProfileRef.current.completedUnits,
         learnerProfileRef.current.totalXP,
+        activeScenarioRef.current,
       );
       const aiMsg = await sendMessageToAI(trimmed, messagesRef.current, systemPrompt);
       setAiAvailable(true);
@@ -660,7 +702,9 @@ export default function ChatScreen() {
           ? t('chat.error_unavailable')
           : errorCode === 'REQUEST_TIMEOUT'
             ? t('chat.error_timeout')
-            : t('chat.error_generic');
+            : errorCode === 'TOO_MANY_REQUESTS' || errorCode === 'HTTP_429'
+              ? t('chat.error_rate_limited')
+              : t('chat.error_generic');
       setMessages((prev) => [
         ...prev,
         {
@@ -675,6 +719,17 @@ export default function ChatScreen() {
       setIsTyping(false);
       setShowQuickReplies(true);
     }
+  };
+
+  const startScenario = (scenario: ChatScenario) => {
+    activeScenarioRef.current = scenario;
+    setActiveScenario(scenario);
+    handleSend(`🎭 ${t(scenario.labelKey)}`);
+  };
+
+  const endScenario = () => {
+    activeScenarioRef.current = null;
+    setActiveScenario(null);
   };
 
   const handleRate = (id: number, rating: 'up' | 'down') => {
@@ -725,7 +780,7 @@ export default function ChatScreen() {
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white" />
           </div>
           <div>
-            <h1 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+            <h1 className="font-bold text-gray-800 dark:text-gray-100 text-sm flex items-center gap-1.5">
               {t('chat.title')}
               <Sparkles size={14} className="text-amber-500" />
             </h1>
@@ -737,27 +792,27 @@ export default function ChatScreen() {
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label={t('chat.settings')}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors"
             >
-              <MoreVertical size={18} className="text-gray-500" />
+              <MoreVertical size={18} className="text-gray-500 dark:text-gray-400" />
             </button>
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <button
                     onClick={handleClearChat}
-                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-2.5 transition-colors"
                   >
-                    <Trash2 size={16} className="text-gray-400" />
+                    <Trash2 size={16} className="text-gray-400 dark:text-gray-500" />
                     {t('chat.clear')}
                   </button>
-                  <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors">
-                    <Settings size={16} className="text-gray-400" />
+                  <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-2.5 transition-colors">
+                    <Settings size={16} className="text-gray-400 dark:text-gray-500" />
                     {t('chat.settings')}
                   </button>
-                  <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors">
-                    <Info size={16} className="text-gray-400" />
+                  <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-2.5 transition-colors">
+                    <Info size={16} className="text-gray-400 dark:text-gray-500" />
                     {t('chat.help')}
                   </button>
                 </div>
@@ -782,7 +837,7 @@ export default function ChatScreen() {
 
       {/* Date Separator */}
       <div className="flex justify-center py-3">
-        <span className="bg-white/80 backdrop-blur-sm text-[11px] text-gray-500 px-3 py-1 rounded-full border border-gray-200/50 shadow-sm flex items-center gap-1.5">
+        <span className="bg-white/80 backdrop-blur-sm text-[11px] text-gray-500 dark:text-gray-400 px-3 py-1 rounded-full border border-gray-200/50 shadow-sm flex items-center gap-1.5">
           <Clock size={11} />
           {formatFullDate(new Date(), language)}
         </span>
@@ -814,10 +869,39 @@ export default function ChatScreen() {
       {showScrollDown && (
         <button
           onClick={scrollToBottom}
-          className="absolute bottom-36 right-4 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all z-20 animate-bounce"
+          className="absolute bottom-36 right-4 w-10 h-10 bg-white dark:bg-gray-900 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:bg-gray-950 transition-all z-20 animate-bounce"
         >
-          <ChevronDown size={20} className="text-gray-600" />
+          <ChevronDown size={20} className="text-gray-600 dark:text-gray-300" />
         </button>
+      )}
+
+      {/* Scénario actif */}
+      {activeScenario && (
+        <div className="px-4 pb-1 w-full max-w-2xl mx-auto">
+          <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-full px-3.5 py-1.5">
+            <span className="text-xs font-semibold text-purple-700">🎭 {t('chat.scenarios.active')}: {t(activeScenario.labelKey)}</span>
+            <button onClick={endScenario} className="text-[11px] font-bold text-purple-500 hover:text-purple-700">
+              {t('chat.scenarios.end')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Scénarios de jeu de rôle */}
+      {showQuickReplies && !isTyping && !activeScenario && (
+        <div className="px-4 pb-1 overflow-x-auto w-full max-w-2xl mx-auto">
+          <div className="flex gap-2 pb-1">
+            {SCENARIOS.map((scenario) => (
+              <button
+                key={scenario.id}
+                onClick={() => startScenario(scenario)}
+                className="flex-shrink-0 px-3.5 py-2 bg-purple-50 border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow active:scale-95"
+              >
+                <span className="block text-sm">🎭 {t(scenario.labelKey)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Quick Replies */}
@@ -828,7 +912,7 @@ export default function ChatScreen() {
               <button
                 key={idx}
                 onClick={() => handleSend(reply.arabic)}
-                className="flex-shrink-0 px-3.5 py-2 bg-white border border-emerald-200 rounded-full text-xs font-medium text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300 transition-all duration-200 shadow-sm hover:shadow active:scale-95"
+                className="flex-shrink-0 px-3.5 py-2 bg-white dark:bg-gray-900 border border-emerald-200 rounded-full text-xs font-medium text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300 transition-all duration-200 shadow-sm hover:shadow active:scale-95"
               >
                 <span className="block text-sm">{reply.text}</span>
               </button>
@@ -849,8 +933,8 @@ export default function ChatScreen() {
       {/* Input Area */}
       <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/50 px-3 py-3 z-20 w-full">
         <div className="flex items-end gap-2 max-w-2xl mx-auto">
-          <button className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 mb-0.5">
-            <Smile size={22} className="text-gray-400" />
+          <button className="p-2.5 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors flex-shrink-0 mb-0.5">
+            <Smile size={22} className="text-gray-400 dark:text-gray-500" />
           </button>
           <div className="flex-1 relative">
             <input
@@ -866,7 +950,7 @@ export default function ChatScreen() {
                 }
               }}
               placeholder={t('chat.input_placeholder')}
-              className="w-full bg-gray-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all outline-none border border-transparent focus:border-emerald-200 placeholder-gray-400"
+              className="w-full bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:bg-gray-900 transition-all outline-none border border-transparent focus:border-emerald-200 placeholder-gray-400"
               dir="auto"
             />
           </div>

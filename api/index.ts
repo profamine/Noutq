@@ -66,6 +66,36 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(express.json({ limit: '10mb' }));
 
+// ── Rate limiting (fenêtre glissante en mémoire) ─────────────────────────────
+// Protège le quota Gemini : le CORS ouvert (*) permet à n'importe quel site
+// d'appeler ces routes. Limite par IP, best-effort (par instance de fonction,
+// pas de coordination inter-instances — suffisant pour dissuader un abus simple).
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+const rateLimitHits = new Map<string, number[]>();
+
+function rateLimit(req: Request, res: Response, next: NextFunction): void {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+
+  const hits = (rateLimitHits.get(ip) ?? []).filter((t) => t > windowStart);
+  if (hits.length >= RATE_LIMIT_MAX_REQUESTS) {
+    res.status(429).json({ error: 'TOO_MANY_REQUESTS' });
+    return;
+  }
+  hits.push(now);
+  rateLimitHits.set(ip, hits);
+
+  // Purge occasionnelle pour éviter une fuite mémoire sur une instance longue durée.
+  if (rateLimitHits.size > 5000) {
+    for (const [key, times] of rateLimitHits) {
+      if (times.every((t) => t <= windowStart)) rateLimitHits.delete(key);
+    }
+  }
+  next();
+}
+
 app.get('/api/status', (_req: Request, res: Response): void => {
   res.set('Cache-Control', 'no-store');
   res.json({ aiAvailable: Boolean(process.env.GEMINI_API_KEY) });
@@ -125,6 +155,7 @@ function validateChatBody(
 
 app.post(
   '/api/chat',
+  rateLimit,
   validateChatBody,
   async (req: Request<{}, {}, ChatRequestBody>, res: Response): Promise<void> => {
     try {
@@ -154,7 +185,7 @@ app.post(
   }
 );
 
-app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
+app.get('/api/tts', rateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const { text, lang } = req.query;
     if (!text || typeof text !== 'string') {
@@ -240,7 +271,7 @@ app.get('/api/tts', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post('/api/transcribe', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/transcribe', rateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const { audioData, mimeType, expectedLanguage } = req.body;
     if (!audioData || typeof audioData !== 'string') {

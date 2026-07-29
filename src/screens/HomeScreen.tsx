@@ -116,7 +116,7 @@ export default function HomeScreen({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 md:pb-6 bg-gray-50 relative">
+    <div className="flex-1 overflow-y-auto pb-24 md:pb-6 bg-gray-50 dark:bg-gray-950 relative">
       {showAboutModal && <AboutModal onClose={() => setShowAboutModal(false)} />}
       
       {/* ── Header ── */}
@@ -408,7 +408,7 @@ function UnitSection({ title, subtitle, progress, color, children }: UnitSection
         <div className="flex items-center justify-between">
           <div>
             <h2 className={`text-base font-bold ${theme.headerText}`}>{title}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
           </div>
           <div className="flex items-center gap-2">
             {isComplete && (
@@ -436,7 +436,7 @@ function UnitSection({ title, subtitle, progress, color, children }: UnitSection
       {/* Zigzag path */}
       <div className="relative flex flex-col items-center gap-7">
         {/* Vertical guide line */}
-        <div className="absolute top-8 bottom-8 w-1.5 bg-gray-200 rounded-full -z-10" />
+        <div className="absolute top-8 bottom-8 w-1.5 bg-gray-200 dark:bg-gray-800 rounded-full -z-10" />
 
         {React.Children.map(children, (child) => child)}
       </div>
@@ -460,7 +460,7 @@ function LessonNode({
     ? `${theme.nodeBg} ${theme.nodeShadow} text-white active:shadow-none active:translate-y-1`
     : status === 'current'
       ? `bg-white border-2 ${theme.currentRing} ${theme.currentText} animate-bounce`
-      : `bg-white border-2 border-gray-200 ${theme.currentText} shadow-sm`;
+      : `bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 ${theme.currentText} shadow-sm`;
 
   const icon = status === 'completed'
     ? <Check strokeWidth={3} size={26} />
@@ -493,7 +493,7 @@ function LessonNode({
           {icon}
         </button>
 
-        <span className="text-[11px] font-bold text-center leading-tight max-w-[80px] text-gray-700">
+        <span className="text-[11px] font-bold text-center leading-tight max-w-[80px] text-gray-700 dark:text-gray-300">
           {title}
         </span>
 
