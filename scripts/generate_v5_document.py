@@ -731,7 +731,13 @@ def add_review(
     add_table(doc, ["المعرّف", "النوع", "المهارة", "المهمة العربية", "Հայերեն", "الصوت"], rows, [0.78, 0.72, 0.85, 1.78, 1.55, 0.9], font_size=8.1)
 
 
-def add_assessment(doc: Document, assessment: dict[str, Any]) -> None:
+def add_assessment(
+    doc: Document,
+    data: dict[str, Any],
+    assessment: dict[str, Any],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+) -> None:
     add_heading(doc, assessment["titleAr"], assessment["titleHy"], level=1, code=assessment["id"])
     if assessment["id"] == "X01":
         add_callout(
@@ -746,6 +752,7 @@ def add_assessment(doc: Document, assessment: dict[str, Any]) -> None:
             "Առանձին լրացուցիչ քննություն է և պարտադիր չէ Core A1-ի համար։",
             fill=PALE_GOLD,
         )
+    manifest = data["audioManifest"]["entries"]
     rows = [
         [
             item["id"],
@@ -753,10 +760,17 @@ def add_assessment(doc: Document, assessment: dict[str, Any]) -> None:
             item["skill"],
             item["promptAr"],
             item["promptHy"],
+            resolve_audio_status_cell(item["id"], manifest.get(item["id"], {}), qr_files, qr_warnings),
         ]
         for item in assessment["items"]
     ]
-    add_table(doc, ["المعرّف", "النوع", "المهارة", "المهمة", "Հայերեն"], rows, [0.82, 0.8, 0.9, 2.28, 1.78], font_size=8.3)
+    add_table(
+        doc,
+        ["المعرّف", "النوع", "المهارة", "المهمة", "Հայերեն", "الصوت"],
+        rows,
+        [0.7, 0.65, 0.75, 1.98, 1.55, 0.95],
+        font_size=8.1,
+    )
     add_heading(doc, "سلّم مختصر", "Կարճ գնահատման սանդղակ", level=2)
     add_table(
         doc,
@@ -838,7 +852,7 @@ def build(
         add_unit(doc, data, units_by_id[unit_id], qr_files, qr_warnings)
     add_review(doc, data, units_by_id["R01"], qr_files, qr_warnings)
     for assessment in data["curriculum"]["assessments"]:
-        add_assessment(doc, assessment)
+        add_assessment(doc, data, assessment, qr_files, qr_warnings)
     add_glossary(doc, data)
     add_release_note(doc, data, base_url)
 
