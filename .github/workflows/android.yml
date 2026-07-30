@@ -33,14 +33,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Sync Capacitor Android & Patch Manifest Conflict
+      - name: Sync Capacitor Android
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
           npx cap sync android
-          sed -i 's|<manifest|<manifest xmlns:tools="http://schemas.android.com/tools"|g' android/app/src/main/AndroidManifest.xml
-          sed -i 's|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"|android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver" tools:replace="android:exported"|g' android/app/src/main/AndroidManifest.xml
+          # Le receveur LocalNotificationRestoreReceiver n'est plus déclaré dans le
+          # manifeste de l'app : le plugin @capacitor/local-notifications le déclare
+          # lui-même (exported="false", directBootAware, BOOT_COMPLETED +
+          # LOCKED_BOOT_COMPLETED + QUICKBOOT_POWERON). Le patch tools:replace qui
+          # existait ici n'a donc plus d'objet.
 
       - name: Build APK with Gradle
         run: |

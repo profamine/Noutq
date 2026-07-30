@@ -2,6 +2,7 @@ node_modules/
 build/
 dist/
 coverage/
+.tmp/
 .DS_Store
 *.log
 .env*
@@ -9,3 +10,7 @@ coverage/
 
 .vercel
 .env*
+
+# Clés API en clair déposées à la racine par erreur — ne jamais committer.
+api_elvenlabs.txt
+*_api_key.txt

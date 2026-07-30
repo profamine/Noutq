@@ -38,3 +38,25 @@ Sans clé API, les leçons et exercices fonctionnent (audio pré-généré dans 
 | `npx tsx scripts/generateAll.ts` | Pré-génère les fichiers audio des leçons (serveur dev démarré requis) |
 | `npm run android:build` | Build + synchronisation Capacitor Android |
 | `npm run android:open` | Ouvre le projet Android Studio |
+
+## Noutq V5 RC2
+
+مصدر الحقيقة القابل للتعديل هو:
+
+- `content/v5/curriculum.json` لبنية المسارات والوحدات والأنشطة والاختبارين.
+- `content/v5/glossary.json` للمعجم المنظم.
+- `src/data/lessons/u1.ts` إلى `u22.ts` للأنشطة الموروثة ذات المعرفات الثابتة.
+
+لا تُعدَّل ملفات DOCX أو PDF يدويًا. بعد تعديل المصدر شغّل:
+
+```powershell
+npm run generate:v5-audio
+npm run validate:v5
+npx tsx scripts/exportV5DocumentData.ts .tmp/v5-document-data.json
+python scripts/generate_v5_document.py --data .tmp/v5-document-data.json --output Noutq-contenu-pedagogique-v5-rc2.docx
+```
+
+ملف `public/audio/manifest.v2.json` يربط كل معرف صوتي بملف محلي أو بحالة
+fallback صريحة. المسار الثابت `/a/{audioId}` يعيد توجيه الملف المتاح ويعرض
+رسالة عربية/أرمنية واضحة عند غياب الأصل. لا تُولَّد رموز QR حتى يُضبط عنوان
+نشر أساسي ثابت (canonical base URL).

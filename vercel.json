@@ -1,6 +1,15 @@
 {
   "version": 2,
+  "functions": {
+    "api/audio.ts": {
+      "includeFiles": "public/audio/manifest.v2.json"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/a/:audioId",
+      "destination": "/api/audio?audioId=:audioId"
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"

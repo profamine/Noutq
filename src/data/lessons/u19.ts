@@ -33,10 +33,10 @@ export const u19: LessonData = {
       transliteration: "anāmu",
       meaning: "Ո՞րն է 'أَنَامُ' իմաստը:",
       options: [
-        { text: "Զարթնում եմ ✗", correct: false },
-        { text: "Քնում եմ ✓", correct: true },
-        { text: "Ուտում եմ ✗", correct: false },
-        { text: "Գնում եմ ✗", correct: false },
+        { text: "Զարթնում եմ", correct: false },
+        { text: "Քնում եմ", correct: true },
+        { text: "Ուտում եմ", correct: false },
+        { text: "Գնում եմ", correct: false },
       ],
     },
     {
@@ -62,9 +62,9 @@ export const u19: LessonData = {
       transliteration: "ṣabāḥan",
       meaning: "Ի՞նչ է 'صَبَاحًا' իմաստը:",
       options: [
-        { text: "Առավոտյան ✓", correct: true },
-        { text: "Կեսօրին ✗", correct: false },
-        { text: "Երեկոյան ✗", correct: false },
+        { text: "Առավոտյան", correct: true },
+        { text: "Կեսօրին", correct: false },
+        { text: "Երեկոյան", correct: false },
       ],
     },
     {

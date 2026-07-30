@@ -1,0 +1,1169 @@
+{
+  "schemaVersion": 6,
+  "release": "V5-RC2",
+  "buildDate": "2026-07-29",
+  "migrationVersion": 2,
+  "audioManifestVersion": 3,
+  "legacyUnitIds": [
+    "u1",
+    "u2",
+    "u3",
+    "u4",
+    "u5",
+    "u6",
+    "u7",
+    "u8",
+    "u9",
+    "u10",
+    "u11",
+    "u12",
+    "u13",
+    "u14",
+    "u15",
+    "u16",
+    "u17",
+    "u18",
+    "u19",
+    "u20",
+    "u21",
+    "u22"
+  ],
+  "tracks": [
+    {
+      "id": "core",
+      "titleAr": "المسار الأساسي A1",
+      "titleHy": "Հիմնական A1 ուղի",
+      "requiredUnits": [
+        "u1",
+        "u2",
+        "u7",
+        "u16",
+        "u5",
+        "u8",
+        "u14",
+        "u10",
+        "u11",
+        "u12",
+        "u15",
+        "u17",
+        "u18",
+        "u19"
+      ],
+      "assessmentId": "X01"
+    },
+    {
+      "id": "grammar",
+      "titleAr": "الامتداد النحوي",
+      "titleHy": "Քերականական ընդլայնում",
+      "requiredUnits": [
+        "u3",
+        "u4",
+        "u9",
+        "u6",
+        "u21",
+        "u22"
+      ],
+      "assessmentId": "X02"
+    }
+  ],
+  "units": [
+    {
+      "id": "C01",
+      "titleAr": "الحروف والنطق",
+      "titleHy": "Տառերը և արտասանությունը",
+      "legacySources": [
+        "u1"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C02",
+      "titleAr": "أسس القراءة",
+      "titleHy": "Ընթերցանության հիմունքներ",
+      "legacySources": [
+        "u2"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C03",
+      "titleAr": "التحيات والتعارف",
+      "titleHy": "Ողջույններ և ծանոթություն",
+      "legacySources": [
+        "u7",
+        "u16"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C04",
+      "titleAr": "الأرقام من 1 إلى 10",
+      "titleHy": "Թվերը 1-ից 10",
+      "legacySources": [
+        "u5"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C05",
+      "titleAr": "الوقت والطقس",
+      "titleHy": "Ժամանակը և եղանակը",
+      "legacySources": [
+        "u8",
+        "u14"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C06",
+      "titleAr": "الأسرة",
+      "titleHy": "Ընտանիքը",
+      "legacySources": [
+        "u10"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C07",
+      "titleAr": "الطعام والشراب",
+      "titleHy": "Ուտելիք և խմիչք",
+      "legacySources": [
+        "u11"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C08",
+      "titleAr": "الأماكن وحروف الجر وظروف المكان",
+      "titleHy": "Վայրեր, նախդիրներ և տեղի մակբայներ",
+      "legacySources": [
+        "u12"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C09",
+      "titleAr": "في المدرسة",
+      "titleHy": "Դպրոցում",
+      "legacySources": [
+        "u15"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C10",
+      "titleAr": "التسوّق",
+      "titleHy": "Գնումներ",
+      "legacySources": [
+        "u17"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C11",
+      "titleAr": "الاتجاهات",
+      "titleHy": "Ուղղություններ",
+      "legacySources": [
+        "u18"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "C12",
+      "titleAr": "الحياة اليومية",
+      "titleHy": "Առօրյա կյանք",
+      "legacySources": [
+        "u19"
+      ],
+      "track": "core"
+    },
+    {
+      "id": "E01",
+      "titleAr": "الجسم والصحة",
+      "titleHy": "Մարմին և առողջություն",
+      "legacySources": [
+        "u13"
+      ],
+      "track": "optional"
+    },
+    {
+      "id": "G01",
+      "titleAr": "التنوين",
+      "titleHy": "Թանվին",
+      "legacySources": [
+        "u3"
+      ],
+      "track": "grammar"
+    },
+    {
+      "id": "G02",
+      "titleAr": "مقدمة في الإعراب",
+      "titleHy": "Իրաբի ներածություն",
+      "legacySources": [
+        "u4"
+      ],
+      "track": "grammar"
+    },
+    {
+      "id": "G03",
+      "titleAr": "المطابقة",
+      "titleHy": "Համաձայնություն",
+      "legacySources": [
+        "u9",
+        "u21"
+      ],
+      "track": "grammar"
+    },
+    {
+      "id": "G04",
+      "titleAr": "المذكر والمؤنث وصيغ الخطاب",
+      "titleHy": "Արական, իգական և դիմելաձևեր",
+      "legacySources": [
+        "u6"
+      ],
+      "track": "grammar"
+    },
+    {
+      "id": "G05",
+      "titleAr": "الحركات الإعرابية",
+      "titleHy": "Իրաբական վերջավորություններ",
+      "legacySources": [
+        "u22"
+      ],
+      "track": "grammar"
+    },
+    {
+      "id": "R01",
+      "titleAr": "مراجعة شاملة",
+      "titleHy": "Ընդհանուր կրկնություն",
+      "legacySources": [
+        "u20"
+      ],
+      "track": "review"
+    },
+    {
+      "id": "X01",
+      "titleAr": "اختبار المسار الأساسي",
+      "titleHy": "Հիմնական ուղու քննություն",
+      "legacySources": [],
+      "track": "assessment"
+    },
+    {
+      "id": "X02",
+      "titleAr": "اختبار الامتداد النحوي",
+      "titleHy": "Քերականական ընդլայնման քննություն",
+      "legacySources": [],
+      "track": "assessment"
+    }
+  ],
+  "pronunciationGuide": {
+    "principleAr": "العربية هي النموذج النهائي، والمقارنة الأرمنية وسيلة مساعدة مؤقتة.",
+    "principleHy": "Արաբերենը վերջնական նմուշն է, իսկ հայերենի հետ համեմատությունը՝ ժամանակավոր հենարան։",
+    "requiredSounds": [
+      "ا",
+      "ب",
+      "ت",
+      "ث",
+      "ج",
+      "ح",
+      "خ",
+      "د",
+      "ذ",
+      "ر",
+      "ز",
+      "س",
+      "ش",
+      "ص",
+      "ض",
+      "ط",
+      "ظ",
+      "ع",
+      "غ",
+      "ف",
+      "ق",
+      "ك",
+      "ل",
+      "م",
+      "ن",
+      "ه",
+      "و",
+      "ي",
+      "ء"
+    ],
+    "categories": [
+      {
+        "id": "A",
+        "titleAr": "أصوات لها مقابل أرمني قريب",
+        "sounds": [
+          "ا",
+          "ب",
+          "ج",
+          "ر",
+          "ش",
+          "ف",
+          "ل",
+          "م",
+          "ن",
+          "خ",
+          "غ"
+        ],
+        "noteAr": "ابدأ بالمقابل الأرمني القريب ثم طابقه بالنموذج العربي. خ تقارب խ، وغ تقارب ղ، وج تقارب ջ، لكن الصوت العربي يبقى المرجع.",
+        "noteHy": "Սկսիր մոտ հայերեն հնչյունից, ապա համեմատիր արաբերեն նմուշի հետ։ خ-ը մոտ է խ-ին, غ-ը՝ ղ-ին, իսկ ج-ը՝ ջ-ին։"
+      },
+      {
+        "id": "B",
+        "titleAr": "أصوات لها نقطة انطلاق قريبة لكنها تحتاج تمييزًا",
+        "sounds": [
+          "ه / ح",
+          "س / ص",
+          "ت / ط",
+          "د / ض",
+          "ز / ظ",
+          "ك / ق",
+          "و / ي"
+        ],
+        "noteAr": "درّب كل زوج ببطء ثم في مقاطع قصيرة، ولا تستبدل الصوت المفخم بنظيره غير المفخم. و وي قد تكونان صامتين أو حرفَي مد بحسب السياق.",
+        "noteHy": "Յուրաքանչյուր զույգ վարժիր դանդաղ, ապա կարճ վանկերով։ Մի՛ փոխարինիր ընդգծված հնչյունը նրա սովորական զույգով։ و և ي-ի գործառույթը կախված է համատեքստից։"
+      },
+      {
+        "id": "C",
+        "titleAr": "أصوات لا مقابل أرمني مباشرًا مفيدًا لها",
+        "sounds": [
+          "ث",
+          "ذ",
+          "ع",
+          "ء"
+        ],
+        "noteAr": "استمع إلى النموذج، راقب موضع اللسان والحلق، ثم سجّل نفسك. لا تستبدل الصوت بحرف أرمني.",
+        "noteHy": "Լսիր նմուշը, հետևիր լեզվի և կոկորդի դիրքին, ապա ձայնագրիր քեզ։ Հնչյունը մի փոխարինիր հայերեն տառով։"
+      }
+    ],
+    "minimalPairs": [
+      "سَ / صَ",
+      "تَ / طَ",
+      "دَ / ضَ",
+      "هَ / حَ"
+    ]
+  },
+  "newActivities": [
+    {
+      "id": "v5.c02.01",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "ب  ت  ث  ن  ي",
+      "transliteration": "b / t / th / n / y",
+      "armenian": "Ճանաչիր մեկուսացված տառերը",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.02",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "ب  بـ  ـبـ  ـب",
+      "transliteration": "b",
+      "armenian": "Տարբերիր տառի առանձին, սկզբնական, միջին և վերջնական ձևերը",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.03",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "ا  د  ذ  ر  ز  و",
+      "transliteration": "ā / d / dh / r / z / w",
+      "armenian": "Այս տառերը չեն միանում հաջորդ տառին",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.04",
+      "unit": "C02",
+      "type": "listening",
+      "arabic": "بَ  بِ  بُ",
+      "transliteration": "ba / bi / bu",
+      "armenian": "Լսիր և տարբերիր կարճ վանկերը",
+      "audio": {
+        "status": "available",
+        "src": "/audio/بَ__بِ__بُ.wav"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.05",
+      "unit": "C02",
+      "type": "listening",
+      "arabic": "بَا  بِي  بُو",
+      "transliteration": "bā / bī / bū",
+      "armenian": "Լսիր երկար ձայնավորները",
+      "audio": {
+        "status": "available",
+        "src": "/audio/بَا__بُو__بِي.wav"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.06",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "دَرَسَ / دَرَّسَ",
+      "transliteration": "darasa / darrasa",
+      "armenian": "Կարդա շադդայով և առանց շադդայի",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.07",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "أَ  إِ  سَأَلَ",
+      "transliteration": "ʾa / ʾi / saʾala",
+      "armenian": "Ճանաչիր համզան",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.08",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "مَدْرَسَة / فَتَى",
+      "transliteration": "madrasa / fatā",
+      "armenian": "Տարբերիր ة և ى",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.09",
+      "unit": "C02",
+      "type": "listening",
+      "arabic": "الشَّمْسُ / القَمَرُ",
+      "transliteration": "ash-shamsu / al-qamaru",
+      "armenian": "Համեմատիր արևային և լուսնային ال-ը",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.10",
+      "unit": "C02",
+      "type": "reading",
+      "arabic": "بَاب / بَيْت / نُور",
+      "transliteration": "bāb / bayt / nūr",
+      "armenian": "Կարդա բառերը",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c02.11",
+      "unit": "C02",
+      "type": "production",
+      "arabic": "هَذَا بَابٌ.",
+      "transliteration": "hādhā bābun",
+      "armenian": "Կարդա կարճ նախադասությունը",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c03.01",
+      "unit": "C03",
+      "type": "listening",
+      "arabic": "أَنْتَ / أَنْتِ",
+      "transliteration": "anta / anti",
+      "armenian": "Դու՝ արական / իգական",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c03.02",
+      "unit": "C03",
+      "type": "mini-dialogue",
+      "arabic": "كَيْفَ حَالُكَ؟ — أَنَا بِخَيْرٍ، شُكْرًا.",
+      "transliteration": "kayfa ḥāluka? — anā bikhayrin, shukran",
+      "armenian": "Ինչպե՞ս ես (արական)։ — Լավ եմ, շնորհակալություն։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c03.03",
+      "unit": "C03",
+      "type": "mini-dialogue",
+      "arabic": "كَيْفَ حَالُكِ؟ — أَنَا بِخَيْرٍ، شُكْرًا.",
+      "transliteration": "kayfa ḥāluki? — anā bikhayrin, shukran",
+      "armenian": "Ինչպե՞ս ես (իգական)։ — Լավ եմ, շնորհակալություն։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c03.04",
+      "unit": "C03",
+      "type": "production",
+      "arabic": "هَلْ تَتَكَلَّمُ العَرَبِيَّةَ؟ / هَلْ تَتَكَلَّمِينَ العَرَبِيَّةَ؟",
+      "transliteration": "hal tatakallamu l-ʿarabiyyata? / hal tatakallīna l-ʿarabiyyata?",
+      "armenian": "Արաբերեն խոսո՞ւմ ես՝ արական / իգական",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.01",
+      "unit": "C05",
+      "type": "listening",
+      "arabic": "السَّاعَةُ الوَاحِدَةُ",
+      "transliteration": "as-sāʿatu l-wāḥidatu",
+      "armenian": "Ժամը մեկն է",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.02",
+      "unit": "C05",
+      "type": "listening",
+      "arabic": "السَّاعَةُ الثَّالِثَةُ",
+      "transliteration": "as-sāʿatu th-thālithatu",
+      "armenian": "Ժամը երեքն է",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.03",
+      "unit": "C05",
+      "type": "listening",
+      "arabic": "السَّاعَةُ الخَامِسَةُ",
+      "transliteration": "as-sāʿatu l-khāmisatu",
+      "armenian": "Ժամը հինգն է",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.04",
+      "unit": "C05",
+      "type": "listening",
+      "arabic": "السَّاعَةُ السَّابِعَةُ وَالنِّصْفُ",
+      "transliteration": "as-sāʿatu s-sābiʿatu wa-n-niṣfu",
+      "armenian": "Ժամը յոթ անց կես է",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.05",
+      "unit": "C05",
+      "type": "mini-dialogue",
+      "arabic": "كَمِ السَّاعَةُ؟ — السَّاعَةُ الخَامِسَةُ.",
+      "transliteration": "kami s-sāʿatu? — as-sāʿatu l-khāmisatu",
+      "armenian": "Ժամը քանի՞սն է։ — Ժամը հինգն է։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c05.06",
+      "unit": "C05",
+      "type": "writing",
+      "arabic": "مَوْعِدِي السَّاعَةُ ...",
+      "transliteration": "mawʿidī s-sāʿatu ...",
+      "armenian": "Իմ հանդիպումը ժամը ... է",
+      "audio": {
+        "status": "missing",
+        "fallback": "writing"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.e01.01",
+      "unit": "E01",
+      "type": "listening",
+      "arabic": "أَيْنَ تَشْعُرُ بِالأَلَمِ؟",
+      "transliteration": "ayna tashʿuru bi-l-alami?",
+      "armenian": "Որտե՞ղ ես ցավ զգում (արական)",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.e01.02",
+      "unit": "E01",
+      "type": "listening",
+      "arabic": "أَيْنَ تَشْعُرِينَ بِالأَلَمِ؟",
+      "transliteration": "ayna tashʿurīna bi-l-alami?",
+      "armenian": "Որտե՞ղ ես ցավ զգում (իգական)",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.e01.03",
+      "unit": "E01",
+      "type": "mini-dialogue",
+      "arabic": "مَا الَّذِي يُؤْلِمُكَ؟ — رَأْسِي يُؤْلِمُنِي.",
+      "transliteration": "mā lladhī yuʾlimuka? — raʾsī yuʾlimunī",
+      "armenian": "Ի՞նչն է ցավում (արական)։ — Գլուխս ցավում է։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.e01.04",
+      "unit": "E01",
+      "type": "mini-dialogue",
+      "arabic": "مَا الَّذِي يُؤْلِمُكِ؟ — عِنْدِي أَلَمٌ فِي ظَهْرِي.",
+      "transliteration": "mā lladhī yuʾlimuki? — ʿindī alamun fī ẓahrī",
+      "armenian": "Ի՞նչն է ցավում (իգական)։ — Մեջքս ցավում է։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c09.01",
+      "unit": "C09",
+      "type": "mini-dialogue",
+      "arabic": "أَيَّ مَادَّةٍ تُحِبُّ؟ — أُحِبُّ الرِّيَاضِيَّاتِ.",
+      "transliteration": "ayya māddatin tuḥibbu? — uḥibbu r-riyāḍiyyāti",
+      "armenian": "Ո՞ր առարկան ես սիրում (արական)։ — Ես սիրում եմ մաթեմատիկան։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c09.02",
+      "unit": "C09",
+      "type": "mini-dialogue",
+      "arabic": "أَيَّ مَادَّةٍ تُحِبِّينَ؟ — أُحِبُّ الرِّيَاضِيَّاتِ.",
+      "transliteration": "ayya māddatin tuḥibbīna? — uḥibbu r-riyāḍiyyāti",
+      "armenian": "Ո՞ր առարկան ես սիրում (իգական)։ — Ես սիրում եմ մաթեմատիկան։",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c10.01",
+      "unit": "C10",
+      "type": "mini-dialogue",
+      "arabic": "بِكَمْ هَذَا، مِنْ فَضْلِكَ؟ / بِكَمْ هَذَا، مِنْ فَضْلِكِ؟",
+      "transliteration": "bikam hādhā, min faḍlika? / min faḍliki?",
+      "armenian": "Որքա՞ն արժե սա, խնդրում եմ՝ արական / իգական դիմելաձև",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c10.02",
+      "unit": "C10",
+      "type": "production",
+      "arabic": "هَلْ عِنْدَكَ مَاءٌ؟ / هَلْ عِنْدَكِ مَاءٌ؟",
+      "transliteration": "hal ʿindaka māʾun? / hal ʿindaki māʾun?",
+      "armenian": "Ջուր ունե՞ք՝ արական / իգական դիմելաձև",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c11.01",
+      "unit": "C11",
+      "type": "listening",
+      "arabic": "اِذْهَبْ يَمِينًا.",
+      "transliteration": "idhhab yamīnan",
+      "armenian": "Գնա աջ (արական)",
+      "audio": {
+        "status": "available",
+        "src": "/audio/اِذْهَبْ.wav"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c11.02",
+      "unit": "C11",
+      "type": "listening",
+      "arabic": "اِذْهَبِي يَمِينًا.",
+      "transliteration": "idhhabī yamīnan",
+      "armenian": "Գնա աջ (իգական)",
+      "audio": {
+        "status": "missing",
+        "fallback": "reading"
+      },
+      "delivery": "in-app"
+    },
+    {
+      "id": "v5.c12.01",
+      "unit": "C12",
+      "type": "production",
+      "arabic": "مَتَى تَسْتَيْقِظُ؟ / مَتَى تَسْتَيْقِظِينَ؟",
+      "transliteration": "matā tastayqiẓu? / matā tastayqiẓīna?",
+      "armenian": "Ե՞րբ ես արթնանում՝ արական / իգական",
+      "audio": {
+        "status": "missing",
+        "fallback": "role-play"
+      },
+      "delivery": "in-app"
+    }
+  ],
+  "textMigrations": [
+    {
+      "exerciseId": "u13.7",
+      "from": "أَيْنَ تُؤْلِمُك؟",
+      "to": "أَيْنَ تَشْعُرُ بِالأَلَمِ؟",
+      "legacyAudioAlias": true,
+      "migrateSrsKey": true
+    },
+    {
+      "exerciseId": "u15.7",
+      "from": "أَيُّ مَادَّةٍ تُحِبّ؟",
+      "to": "أَيَّ مَادَّةٍ تُحِبُّ؟",
+      "legacyAudioAlias": true,
+      "migrateSrsKey": true
+    },
+    {
+      "exerciseId": "u16.3",
+      "from": "كَيْفَ تَقُولُ 'ես հայ եմ' بِالعَرَبِيَّة؟",
+      "to": "كَيْفَ تَقُولُ: «أَنَا أَرْمَنِيٌّ / أَرْمَنِيَّةٌ»؟",
+      "legacyAudioAlias": true,
+      "legacyAudioText": "كَيْفَ تَقُولُ",
+      "migrateSrsKey": true
+    },
+    {
+      "exerciseId": "u14.2",
+      "from": "الجَوُّ اليَوْم مُشْمِس",
+      "to": "الجَوُّ اليَوْمَ مُشْمِس",
+      "legacyAudioAlias": true,
+      "migrateSrsKey": true
+    },
+    {
+      "exerciseId": "u14.8",
+      "from": "الجَوُّ اليَوْم غَائِم وَبَارِد",
+      "to": "الجَوُّ اليَوْمَ غَائِم وَبَارِد",
+      "legacyAudioAlias": true,
+      "migrateSrsKey": true
+    }
+  ],
+  "review": [
+    {
+      "id": "v5.r01.01",
+      "type": "listening",
+      "skill": "التعارف",
+      "promptAr": "استمع واكتب الاسم والبلد: أَنَا اسْمِي مَارِي وَأَنَا مِنْ أَرْمِينِيَا.",
+      "promptHy": "Լսիր և գրիր անունն ու երկիրը։",
+      "audio": {
+        "status": "missing",
+        "fallback": "teacher-read"
+      },
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.02",
+      "type": "reading",
+      "skill": "المكان",
+      "promptAr": "اقرأ وحدّد المكان: السَّيَّارَةُ أَمَامَ المَدْرَسَةِ.",
+      "promptHy": "Կարդա և նշիր մեքենայի տեղը։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.03",
+      "type": "contextual-choice",
+      "skill": "الوقت",
+      "promptAr": "اختر الساعة الموافقة لعبارة: السَّاعَةُ السَّابِعَةُ وَالنِّصْفُ.",
+      "promptHy": "Ընտրիր համապատասխան ժամացույցը։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.04",
+      "type": "sentence-completion",
+      "skill": "الأسرة",
+      "promptAr": "أكمل: عِنْدِي أَبٌ وَ... .",
+      "promptHy": "Լրացրու ընտանիքի մասին նախադասությունը։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.05",
+      "type": "classification",
+      "skill": "المكان",
+      "promptAr": "صنّف: فِي / عَلَى / أَمَامَ / بَيْنَ إلى حروف جر وظروف مكان.",
+      "promptHy": "Բաժանիր նախդիրներն ու տեղի մակբայները։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.06",
+      "type": "mini-dialogue",
+      "skill": "التسوّق",
+      "promptAr": "أكمل حوار شراء بثمن مناسب وعبارة شكر.",
+      "promptHy": "Լրացրու գնման երկխոսությունը գնով և շնորհակալությամբ։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.07",
+      "type": "ordering",
+      "skill": "الروتين",
+      "promptAr": "رتّب: أَسْتَيْقِظُ / أَفْطِرُ / أَدْرُسُ / أَنَامُ.",
+      "promptHy": "Դասավորիր առօրյա գործողությունները։",
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "v5.r01.08",
+      "type": "production",
+      "skill": "الاتجاهات",
+      "promptAr": "اسأل عن الطريق ثم أعطِ تعليمتين.",
+      "promptHy": "Հարցրու ճանապարհը և տուր երկու ուղղություն։",
+      "delivery": "teacher-led"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "X01",
+      "titleAr": "اختبار المسار الأساسي A1",
+      "titleHy": "Հիմնական A1 ուղու քննություն",
+      "requiredTrack": "core",
+      "completionIndependentOf": [
+        "grammar"
+      ],
+      "items": [
+        {
+          "id": "v5.x01.01",
+          "type": "listening",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u7"
+          ],
+          "skill": "التحيات",
+          "promptAr": "استمع واختر الرد المناسب للتحية.",
+          "promptHy": "Լսիր և ընտրիր ողջույնի ճիշտ պատասխանը։",
+          "audio": {
+            "status": "missing",
+            "fallback": "teacher-read"
+          },
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.02",
+          "type": "mini-dialogue",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u16"
+          ],
+          "skill": "التعارف",
+          "promptAr": "أكمل: — مَا اسْمُكَ؟ — ______.",
+          "promptHy": "Լրացրու ծանոթության երկխոսությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.03",
+          "type": "writing",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u16"
+          ],
+          "skill": "التعارف",
+          "promptAr": "اكتب اسمك وبلدك في جملتين.",
+          "promptHy": "Գրիր անունդ և երկիրդ երկու նախադասությամբ։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.04",
+          "type": "listening-discrimination",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u5"
+          ],
+          "skill": "الأرقام",
+          "promptAr": "استمع وحدّد العدد الصحيح بين 1 و10.",
+          "promptHy": "Լսիր և ընտրիր ճիշտ թիվը 1-ից 10։",
+          "audio": {
+            "status": "missing",
+            "fallback": "teacher-read"
+          },
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.05",
+          "type": "contextual-choice",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u8"
+          ],
+          "skill": "الوقت",
+          "promptAr": "اختر الساعة الموافقة: السَّاعَةُ الثَّالِثَةُ.",
+          "promptHy": "Ընտրիր «ժամը երեքն է» արտահայտությանը համապատասխան ժամացույցը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.06",
+          "type": "sentence-completion",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u14"
+          ],
+          "skill": "الطقس",
+          "promptAr": "أكمل بحسب الصورة: الجَوُّ اليَوْمَ ______.",
+          "promptHy": "Լրացրու եղանակի նախադասությունը ըստ նկարի։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.07",
+          "type": "reading",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u10"
+          ],
+          "skill": "الأسرة",
+          "promptAr": "اقرأ فقرة قصيرة وحدّد عدد أفراد الأسرة.",
+          "promptHy": "Կարդա կարճ տեքստը և նշիր ընտանիքի անդամների թիվը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.08",
+          "type": "matching",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u11"
+          ],
+          "skill": "الطعام",
+          "promptAr": "طابق أربعة أطعمة مع صورها.",
+          "promptHy": "Համապատասխանեցրու չորս ուտելիք իրենց նկարներին։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.09",
+          "type": "reading",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u12"
+          ],
+          "skill": "المكان",
+          "promptAr": "اقرأ: الكِتَابُ عَلَى المَكْتَبِ. ثم اختر الصورة الصحيحة.",
+          "promptHy": "Կարդա և ընտրիր ճիշտ նկարը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.10",
+          "type": "contextual-choice",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u15"
+          ],
+          "skill": "المدرسة",
+          "promptAr": "اختر جوابًا طبيعيًا لسؤال: أَيَّ مَادَّةٍ تُحِبُّ؟",
+          "promptHy": "Ընտրիր բնական պատասխան առարկայի մասին հարցին։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.11",
+          "type": "mini-dialogue",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u17"
+          ],
+          "skill": "التسوّق",
+          "promptAr": "أكمل حوارًا قصيرًا يتضمن بِكَمْ؟ ومِنْ فَضْلِكَ/فَضْلِكِ.",
+          "promptHy": "Լրացրու գնման կարճ երկխոսությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.12",
+          "type": "ordering",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u18"
+          ],
+          "skill": "الاتجاهات",
+          "promptAr": "رتّب ثلاث تعليمات للوصول إلى المدرسة.",
+          "promptHy": "Դասավորիր դպրոց հասնելու երեք ուղղությունները։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.13",
+          "type": "writing",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u19"
+          ],
+          "skill": "الروتين",
+          "promptAr": "اكتب ثلاث جمل عن روتينك اليومي.",
+          "promptHy": "Գրիր առօրյայիդ մասին երեք նախադասություն։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x01.14",
+          "type": "speaking",
+          "conceptScope": "core",
+          "sourceUnits": [
+            "u16",
+            "u19"
+          ],
+          "skill": "الإنتاج",
+          "promptAr": "قدّم نفسك في 30–45 ثانية: الاسم والبلد والدراسة أو العمل.",
+          "promptHy": "Ներկայացրու քեզ 30–45 վայրկյանում։",
+          "delivery": "teacher-led"
+        }
+      ],
+      "delivery": "teacher-led"
+    },
+    {
+      "id": "X02",
+      "titleAr": "اختبار الامتداد النحوي",
+      "titleHy": "Քերականական ընդլայնման քննություն",
+      "requiredTrack": "grammar",
+      "optionalForCore": true,
+      "items": [
+        {
+          "id": "v5.x02.01",
+          "type": "listening-discrimination",
+          "conceptScope": "grammar",
+          "skill": "التنوين",
+          "promptAr": "ميّز سمعيًا بين كِتَابٌ / كِتَابًا / كِتَابٍ.",
+          "promptHy": "Լսելով տարբերիր երեք թանվինները։",
+          "audio": {
+            "status": "available",
+            "src": "/audio/كِتَابٌ__كِتَابًا__كِتَابٍ.wav"
+          },
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.02",
+          "type": "classification",
+          "conceptScope": "grammar",
+          "skill": "الإعراب",
+          "promptAr": "صنّف ثلاث كلمات إلى مرفوع ومنصوب ومجرور.",
+          "promptHy": "Բաժանիր բառերը ուղղական, հայցական և սեռական հոլովների։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.03",
+          "type": "sentence-completion",
+          "conceptScope": "grammar",
+          "skill": "الرفع",
+          "promptAr": "أكمل الفاعل بالحركة المناسبة: جَاءَ الطَّالِبُ.",
+          "promptHy": "Լրացրու ենթակայի ճիշտ վերջավորությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.04",
+          "type": "sentence-completion",
+          "conceptScope": "grammar",
+          "skill": "النصب",
+          "promptAr": "أكمل المفعول به بالحركة المناسبة: رَأَيْتُ الوَلَدَ.",
+          "promptHy": "Լրացրու ուղիղ խնդրի ճիշտ վերջավորությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.05",
+          "type": "sentence-completion",
+          "conceptScope": "grammar",
+          "skill": "الجر",
+          "promptAr": "أكمل بعد حرف الجر: فِي البَيْتِ.",
+          "promptHy": "Լրացրու նախդրից հետո ճիշտ վերջավորությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.06",
+          "type": "matching",
+          "conceptScope": "grammar",
+          "skill": "المطابقة",
+          "promptAr": "طابق الاسم والصفة في الجنس والعدد.",
+          "promptHy": "Համապատասխանեցրու գոյականն ու ածականը սեռով և թվով։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.07",
+          "type": "transformation",
+          "conceptScope": "grammar",
+          "skill": "المذكر والمؤنث",
+          "promptAr": "حوّل: أَنْتَ تَكْتُبُ ← أَنْتِ تَكْتُبِينَ.",
+          "promptHy": "Արական դիմելաձևը փոխիր իգականի։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.08",
+          "type": "transformation",
+          "conceptScope": "grammar",
+          "skill": "صيغ الخطاب",
+          "promptAr": "حوّل: اِذْهَبْ ← اِذْهَبِي.",
+          "promptHy": "Հրամայականի արական ձևը փոխիր իգականի։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.09",
+          "type": "error-correction",
+          "conceptScope": "grammar",
+          "skill": "الحركات الإعرابية",
+          "promptAr": "صحّح الحركة الأخيرة في جملة قصيرة.",
+          "promptHy": "Ուղղիր կարճ նախադասության վերջավորությունը։",
+          "delivery": "teacher-led"
+        },
+        {
+          "id": "v5.x02.10",
+          "type": "writing",
+          "conceptScope": "grammar",
+          "skill": "التكامل",
+          "promptAr": "اكتب جملتين مضبوطتين توظفان الرفع والجر.",
+          "promptHy": "Գրիր երկու նախադասություն՝ ճիշտ կիրառելով ուղղականն ու սեռականը։",
+          "delivery": "teacher-led"
+        }
+      ],
+      "delivery": "teacher-led"
+    }
+  ]
+}

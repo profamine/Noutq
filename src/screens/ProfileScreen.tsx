@@ -10,6 +10,7 @@ import { requestNotificationPermission, scheduleDailyReminderNotification, cance
 import { formatMonthYear, getWeekdayInitial } from '../utils/locale';
 import { computeAchievements } from '../data/achievements';
 import { getLeagueStatus } from '../data/leagues';
+import { getV5TrackStatus, getV5SideTrackStatus } from '../data/v5/curriculum';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -152,6 +153,10 @@ export default function ProfileScreen({
 
   const goalsPercent = Math.round((completedUnits.length / TOTAL_LESSONS) * 100);
   const dailyGoalPercent = Math.min(100, Math.round((xpToday / dailyGoalXP) * 100));
+  const coreStatus = getV5TrackStatus(completedUnits, 'core');
+  const grammarStatus = getV5TrackStatus(completedUnits, 'grammar');
+  const optionalStatus = getV5SideTrackStatus(completedUnits, 'optional');
+  const reviewStatus = getV5SideTrackStatus(completedUnits, 'review');
 
   const historyDates = Array.from({ length: 28 }, (_, i) => {
     const date = new Date();
@@ -289,6 +294,69 @@ export default function ProfileScreen({
               label={t('profile.goals')}
             />
           </div>
+        </section>
+
+        {/* ── V5 Track completion — independent core / grammar status ── */}
+        <section>
+          <h2 className="text-base font-bold text-gray-700 dark:text-gray-300 mb-3">
+            {language === 'ar' ? 'مسارات Noutq V5' : 'Noutq V5 ուղիներ'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              {
+                id: 'core',
+                label: language === 'ar' ? 'المسار الأساسي A1' : 'Հիմնական A1 ուղի',
+                status: coreStatus,
+                color: 'bg-blue-500',
+              },
+              {
+                id: 'grammar',
+                label: language === 'ar' ? 'الامتداد النحوي' : 'Քերականական ընդլայնում',
+                status: grammarStatus,
+                color: 'bg-violet-500',
+              },
+              {
+                id: 'optional',
+                label: language === 'ar' ? 'وحدات الإثراء' : 'Հարստացման միավորներ',
+                status: optionalStatus,
+                color: 'bg-teal-500',
+              },
+              {
+                id: 'review',
+                label: language === 'ar' ? 'المراجعة الشاملة' : 'Ընդհանուր վերանայում',
+                status: reviewStatus,
+                color: 'bg-amber-500',
+              },
+            ].map(({ id, label, status, color }) => (
+              <div key={id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p className="font-bold text-sm text-gray-800 dark:text-gray-100">{label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {status.completed
+                        ? (language === 'ar' ? 'مكتمل بصورة مستقلة' : 'Ավարտված է անկախ կարգավիճակով')
+                        : `${status.completedCount}/${status.requiredCount}`}
+                    </p>
+                  </div>
+                  <span className={`shrink-0 text-xs font-black px-2 py-1 rounded-full ${
+                    status.completed
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                      : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                  }`}>
+                    {status.completed ? '✓' : `${status.percent}%`}
+                  </span>
+                </div>
+                <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${status.percent}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-2">
+            {language === 'ar'
+              ? 'إتمام الامتداد النحوي ووحدات الإثراء والمراجعة ليس شرطًا لإتمام المسار الأساسي A1.'
+              : 'Քերականական ընդլայնումը, հարստացման միավորները և վերանայումը պարտադիր չեն հիմնական A1 ուղին ավարտելու համար։'}
+          </p>
         </section>
 
         {/* ── Daily Goal ── */}

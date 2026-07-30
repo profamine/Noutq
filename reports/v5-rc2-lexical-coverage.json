@@ -1,0 +1,26 @@
+{
+  "release": "V5-RC2",
+  "scope": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06",
+    "C07",
+    "C08",
+    "C09",
+    "C10",
+    "C11",
+    "C12",
+    "E01"
+  ],
+  "totalRequired": 160,
+  "requiredLexemes": 109,
+  "requiredPhrases": 51,
+  "totalPresent": 160,
+  "missing": [],
+  "extra": [],
+  "duplicate": false,
+  "coveragePercentage": 100
+}

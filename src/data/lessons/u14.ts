@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u14: LessonData = {
   id: "u14",
-  title: "Եղանակ (Yeghanak)",
+  title: "Եղանակ",
   titleAr: "الطقس",
   xpReward: 60,
   steps: [
@@ -18,7 +18,7 @@ export const u14: LessonData = {
     {
       id: 2,
       type: "listen",
-      arabic: "الجَوُّ اليَوْم مُشْمِس",
+      arabic: "الجَوُّ اليَوْمَ مُشْمِس",
       armenian: "Այսօր եղանակը արևոտ է",
       transliteration: "al-jawwu l-yawma mushmis",
       hint: "الجَوّ = եղանակ · مُشْمِس = արևոտ",
@@ -89,7 +89,7 @@ export const u14: LessonData = {
     {
       id: 8,
       type: "speak",
-      arabic: "الجَوُّ اليَوْم غَائِم وَبَارِد",
+      arabic: "الجَوُّ اليَوْمَ غَائِم وَبَارِد",
       armenian: "Այսօր եղանակը ամպամած է և ցուրտ:",
       transliteration: "al-jawwu l-yawma ghāʾim wa-bārid",
       meaning: "Կրկնե՛ք նախադասությունը:",

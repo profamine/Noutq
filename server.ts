@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 
 import apiApp from './api/index.js'; // Note: Node respects .js extension for TS files with ts-node/tsx
+import { handleAudioResolver } from './src/server/audioResolver.js';
 
 // ─── Serveur principal ───────────────────────────────────────────────────────
 async function startServer(): Promise<void> {
@@ -12,6 +13,15 @@ async function startServer(): Promise<void> {
 
   // Mount API paths
   app.use(apiApp);
+
+  // Stable audio resolver used by book/PDF QR links. The public URL stays
+  // stable even if the underlying WAV filename changes.
+  app.get('/a/:audioId', (req: Request, res: Response) => {
+    const manifestPath = IS_PROD
+      ? path.resolve(process.cwd(), 'dist', 'audio', 'manifest.v2.json')
+      : path.resolve(process.cwd(), 'public', 'audio', 'manifest.v2.json');
+    handleAudioResolver(req, res, manifestPath);
+  });
 
   // ── Middleware Vite (dev) ou fichiers statiques (prod) ──────────────────
   if (!IS_PROD) {

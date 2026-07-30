@@ -21,9 +21,9 @@ export const u21: LessonData = {
       transliteration: "ʿindī ... kutub",
       meaning: "Լրացրեք նախադասությունը ճիշտ թվով:",
       options: [
-        { text: "ثَلَاثَةُ كُتُبٍ ✓", correct: true },
-        { text: "ثَلَاثَةُ كِتَابٍ ✗", correct: false },
-        { text: "ثَلَاثَةَ كُتُبًا ✗", correct: false },
+        { text: "ثَلَاثَةُ كُتُبٍ", correct: true },
+        { text: "ثَلَاثَةُ كِتَابٍ", correct: false },
+        { text: "ثَلَاثَةَ كُتُبًا", correct: false },
       ],
     },
     {
@@ -33,9 +33,9 @@ export const u21: LessonData = {
       transliteration: "fī l-qismi ... ṭullāb",
       meaning: "Ընտրեք ճիշտ համադրությունը:",
       options: [
-        { text: "خَمْسَةُ طُلَّابٍ ✓", correct: true },
-        { text: "خَمْسَ طُلَّابٍ ✗", correct: false },
-        { text: "خَمْسُونَ طُلَّابٍ ✗", correct: false },
+        { text: "خَمْسَةُ طُلَّابٍ", correct: true },
+        { text: "خَمْسَ طُلَّابٍ", correct: false },
+        { text: "خَمْسُونَ طُلَّابٍ", correct: false },
       ],
     },
     {
@@ -45,9 +45,9 @@ export const u21: LessonData = {
       transliteration: "qaraʾtu ... durūs",
       meaning: "Ընտրեք ճիշտ պատասխանը:",
       options: [
-        { text: "سَبْعَةَ دُرُوسٍ ✓", correct: true },
-        { text: "سَبْعَةَ دَرْسٍ ✗", correct: false },
-        { text: "سَبْعُونَ دُرُوسٍ ✗", correct: false },
+        { text: "سَبْعَةَ دُرُوسٍ", correct: true },
+        { text: "سَبْعَةَ دَرْسٍ", correct: false },
+        { text: "سَبْعُونَ دُرُوسٍ", correct: false },
       ],
     },
     {
@@ -78,8 +78,8 @@ export const u21: LessonData = {
       transliteration: "Taṣḥīḥ: khamsatu kitābin",
       meaning: "Ինչպե՞ս է ճիշտ:",
       options: [
-        { text: "خَمْسَةُ كُتُبٍ ✓", correct: true },
-        { text: "خَمْسُ كُتُبٍ ✗", correct: false },
+        { text: "خَمْسَةُ كُتُبٍ", correct: true },
+        { text: "خَمْسُ كُتُبٍ", correct: false },
       ]
     }
   ],

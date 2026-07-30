@@ -19,16 +19,16 @@ export const u20: LessonData = {
       transliteration: "kayfa ḥāluk?",
       meaning: "Ո՞րն է ճիշտ պատասխանը 'Լավ եմ':",
       options: [
-        { text: "أَنَا بِخَيْر ✓", correct: true },
-        { text: "أَنَا جَائِع ✗", correct: false },
-        { text: "أَنَا نَائِم ✗", correct: false },
+        { text: "أَنَا بِخَيْر", correct: true },
+        { text: "أَنَا جَائِع", correct: false },
+        { text: "أَنَا نَائِم", correct: false },
       ],
     },
     {
       id: 21, type: "quiz",
       arabic: "كَيْفَ حَالُك؟", armenian: "Ինչպե՞ս ես:", transliteration: "kayfa ḥāluk?",
       meaning: "Կրկնություն: 'Լավ եմ' արաբերեն:",
-      options: [{ text: "أَنَا بِخَيْر ✓", correct: true }, { text: "أَنَا جَائِع ✗", correct: false }],
+      options: [{ text: "أَنَا بِخَيْر", correct: true }, { text: "أَنَا جَائِع", correct: false }],
     },
     {
       id: 3, type: "quiz",
@@ -36,9 +36,9 @@ export const u20: LessonData = {
       transliteration: "al-kitābu ʿalā l-maktabi",
       meaning: "Ի՞նչ է 'عَلَى' իմաստը:",
       options: [
-        { text: "Մեջ (in) ✗", correct: false },
-        { text: "Վրա (on) ✓", correct: true },
-        { text: "Առջև (front) ✗", correct: false },
+        { text: "Մեջ (in)", correct: false },
+        { text: "Վրա (on)", correct: true },
+        { text: "Առջև (front)", correct: false },
       ],
     },
     {
@@ -64,9 +64,9 @@ export const u20: LessonData = {
       transliteration: "anā adrusu l-ʿarabiyya",
       meaning: "Ի՞նչ է 'أَدْرُسُ' իմաստը:",
       options: [
-        { text: "Քնում եմ ✗", correct: false },
-        { text: "Սովորում եմ ✓", correct: true },
-        { text: "Գնում եմ ✗", correct: false },
+        { text: "Քնում եմ", correct: false },
+        { text: "Սովորում եմ", correct: true },
+        { text: "Գնում եմ", correct: false },
       ],
     },
     {

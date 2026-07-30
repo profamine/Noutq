@@ -22,6 +22,20 @@ import { isOnline, fetchWithTimeout, apiUrl } from '../utils/network';
 
 type Platform = 'android' | 'ios' | 'desktop';
 
+interface AudioManifestEntry {
+  audioId: string;
+  text: string;
+  status: 'available' | 'missing';
+  src?: string;
+  fallback?: string;
+}
+
+interface AudioManifestV2 {
+  entries: Record<string, AudioManifestEntry>;
+  textIndex: Record<string, string>;
+  legacyTextSources: Record<string, string>;
+}
+
 /** Détecte si l'app tourne dans un conteneur Capacitor (APK natif). */
 function isCapacitorApp(): boolean {
   return Capacitor.isNativePlatform();
@@ -65,6 +79,11 @@ export function useArabicTTS() {
   const currentAudio = useRef<HTMLAudioElement | null>(null);
   const arabicVoice = useRef<SpeechSynthesisVoice | null>(null);
   const manifest = useRef<Record<string, string>>({});
+  const manifestV2 = useRef<AudioManifestV2>({
+    entries: {},
+    textIndex: {},
+    legacyTextSources: {},
+  });
   const audioUnlocked = useRef(false);
 
   useEffect(() => {
@@ -83,6 +102,10 @@ export function useArabicTTS() {
     fetch('/audio/manifest.json')
       .then((r) => (r.ok ? r.json() : {}))
       .then((m) => { if (!cancelled) manifest.current = m; })
+      .catch(() => {});
+    fetch('/audio/manifest.v2.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((m) => { if (!cancelled && m) manifestV2.current = m; })
       .catch(() => {});
 
     // Débloque l'audio mobile au 1er geste utilisateur (résout NotAllowedError).
@@ -200,7 +223,7 @@ export function useArabicTTS() {
     setTimeout(() => { try { window.speechSynthesis.resume(); } catch { /* noop */ } }, 80);
   }, [playServerTTS]);
 
-  const speak = useCallback(async (text: string, speed = 1.0): Promise<boolean> => {
+  const speak = useCallback(async (text: string, speed = 1.0, audioId?: string): Promise<boolean> => {
     const clean = text?.trim();
     if (!clean) return false;
     stop();
@@ -210,7 +233,12 @@ export function useArabicTTS() {
     const inCapacitor = isCapacitorApp();
 
     // 1) Audio pré-généré (le plus fiable, surtout sur Android).
-    const preGen = manifest.current[clean];
+    const indexedAudioId = audioId ?? manifestV2.current.textIndex[clean];
+    const indexedEntry = indexedAudioId ? manifestV2.current.entries[indexedAudioId] : undefined;
+    const preGen =
+      (indexedEntry?.status === 'available' ? indexedEntry.src : undefined) ??
+      manifestV2.current.legacyTextSources[clean] ??
+      manifest.current[clean];
     if (preGen) {
       try {
         await playUrl(preGen, speed);

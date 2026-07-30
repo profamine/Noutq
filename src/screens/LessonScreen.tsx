@@ -36,6 +36,7 @@ import { useArabicTTS } from '../hooks/useArabicTTS';
 import { fetchWithTimeout, apiUrl } from '../utils/network';
 import { lessonsData, type LessonData, type LessonStep, type QuizOption } from '../data/lessons';
 import { Preferences } from '@capacitor/preferences';
+import { parseLessonProgress } from '../services/v5Migration';
 
 // ===== Sound Effects (Real Web Audio + Vibration) =====
 const lazyAudioContext = (() => {
@@ -540,11 +541,9 @@ export default function LessonScreen({
     if (!lessonId) return;
     Preferences.get({ key: `lessonProgress_${lessonId}` }).then(({ value }) => {
       if (!value) return;
-      try {
-        const saved = JSON.parse(value) as { stepIndex: number; lives: number };
-        // N'afficher que si l'utilisateur n'est pas à l'étape 0 avec 3 vies
-        if (saved.stepIndex > 0) setResumeModal(saved);
-      } catch { /* données corrompues — ignorer */ }
+      const saved = parseLessonProgress(value, lessonsData[lessonId].steps.length);
+      // N'afficher que si l'utilisateur n'est pas à l'étape 0 avec 3 vies.
+      if (saved && saved.stepIndex > 0) setResumeModal(saved);
     });
   }, [lessonId]);
 
@@ -611,8 +610,11 @@ export default function LessonScreen({
     }
   }, [step]);
 
-  const handlePlayAudio = () => speak(step.arabic, 1.0);
-  const handlePlaySlow = () => speak(step.arabic, 0.7);
+  // Les étapes V5 portent leur identifiant audio stable dans `audio` ; les
+  // étapes historiques restent adressées par « unité.étape ».
+  const audioId = step.audio ?? (lessonId ? `${lessonId}.${step.id}` : undefined);
+  const handlePlayAudio = () => speak(step.arabic, 1.0, audioId);
+  const handlePlaySlow = () => speak(step.arabic, 0.7, audioId);
 
   const handleSimulatedRecord = () => {
     if (recording) {

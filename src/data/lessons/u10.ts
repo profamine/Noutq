@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u10: LessonData = {
   id: "u10",
-  title: "Ընտանիք (Family)",
+  title: "Ընտանիք",
   titleAr: "العائلة",
   xpReward: 60,
   steps: [

@@ -9,6 +9,7 @@ interface Props {
 }
 
 interface Question {
+  audioId: string;
   arabic: string;
   armenian: string;
   transliteration: string;
@@ -24,11 +25,12 @@ function shuffle<T>(arr: T[]): T[] {
 
 function buildQuestions(): Question[] {
   // Collecter tous les mots courts des steps listen
-  const pool: { arabic: string; armenian: string; transliteration: string }[] = [];
+  const pool: { audioId: string; arabic: string; armenian: string; transliteration: string }[] = [];
   Object.values(lessonsData).forEach(lesson => {
     lesson.steps.forEach(step => {
       if (step.type === 'listen' && step.arabic && step.armenian && step.arabic.length < 30) {
         pool.push({
+          audioId: `${lesson.id}.${step.id}`,
           arabic: step.arabic,
           armenian: step.armenian,
           transliteration: step.transliteration || '',
@@ -65,9 +67,9 @@ export default function ListeningPractice({ onBack }: Props) {
   const q = questions[current];
 
   const handleListen = useCallback(() => {
-    speak(q.arabic);
+    speak(q.arabic, 1.0, q.audioId);
     setPlayed(true);
-  }, [speak, q.arabic]);
+  }, [speak, q.arabic, q.audioId]);
 
   const handleAnswer = (idx: number) => {
     if (selected !== null) return;

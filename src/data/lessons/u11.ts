@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u11: LessonData = {
   id: "u11",
-  title: "Ուտելիք և ջուր (Food & Drink)",
+  title: "Ուտելիք և ջուր",
   titleAr: "الطعام والشراب",
   xpReward: 60,
   steps: [

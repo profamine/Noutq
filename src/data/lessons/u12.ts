@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u12: LessonData = {
   id: "u12",
-  title: "Տեղեր և նախդիրներ (Places)",
+  title: "Տեղեր և նախդիրներ",
   titleAr: "الأماكن وحروف الجر",
   xpReward: 70,
   steps: [

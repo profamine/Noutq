@@ -24,7 +24,9 @@ import { u20 } from './lessons/u20';
 import { u21 } from './lessons/u21';
 import { u22 } from './lessons/u22';
 
-export const lessonsData: Record<string, LessonData> = {
+import { getV5StepsByLegacyUnit } from './v5/newActivities';
+
+const baseLessons: Record<string, LessonData> = {
   u1,
   u2,
   u3,
@@ -48,5 +50,19 @@ export const lessonsData: Record<string, LessonData> = {
   u21,
   u22,
 };
+
+/**
+ * Les activités V5 (content/v5/curriculum.json) sont ajoutées à la fin de leur
+ * unité historique, afin que le document pédagogique et l'application décrivent
+ * exactement le même contenu.
+ */
+const v5StepsByUnit = getV5StepsByLegacyUnit();
+
+export const lessonsData: Record<string, LessonData> = Object.fromEntries(
+  Object.entries(baseLessons).map(([id, lesson]) => {
+    const extra = v5StepsByUnit[id];
+    return [id, extra?.length ? { ...lesson, steps: [...lesson.steps, ...extra] } : lesson];
+  }),
+);
 
 export type { LessonData, LessonStep, MatchPair, QuizOption };

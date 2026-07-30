@@ -21,9 +21,9 @@ export const u22: LessonData = {
       transliteration: "kataba ... ad-darsa",
       meaning: "Տեղադրեք ճիշտ վերջավորությամբ գոյականը (Ենթակա):",
       options: [
-        { text: "الطَّالِبُ ✓", correct: true },
-        { text: "الطَّالِبَ ✗", correct: false },
-        { text: "الطَّالِبِ ✗", correct: false },
+        { text: "الطَّالِبُ", correct: true },
+        { text: "الطَّالِبَ", correct: false },
+        { text: "الطَّالِبِ", correct: false },
       ],
     },
     {
@@ -33,9 +33,9 @@ export const u22: LessonData = {
       transliteration: "dhahaba l-waladu ilā ...",
       meaning: "Տեղադրեք ճիշտ վերջավորությամբ գոյականը (إِلَى -ից հետո):",
       options: [
-        { text: "المَدْرَسَةِ ✓", correct: true },
-        { text: "المَدْرَسَةُ ✗", correct: false },
-        { text: "المَدْرَسَةَ ✗", correct: false },
+        { text: "المَدْرَسَةِ", correct: true },
+        { text: "المَدْرَسَةُ", correct: false },
+        { text: "المَدْرَسَةَ", correct: false },
       ],
     },
     {
@@ -45,9 +45,9 @@ export const u22: LessonData = {
       transliteration: "qaraʾa ṭ-ṭālibu ...",
       meaning: "Տեղադրեք ճիշտ վերջավորությամբ գոյականը (Ուղիղ խնդիր):",
       options: [
-        { text: "الكِتَابَ ✓", correct: true },
-        { text: "الكِتَابُ ✗", correct: false },
-        { text: "الكِتَابِ ✗", correct: false },
+        { text: "الكِتَابَ", correct: true },
+        { text: "الكِتَابُ", correct: false },
+        { text: "الكِتَابِ", correct: false },
       ],
     },
     {
@@ -69,8 +69,8 @@ export const u22: LessonData = {
       transliteration: "Taṣḥīḥ: jāʾa ṭ-ṭāliba",
       meaning: "Ո՞րն է ճիշտ ձևը ենթակայի համար:",
       options: [
-        { text: "جَاءَ الطَّالِبُ ✓", correct: true },
-        { text: "جَاءَ الطَّالِبِ ✗", correct: false },
+        { text: "جَاءَ الطَّالِبُ", correct: true },
+        { text: "جَاءَ الطَّالِبِ", correct: false },
       ],
     },
     {

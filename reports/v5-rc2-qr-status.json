@@ -1,0 +1,8 @@
+{
+  "release": "V5-RC2",
+  "enabled": false,
+  "canonicalBaseUrl": null,
+  "reason": "NOUTQ_PUBLIC_BASE_URL is not configured; QR generation is explicitly disabled.",
+  "targetCount": 0,
+  "targets": []
+}

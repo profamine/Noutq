@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u13: LessonData = {
   id: "u13",
-  title: "Մարմնի մասեր (Marmni maser)",
+  title: "Մարմնի մասեր",
   titleAr: "أعضاء الجسم",
   xpReward: 60,
   steps: [
@@ -76,12 +76,12 @@ export const u13: LessonData = {
     {
       id: 7,
       type: "quiz",
-      arabic: "أَيْنَ تُؤْلِمُك؟",
-      armenian: "Որտե՞ղ է ցավում:",
-      transliteration: "ayna tuʾlimuk?",
-      meaning: "Ի՞նչ է նշանակում 'أَيْنَ تُؤْلِمُك؟':",
+      arabic: "أَيْنَ تَشْعُرُ بِالأَلَمِ؟",
+      armenian: "Որտե՞ղ ես ցավ զգում (արական):",
+      transliteration: "ayna tashʿuru bi-l-alami?",
+      meaning: "Ի՞նչ է նշանակում 'أَيْنَ تَشْعُرُ بِالأَلَمِ؟':",
       options: [
-        { text: "Որտե՞ղ է ցավում:", correct: true },
+        { text: "Որտե՞ղ ես ցավ զգում:", correct: true },
         { text: "Ինչպե՞ս եք:", correct: false },
         { text: "Ու՞ր եք գնում:", correct: false },
       ],
@@ -102,7 +102,7 @@ export const u13: LessonData = {
       armenian: "Ձեռք",
       transliteration: "yad",
       meaning: "Գրե՛ք 'Ձեռք' արաբերեն:",
-      hint: "ي + دّ",
+      hint: "ي + د",
     },
   ],
 };

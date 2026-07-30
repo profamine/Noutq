@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u15: LessonData = {
   id: "u15",
-  title: "Դպրոցում (Dprotsum)",
+  title: "Դպրոցում",
   titleAr: "في المدرسة",
   xpReward: 60,
   steps: [
@@ -76,10 +76,10 @@ export const u15: LessonData = {
     {
       id: 7,
       type: "quiz",
-      arabic: "أَيُّ مَادَّةٍ تُحِبّ؟",
-      armenian: "Ո՞ր առարկան ես սիրում:",
-      transliteration: "ayyu māddatin tuḥibb?",
-      meaning: "Ի՞նչ է 'أَيُّ مَادَّةٍ' իմաստը:",
+      arabic: "أَيَّ مَادَّةٍ تُحِبُّ؟",
+      armenian: "Ո՞ր առարկան ես սիրում (արական):",
+      transliteration: "ayya māddatin tuḥibbu?",
+      meaning: "Ի՞նչ է 'أَيَّ مَادَّةٍ' իմաստը:",
       options: [
         { text: "Ո՞ր առարկան", correct: true },
         { text: "Որտե՞ղ է", correct: false },

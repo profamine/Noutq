@@ -17,7 +17,9 @@ export type StorageKey =
   | 'xpAtDayStart'
   | 'xpAtDayStartDate'
   | 'placementTestDone'
-  | 'themePreference';
+  | 'themePreference'
+  | 'v5MigrationVersion'
+  | 'v5MigrationBackup';
 
 /** Toutes les clés incluses dans l'export/import de sauvegarde locale. */
 export const BACKUP_KEYS: StorageKey[] = [
@@ -25,6 +27,7 @@ export const BACKUP_KEYS: StorageKey[] = [
   'speechSetupDone', 'userName', 'vocabScores', 'notificationsEnabled',
   'srsState', 'streakFreezes', 'dailyGoalXP', 'xpAtDayStart',
   'xpAtDayStartDate', 'placementTestDone', 'themePreference',
+  'v5MigrationVersion', 'v5MigrationBackup',
 ];
 
 const BACKUP_FORMAT_VERSION = 1;

@@ -26,10 +26,10 @@ export const u18: LessonData = {
       transliteration: "yamīn",
       meaning: "Ո՞րն է 'يَمِين' իմաստը:",
       options: [
-        { text: "Ձախ ✗", correct: false },
-        { text: "Աջ ✓", correct: true },
-        { text: "Առջև ✗", correct: false },
-        { text: "Հետև ✗", correct: false },
+        { text: "Ձախ", correct: false },
+        { text: "Աջ", correct: true },
+        { text: "Առջև", correct: false },
+        { text: "Հետև", correct: false },
       ],
     },
     {
@@ -62,9 +62,9 @@ export const u18: LessonData = {
       transliteration: "idhhab",
       meaning: "Ի՞նչ է 'اِذْهَبْ' իմաստը:",
       options: [
-        { text: "Գնա ✓", correct: true },
-        { text: "Արի ✗", correct: false },
-        { text: "Կանգնիր ✗", correct: false },
+        { text: "Գնա", correct: true },
+        { text: "Արի", correct: false },
+        { text: "Կանգնիր", correct: false },
       ],
     },
     {

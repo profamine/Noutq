@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u16: LessonData = {
   id: "u16",
-  title: "Խոսում եմ (Khosum em)",
+  title: "Խոսում եմ",
   titleAr: "محادثة كاملة",
   xpReward: 80,
   steps: [
@@ -27,26 +27,26 @@ export const u16: LessonData = {
     {
       id: 3,
       type: "quiz",
-      arabic: "كَيْفَ تَقُولُ 'ես հայ եմ' بِالعَرَبِيَّة؟",
-      armenian: "Ինչպես ես ասում 'ես հայ եմ' արաբերեն:",
-      transliteration: "kayfa taqūlu 'yes hay em' bi-l-ʿarabiyya?",
-      meaning: "Ինչպե՞ս է 'ես հայ եմ' արաբերեն:",
+      arabic: "كَيْفَ تَقُولُ: «أَنَا أَرْمَنِيٌّ / أَرْمَنِيَّةٌ»؟",
+      armenian: "Ինչպե՞ս ես արաբերեն ասում «Ես հայ եմ»՝ արական / իգական:",
+      transliteration: "kayfa taqūlu: anā armaniyyun / armaniyyatun?",
+      meaning: "Ընտրիր խոսողի սեռին համապատասխան ձևը:",
       options: [
-        { text: "أَنَا أَرْمَنِيٌّ", correct: true },
-        { text: "أَنَا عَرَبِيٌّ", correct: false },
-        { text: "أَنَا أَدْرُسُ", correct: false },
+        { text: "أَنَا أَرْمَنِيٌّ / أَنَا أَرْمَنِيَّةٌ", correct: true },
+        { text: "أَنَا عَرَبِيٌّ / أَنَا عَرَبِيَّةٌ", correct: false },
+        { text: "أَنَا أَدْرُسُ العَرَبِيَّةَ", correct: false },
       ],
     },
     {
       id: 31,
       type: "quiz",
-      arabic: "كَيْفَ تَقُولُ 'ես հայ եմ' بِالعَرَبِيَّة؟",
-      armenian: "Ինչպես ես ասում 'ես հայ եմ' արաբերեն:",
-      transliteration: "kayfa taqūlu 'yes hay em' bi-l-ʿarabiyya?",
-      meaning: "Կրկնություն: Ինչպե՞ս է 'ես հայ եմ' արաբերեն:",
+      arabic: "أَكْمِلْ: أَنَا مِنْ أَرْمِينِيَا وَأَنَا ...",
+      armenian: "Լրացրու՝ Ես Հայաստանից եմ և ես ...",
+      transliteration: "akmil: anā min Armīniyā wa-anā ...",
+      meaning: "Ընտրիր բնական շարունակությունը:",
       options: [
-        { text: "أَنَا أَرْمَنِيٌّ", correct: true },
-        { text: "أَنَا عَرَبِيٌّ", correct: false },
+        { text: "أَرْمَنِيٌّ / أَرْمَنِيَّةٌ", correct: true },
+        { text: "عَرَبِيٌّ / عَرَبِيَّةٌ", correct: false },
       ],
     },
     {

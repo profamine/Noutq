@@ -62,9 +62,9 @@ export const u17: LessonData = {
       transliteration: "bikam hādhā?",
       meaning: "Ի՞նչ է 'بِكَمْ هَذَا؟' իմաստը:",
       options: [
-        { text: "Ինչքա՞ն արժե սա: ✓", correct: true },
-        { text: "Ի՞նչ է սա: ✗", correct: false },
-        { text: "Որտե՞ղ է սա: ✗", correct: false },
+        { text: "Ինչքա՞ն արժե սա:", correct: true },
+        { text: "Ի՞նչ է սա:", correct: false },
+        { text: "Որտե՞ղ է սա:", correct: false },
       ],
     },
     {

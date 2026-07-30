@@ -1,0 +1,8 @@
+{
+  "name": "CASE E — corrected legacy SRS texts",
+  "completedUnits": "[\"u13\",\"u15\",\"u16\"]",
+  "totalXP": "760",
+  "srsState": "{\"أَيْنَ تُؤْلِمُك؟\":{\"interval\":3,\"easeFactor\":2.5,\"repetitions\":2,\"dueDate\":\"2026-08-01\"},\"أَيُّ مَادَّةٍ تُحِبّ؟\":{\"interval\":7,\"easeFactor\":2.6,\"repetitions\":3,\"dueDate\":\"2026-08-05\"},\"كَيْفَ تَقُولُ 'ես հայ եմ' بِالعَرَبِيَّة؟\":{\"interval\":1,\"easeFactor\":2.4,\"repetitions\":1,\"dueDate\":\"2026-07-30\"}}",
+  "lessonProgress": null,
+  "stepCount": 10
+}

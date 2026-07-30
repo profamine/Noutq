@@ -1,0 +1,17 @@
+{
+  "version": 3,
+  "entries": {
+    "fixture.missing.01": {
+      "exerciseId": "fixture.missing.01",
+      "audioId": "fixture.missing.01",
+      "text": "نصّ اختباري",
+      "status": "missing",
+      "fallback": "reading",
+      "stablePath": "/a/fixture.missing.01",
+      "activityType": "listen",
+      "expectedFilename": "fixture.missing.01.mp3"
+    }
+  },
+  "textIndex": {},
+  "legacyTextSources": {}
+}

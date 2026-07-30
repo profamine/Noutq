@@ -16,6 +16,8 @@ import SpeechSetupScreen from './screens/SpeechSetupScreen';
 import PlacementTestScreen from './screens/PlacementTestScreen';
 import { storageGet, storageSet } from './services/storage';
 import { requestNotificationPermission, scheduleDailyReminderNotification } from './services/notifications';
+import { runV5Migration } from './services/v5Migration';
+import { completeLessonOnce } from './services/progress';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,7 @@ function AppContent() {
   // ── Load persisted state ──────────────────────────────────────────────────
   useEffect(() => {
     (async () => {
+      await runV5Migration();
       const [setupDone, units, xp, rawStreakStr, lastDate, freezesStr, goalStr, dayStartXpStr, dayStartDate, placementDone] = await Promise.all([
         storageGet('speechSetupDone'),
         storageGet('completedUnits'),
@@ -185,15 +188,12 @@ function AppContent() {
   const markUnitComplete = useCallback((lessonId: string, xpEarned: number) => {
     const today = new Date().toDateString();
 
-    if (!completedUnits.includes(lessonId)) {
-      const nextUnits = [...completedUnits, lessonId];
-      setCompletedUnits(nextUnits);
-      storageSet('completedUnits', JSON.stringify(nextUnits));
-      setTotalXP((currentXp) => {
-        const nextXp = currentXp + xpEarned;
-        storageSet('totalXP', String(nextXp));
-        return nextXp;
-      });
+    const completion = completeLessonOnce({ completedUnits, totalXP }, lessonId, xpEarned);
+    if (completion.changed) {
+      setCompletedUnits(completion.completedUnits);
+      setTotalXP(completion.totalXP);
+      storageSet('completedUnits', JSON.stringify(completion.completedUnits));
+      storageSet('totalXP', String(completion.totalXP));
     }
 
     if (lastStudyDateRef.current !== today) {
@@ -228,7 +228,7 @@ function AppContent() {
         storageSet('studyHistory', JSON.stringify(history));
       }
     });
-  }, [completedUnits]);
+  }, [completedUnits, totalXP]);
 
   const navigateToLesson = useCallback((lessonId: string) => {
     setActiveLesson(lessonId);
