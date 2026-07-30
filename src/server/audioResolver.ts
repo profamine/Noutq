@@ -103,7 +103,7 @@ export function handleAudioResolver(
   audioIdOverride?: string,
   webAudioEnabled = false,
 ): void {
-  const audioId = audioIdOverride ?? req.params.audioId;
+  const audioId = audioIdOverride ?? req.params?.audioId;
   if (!isValidAudioId(audioId)) {
     res.status(400).send('Invalid audio ID');
     return;
@@ -116,7 +116,13 @@ export function handleAudioResolver(
       res.status(404).send('Audio ID not found');
       return;
     }
-    if (req.accepts('json') && !req.accepts('html')) {
+    // req.accepts() est une méthode Express — indisponible sur le req brut
+    // qu'expose une Vercel Serverless Function (api/audio.ts n'est pas une
+    // app Express, contrairement à server.ts en dev). On lit l'en-tête
+    // Accept directement pour que ça fonctionne dans les deux runtimes.
+    const acceptHeader = String(req.headers?.accept ?? '');
+    const prefersJson = acceptHeader.includes('application/json') && !acceptHeader.includes('text/html');
+    if (prefersJson) {
       res.json({ audioId, ...entry, webAudioEnabled });
       return;
     }
@@ -129,10 +135,16 @@ export function handleAudioResolver(
       return;
     }
 
-    res.status(200).type('html').send(
+    // res.type() est aussi une méthode Express uniquement ; res.send() d'une
+    // chaîne retombe déjà sur text/html par défaut dans Express ET dans le
+    // runtime Node de Vercel, donc inutile et non portable ici.
+    res.status(200).send(
       renderFallbackPage(audioId, entry, webAudioEnabled && entry.status === 'available'),
     );
-  } catch {
+  } catch (err) {
+    // Sans ce log, une régression ici est invisible : le catch précédent
+    // avalait l'erreur et ne laissait qu'un 503 générique dans les logs Vercel.
+    console.error('[audioResolver] unexpected error for audioId=%s: %o', audioId, err);
     res.status(503).send('Audio resolver unavailable');
   }
 }
