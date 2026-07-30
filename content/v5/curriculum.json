@@ -1176,6 +1176,11 @@
       "audioId": "u13.7",
       "includeInBookQr": true,
       "reason": "Échantillon QR demandé explicitement (question médicale corrigée — forte valeur d'écoute malgré le type quiz)."
+    },
+    {
+      "audioId": "v5.c02.01",
+      "includeInBookQr": true,
+      "reason": "Premier item de C02 — sert de cible au QR « démarrer l'unité » du carnet, type reading donc non éligible par défaut."
     }
   ]
 }

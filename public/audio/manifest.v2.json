@@ -2915,7 +2915,7 @@
       "stablePath": "/a/v5.c02.01",
       "activityType": "reading",
       "expectedFilename": "v5.c02.01.mp3",
-      "includeInBookQr": false,
+      "includeInBookQr": true,
       "src": "/audio/v5.c02.01.mp3",
       "unitTitleAr": "أسس القراءة",
       "unitTitleHy": "Ընթերցանության հիմունքներ"

@@ -16,7 +16,7 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 from docx import Document
 from docx.enum.section import WD_SECTION
-from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_ROW_HEIGHT_RULE, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -80,6 +80,39 @@ TYPE_AR = {
     "error-correction": "تصحيح",
 }
 
+ACTIVITY_ICON = {
+    "listen": "🎧",
+    "listening": "🎧",
+    "listening-discrimination": "🎧",
+    "speak": "🗣️",
+    "speaking": "🗣️",
+    "quiz": "❓",
+    "contextual-choice": "❓",
+    "match": "🔗",
+    "matching": "🔗",
+    "write": "✍️",
+    "writing": "✍️",
+    "reading": "📖",
+    "production": "🗣️",
+    "mini-dialogue": "💬",
+    "sentence-completion": "✏️",
+    "classification": "🗂️",
+    "ordering": "🔢",
+    "transformation": "🔄",
+    "error-correction": "🛠️",
+}
+
+# Accent visuel par piste — pas une nouvelle taxonomie, juste une couleur cohérente
+# avec la palette de marque pour distinguer d'un coup d'œil le tronc commun (core),
+# l'extension grammaticale optionnelle, la révision et l'évaluation.
+TRACK_ACCENT = {
+    "core": MID_GREEN,
+    "grammar": "1D4E89",
+    "optional": "B45309",
+    "review": "6B4FA0",
+    "assessment": "9B2C2C",
+}
+
 
 @dataclass
 class QrCell:
@@ -102,6 +135,16 @@ def load_qr_metadata(path: Path) -> dict[str, Path]:
     return {item["audioId"]: (Path.cwd() / item["qrFile"]).resolve() for item in payload["items"]}
 
 
+def set_picture_name(shape, name: str, descr: str) -> None:
+    """python-docx nomme l'image insérée d'après le nom de fichier source
+    (ex: u1.4.png) dans un attribut XML interne, non lu par un lecteur normal
+    mais visible en inspectant le document — on le remplace pour ne laisser
+    aucun identifiant technique nulle part, même hors du texte affiché."""
+    cnv_pr = shape._inline.graphic.graphicData.pic.nvPicPr.cNvPr
+    cnv_pr.set("name", name)
+    cnv_pr.set("descr", descr)
+
+
 def add_qr_cell(cell, audio_id: str, qr_path: Path, *, available: bool) -> None:
     p = cell.paragraphs[0]
     clear_paragraph(p)
@@ -110,7 +153,8 @@ def add_qr_cell(cell, audio_id: str, qr_path: Path, *, available: bool) -> None:
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p.add_run()
     # 2.0cm : dans la fourchette 18–22mm demandée, net à 300 DPI (voir generateAudioQr.ts).
-    run.add_picture(str(qr_path), width=Cm(2.0))
+    shape = run.add_picture(str(qr_path), width=Cm(2.0))
+    set_picture_name(shape, "QR", "رمز QR")
     caption = cell.add_paragraph()
     caption.paragraph_format.space_after = Pt(0)
     caption.paragraph_format.space_before = Pt(0)
@@ -165,6 +209,24 @@ def set_table_borders(table, color=BORDER, size="6") -> None:
         el.set(qn("w:sz"), size)
         el.set(qn("w:color"), color)
         borders.append(el)
+
+
+def set_table_left_accent(table, color: str, size: str = "24") -> None:
+    """Épaissit et colore uniquement la bordure gauche (déjà posée par
+    set_table_borders) — le liseré coloré qui distingue une piste (core/
+    grammaire/révision/évaluation) d'un coup d'œil sur les cartes d'exercice."""
+    tbl_pr = table._tbl.tblPr
+    borders = tbl_pr.find(qn("w:tblBorders"))
+    if borders is None:
+        borders = OxmlElement("w:tblBorders")
+        tbl_pr.append(borders)
+    left = borders.find(qn("w:left"))
+    if left is None:
+        left = OxmlElement("w:left")
+        borders.append(left)
+    left.set(qn("w:val"), "single")
+    left.set(qn("w:sz"), size)
+    left.set(qn("w:color"), color)
 
 
 def set_table_geometry(table, widths_inches: list[float]) -> None:
@@ -316,7 +378,7 @@ def add_unit_lead(doc: Document, ar: str, hy: str) -> None:
     add_text(p2, f"  {hy}  ", size=9, color=ARMENIAN_INK, rtl=False)
 
 
-def add_table(doc: Document, headers: list[str], rows: Iterable[list[str]], widths: list[float], font_size=8.5):
+def add_table(doc: Document, headers: list[str], rows: Iterable[list[str]], widths: list[float], font_size=8.5, header_color=GREEN):
     row_values_list = list(rows)
     table = doc.add_table(rows=1, cols=len(headers))
     set_table_geometry(table, widths)
@@ -325,7 +387,7 @@ def add_table(doc: Document, headers: list[str], rows: Iterable[list[str]], widt
     # when a table flows to another page, so this is safe for short tables too.
     set_row_no_split(table.rows[0], repeat_header=True)
     for i, header in enumerate(headers):
-        set_cell_shading(table.rows[0].cells[i], GREEN)
+        set_cell_shading(table.rows[0].cells[i], header_color)
         add_mixed_cell(table.rows[0].cells[i], header, header=True, size=8.5)
     for row_values in row_values_list:
         row = table.add_row()
@@ -441,24 +503,25 @@ def lesson_rows(
     unit: dict[str, Any],
     qr_files: dict[str, Path],
     qr_warnings: list[str],
-) -> list[list[Any]]:
+) -> list[dict[str, Any]]:
     manifest = data["audioManifest"]["entries"]
-    rows: list[list[Any]] = []
+    items: list[dict[str, Any]] = []
     for source_id in unit["legacySources"]:
         lesson = data["lessons"][source_id]
         for step in lesson["steps"]:
             exercise_id = f"{source_id}.{step['id']}"
             audio = manifest.get(exercise_id, {})
             status_cell = resolve_audio_status_cell(exercise_id, audio, qr_files, qr_warnings)
-            rows.append([
-                exercise_id,
-                TYPE_AR.get(step["type"], step["type"]),
-                step.get("arabic", ""),
-                step.get("transliteration", "—") or "—",
-                step.get("armenian", ""),
-                status_cell,
-            ])
-    return rows
+            items.append({
+                "id": exercise_id,
+                "type": step["type"],
+                "typeLabel": TYPE_AR.get(step["type"], step["type"]),
+                "arabic": step.get("arabic", ""),
+                "translit": step.get("transliteration", "—") or "—",
+                "armenian": step.get("armenian", ""),
+                "statusCell": status_cell,
+            })
+    return items
 
 
 def activity_rows(
@@ -466,87 +529,258 @@ def activity_rows(
     unit_id: str,
     qr_files: dict[str, Path],
     qr_warnings: list[str],
-) -> list[list[Any]]:
+) -> list[dict[str, Any]]:
     manifest = data["audioManifest"]["entries"]
-    rows: list[list[Any]] = []
+    items: list[dict[str, Any]] = []
     for activity in data["curriculum"]["newActivities"]:
         if activity["unit"] != unit_id:
             continue
         # Statut live, pas activity.get("audio", {}) qui peut être obsolète dans curriculum.json.
         audio = manifest.get(activity["id"], {})
         status_cell = resolve_audio_status_cell(activity["id"], audio, qr_files, qr_warnings, FALLBACK_LABELS_AR)
-        rows.append([
-            activity["id"],
-            TYPE_AR.get(activity["type"], activity["type"]),
-            activity.get("arabic", ""),
-            activity.get("transliteration", "—") or "—",
-            activity.get("armenian", ""),
-            status_cell,
-        ])
-    return rows
+        items.append({
+            "id": activity["id"],
+            "type": activity["type"],
+            "typeLabel": TYPE_AR.get(activity["type"], activity["type"]),
+            "arabic": activity.get("arabic", ""),
+            "translit": activity.get("transliteration", "—") or "—",
+            "armenian": activity.get("armenian", ""),
+            "statusCell": status_cell,
+        })
+    return items
 
 
-def add_cover(doc: Document, data: dict[str, Any]) -> None:
+PRACTICE_TYPES_DOUBLE = {"writing", "production", "mini-dialogue", "speak", "speaking"}
+
+
+def add_practice_line(container) -> None:
+    """Ligne réglée (bordure basse) pour recopier le mot/la phrase à la main —
+    l'élément qui transforme les tableaux de référence en carnet d'exercices."""
+    p = container.add_paragraph()
+    p.paragraph_format.space_before = Pt(3)
+    p.paragraph_format.space_after = Pt(9)
+    p_pr = p._p.get_or_add_pPr()
+    p_bdr = OxmlElement("w:pBdr")
+    bottom = OxmlElement("w:bottom")
+    bottom.set(qn("w:val"), "single")
+    bottom.set(qn("w:sz"), "4")
+    bottom.set(qn("w:space"), "1")
+    bottom.set(qn("w:color"), BORDER)
+    p_bdr.append(bottom)
+    p_pr.append(p_bdr)
+
+
+def add_activity_card(
+    doc: Document,
+    item: dict[str, Any],
+    show_id: bool = True,
+    show_missing_status: bool = True,
+    accent_color: str = BORDER,
+) -> None:
+    """Bloc d'exercice façon carnet : texte + transcription + traduction +
+    ligne(s) de recopiage + case « أتقنته » — remplace la ligne de tableau
+    compacte pour que le livre se pratique dans l'ordre, pas seulement s'y réfère.
+    show_id/show_missing_status à False pour le profil « manuel » grand public :
+    ni identifiant technique (u1.4, v5.c02.01…), ni texte d'indisponibilité
+    interne — un lecteur non technique ne doit voir que ce qui l'aide à apprendre."""
+    table = doc.add_table(rows=1, cols=1)
+    set_table_geometry(table, [6.58])
+    set_table_borders(table, color=BORDER, size="4")
+    set_table_left_accent(table, accent_color)
+    set_row_no_split(table.rows[0])
+    cell = table.cell(0, 0)
+    set_cell_margins(cell, top=90, start=140, bottom=70, end=140)
+
+    header = cell.paragraphs[0]
+    clear_paragraph(header)
+    header.paragraph_format.space_after = Pt(2)
+    header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    set_paragraph_bidi(header, True)
+    icon = ACTIVITY_ICON.get(item.get("type"), "")
+    label = f"{icon} {item['typeLabel']}".strip() if icon else item["typeLabel"]
+    meta_text = f"{item['id']}  ·  {label}" if show_id else label
+    meta_run = header.add_run(meta_text)
+    set_run_font(meta_run, "Arial", 7.5, MUTED, rtl=True)
+    status_cell = item["statusCell"]
+    if isinstance(status_cell, QrCell):
+        header.add_run("   ")
+        pic_run = header.add_run()
+        shape = pic_run.add_picture(str(status_cell.qr_path), width=Cm(1.3))
+        set_picture_name(shape, "QR", "رمز QR")
+    elif status_cell and show_missing_status:
+        status_run = header.add_run(f"   —   {status_cell}")
+        set_run_font(status_run, "Arial", 7.5, MUTED, rtl=True)
+
+    if item.get("arabic"):
+        p_ar = cell.add_paragraph()
+        p_ar.paragraph_format.space_before = Pt(3)
+        p_ar.paragraph_format.space_after = Pt(1)
+        add_text(p_ar, item["arabic"], size=15, bold=True, color=INK, rtl=True)
+
+    if item.get("translit") and item["translit"] != "—":
+        p_tr = cell.add_paragraph()
+        p_tr.paragraph_format.space_after = Pt(1)
+        p_tr.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        run = p_tr.add_run(item["translit"])
+        set_run_font(run, "Arial", 9, MUTED, rtl=False)
+        run.font.italic = True
+
+    if item.get("armenian"):
+        p_hy = cell.add_paragraph()
+        p_hy.paragraph_format.space_after = Pt(2)
+        add_text(p_hy, item["armenian"], size=9.5, color=ARMENIAN_INK, rtl=False)
+
+    if item.get("arabic"):
+        for _ in range(2 if item.get("type") in PRACTICE_TYPES_DOUBLE else 1):
+            add_practice_line(cell)
+
+    footer = cell.add_paragraph()
+    footer.paragraph_format.space_before = Pt(2)
+    footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    set_paragraph_bidi(footer, True)
+    box_run = footer.add_run("☐ أتقنته")
+    set_run_font(box_run, "Arial", 9, GREEN, bold=True, rtl=True)
+    hy_run = footer.add_run("   /   Տիրապետեցի")
+    set_run_font(hy_run, "Arial", 8, MID_GREEN, rtl=False)
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(3)
+
+
+def add_unit_start_qr(
+    doc: Document,
+    unit_id: str,
+    ordered_items: list[dict[str, Any]],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+    accent_color: str = MID_GREEN,
+) -> None:
+    """QR unique en tête d'unité qui ouvre directement le premier pas de cette
+    unité dans l'app (réutilise le même resolver /a/{id} et le même
+    findStepByAudioId côté client — aucun changement app nécessaire)."""
+    if not ordered_items:
+        return
+    first_id = ordered_items[0]["id"]
+    qr_path = qr_files.get(first_id)
+    if qr_path is None:
+        qr_warnings.append(f"{first_id}: id de démarrage de l'unité {unit_id} sans QR (ajouter un override includeInBookQr si souhaité)")
+        return
+    table = doc.add_table(rows=1, cols=1)
+    set_table_geometry(table, [6.58])
+    set_table_borders(table, color=accent_color, size="6")
+    cell = table.cell(0, 0)
+    set_cell_shading(cell, PALE_GREEN)
+    p = cell.paragraphs[0]
+    clear_paragraph(p)
+    p.paragraph_format.space_before = Pt(4)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run()
+    shape = run.add_picture(str(qr_path), width=Cm(2.4))
+    set_picture_name(shape, "QR", "امسح لبدء الوحدة")
+    cap1 = cell.add_paragraph()
+    cap1.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    add_text(cap1, "امسح لبدء هذه الوحدة داخل التطبيق", size=9.5, bold=True, color=accent_color, rtl=True)
+    cap2 = cell.add_paragraph()
+    cap2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cap2.paragraph_format.space_after = Pt(4)
+    add_text(cap2, "Սկանավորեք՝ այս բաժինը հավելվածում սկսելու համար", size=8.5, color=ARMENIAN_INK, rtl=False)
+    doc.add_paragraph().paragraph_format.space_after = Pt(2)
+
+
+def add_cover(doc: Document, data: dict[str, Any], show_stats: bool = True, tagline: tuple[str, str] | None = None) -> None:
     release = data["curriculum"]["release"]
     build_date = data["curriculum"]["buildDate"]
-    p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(72)
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run("NOUTQ")
-    set_run_font(run, "Arial", 32, GREEN, bold=True)
 
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    add_text(p, "منهج العربية للناطقين بالأرمنية", size=22, bold=True, color=GREEN, rtl=True)
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    add_text(p, "Հայախոսների համար արաբերենի ուսումնական ծրագիր", size=15, bold=True, color=MID_GREEN, rtl=False)
+    # Bandeau plein de couleur en tête de couverture — plus proche d'une vraie
+    # couverture de livre que du bloc de texte centré sur fond blanc d'avant.
+    band = doc.add_table(rows=1, cols=1)
+    set_table_geometry(band, [6.58])
+    row = band.rows[0]
+    row.height = Cm(9.5)
+    row.height_rule = WD_ROW_HEIGHT_RULE.AT_LEAST
+    cell = band.cell(0, 0)
+    set_cell_shading(cell, GREEN)
+    cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    set_cell_margins(cell, top=200, start=200, bottom=200, end=200)
 
-    doc.add_paragraph()
-    add_callout(
-        doc,
-        f"{release}: مسار أساسي مستقل، امتداد نحوي اختياري، معرّفات V4 محفوظة.",
-        "Թողարկման թեկնածու․ անկախ հիմնական ուղի, ընտրովի քերականական ընդլայնում և պահպանված V4 նույնացուցիչներ։",
-    )
-    legacy_count = sum(len(lesson["steps"]) for lesson in data["lessons"].values())
-    new_count = len(data["curriculum"]["newActivities"])
-    exam_count = sum(len(a["items"]) for a in data["curriculum"]["assessments"])
-    add_table(
-        doc,
-        ["Legacy محفوظ", "أنشطة V5 جديدة", "بنود التقييم"],
-        [[str(legacy_count), str(new_count), str(exam_count)]],
-        [2.18, 2.2, 2.2],
-        font_size=11,
-    )
-    p = doc.add_paragraph()
+    p = cell.paragraphs[0]
+    clear_paragraph(p)
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    add_text(p, f"{release} · {build_date}", size=10, bold=True, color=MID_GREEN, rtl=False)
+    p.paragraph_format.space_after = Pt(8)
+    run = p.add_run("✦  NOUTQ  ✦")
+    set_run_font(run, "Arial", 34, WHITE, bold=True)
+
+    p = cell.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_after = Pt(4)
+    set_paragraph_bidi(p, True)
+    run = p.add_run("منهج العربية للناطقين بالأرمنية")
+    set_run_font(run, "Arial", 18, WHITE, bold=True, rtl=True)
+
+    p = cell.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run("Հայախոսների համար արաբերենի ուսումնական ծրագիր")
+    set_run_font(run, "Arial", 13, WHITE, bold=True)
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(14)
+    if show_stats:
+        add_callout(
+            doc,
+            f"{release}: مسار أساسي مستقل، امتداد نحوي اختياري، معرّفات V4 محفوظة.",
+            "Թողարկման թեկնածու․ անկախ հիմնական ուղի, ընտրովի քերականական ընդլայնում և պահպանված V4 նույնացուցիչներ։",
+        )
+        legacy_count = sum(len(lesson["steps"]) for lesson in data["lessons"].values())
+        new_count = len(data["curriculum"]["newActivities"])
+        exam_count = sum(len(a["items"]) for a in data["curriculum"]["assessments"])
+        add_table(
+            doc,
+            ["Legacy محفوظ", "أنشطة V5 جديدة", "بنود التقييم"],
+            [[str(legacy_count), str(new_count), str(exam_count)]],
+            [2.18, 2.2, 2.2],
+            font_size=11,
+        )
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        add_text(p, f"{release} · {build_date}", size=10, bold=True, color=MID_GREEN, rtl=False)
+    elif tagline:
+        ar, hy = tagline
+        add_callout(doc, ar, hy)
     doc.add_page_break()
 
 
-def add_contents(doc: Document, data: dict[str, Any]) -> None:
+def add_contents(doc: Document, data: dict[str, Any], show_technical_columns: bool = True) -> None:
     add_heading(doc, "الفهرس والمسارات", "Բովանդակություն և ուղիներ", level=1)
     units = data["curriculum"]["units"]
-    rows = []
-    for unit in units:
-        rows.append([
-            unit["id"],
-            unit["titleAr"],
-            unit["titleHy"],
-            " + ".join(unit["legacySources"]) if unit["legacySources"] else "جديد",
-            unit["track"],
-        ])
-    add_table(
-        doc,
-        ["الرمز", "العربية", "Հայերեն", "مصدر V4", "المسار"],
-        rows,
-        [0.65, 1.85, 2.0, 1.0, 1.08],
-        font_size=8.5,
-    )
+    if show_technical_columns:
+        rows = [
+            [
+                unit["id"],
+                unit["titleAr"],
+                unit["titleHy"],
+                " + ".join(unit["legacySources"]) if unit["legacySources"] else "جديد",
+                unit["track"],
+            ]
+            for unit in units
+        ]
+        add_table(
+            doc,
+            ["الرمز", "العربية", "Հայերեն", "مصدر V4", "المسار"],
+            rows,
+            [0.65, 1.85, 2.0, 1.0, 1.08],
+            font_size=8.5,
+        )
+    else:
+        rows = [[str(i + 1), unit["titleAr"], unit["titleHy"]] for i, unit in enumerate(units)]
+        add_table(
+            doc,
+            ["#", "العربية", "Հայերեն"],
+            rows,
+            [0.5, 3.04, 3.04],
+            font_size=9,
+        )
     add_callout(
         doc,
-        "يمكن إتمام Core A1 دون X02. يُعرض إتمام المسار الأساسي والامتداد النحوي بصورة مستقلة داخل التطبيق.",
-        "Core A1-ը կարելի է ավարտել առանց X02-ի։ Հիմնական և քերականական ուղիների ավարտը հավելվածում ցուցադրվում է առանձին։",
+        "يمكن إتمام المسار الأساسي دون امتداد القواعد الاختياري. يُعرض تقدّمك في كل مسار بصورة مستقلة داخل التطبيق.",
+        "Հիմնական ուղին կարելի է ավարտել առանց ընտրովի քերականական ընդլայնման։ Ձեր առաջընթացը յուրաքանչյուր ուղում ցուցադրվում է հավելվածում առանձին։",
         fill=PALE_GOLD,
     )
 
@@ -655,39 +889,34 @@ def add_unit(
     unit: dict[str, Any],
     qr_files: dict[str, Path],
     qr_warnings: list[str],
+    show_id: bool = True,
 ) -> None:
     unit_id = unit["id"]
-    add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code=unit_id)
+    accent = TRACK_ACCENT.get(unit.get("track"), BORDER)
+    add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code=unit_id if show_id else None)
     ar_desc, hy_desc = UNIT_DESCRIPTIONS.get(unit_id, ("", ""))
     if ar_desc:
         add_unit_lead(doc, ar_desc, hy_desc)
 
-    rows = lesson_rows(data, unit, qr_files, qr_warnings)
-    new_rows = activity_rows(data, unit_id, qr_files, qr_warnings)
+    items = lesson_rows(data, unit, qr_files, qr_warnings)
+    new_items = activity_rows(data, unit_id, qr_files, qr_warnings)
     if unit_id in {"C02", "C03"}:
-        rows = new_rows + rows
-        new_rows = []
-    if rows:
+        items = new_items + items
+        new_items = []
+
+    add_unit_start_qr(doc, unit_id, items or new_items, qr_files, qr_warnings, accent_color=accent)
+
+    if items:
         if unit_id in {"C02", "C03"}:
             add_heading(doc, "أنشطة الوحدة بترتيب V5", "Միավորի վարժությունները՝ V5 հերթականությամբ", level=2)
         else:
-            add_heading(doc, "الأنشطة الموروثة المحفوظة", "Պահպանված Legacy վարժություններ", level=2)
-        add_table(
-            doc,
-            ["المعرّف", "النوع", "العربية", "النقحرة", "Հայերեն", "الصوت"],
-            rows,
-            [0.78, 0.67, 1.55, 1.0, 1.63, 0.95],
-            font_size=7.7 if len(rows) > 20 else (7.9 if len(rows) > 15 else 8.5),
-        )
-    if new_rows:
+            add_heading(doc, "الأنشطة الموروثة المحفوظة", "Ժառանգված ու պահպանված վարժություններ", level=2)
+        for item in items:
+            add_activity_card(doc, item, show_id=show_id, show_missing_status=show_id, accent_color=accent)
+    if new_items:
         add_heading(doc, "إضافات V5", "V5 հավելումներ", level=2)
-        add_table(
-            doc,
-            ["المعرّف", "النوع", "العربية", "النقحرة", "Հայերեն", "الصوت"],
-            new_rows,
-            [0.78, 0.67, 1.55, 1.0, 1.63, 0.95],
-            font_size=8.2,
-        )
+        for item in new_items:
+            add_activity_card(doc, item, show_id=show_id, show_missing_status=show_id, accent_color=accent)
 
     production = [
         a for a in data["curriculum"]["newActivities"]
@@ -709,26 +938,39 @@ def add_review(
     unit: dict[str, Any],
     qr_files: dict[str, Path],
     qr_warnings: list[str],
+    show_id: bool = True,
 ) -> None:
-    add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code="R01")
+    accent = TRACK_ACCENT.get("review", BORDER)
+    add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code="R01" if show_id else None)
     add_callout(
         doc,
         "المراجعة سياقية: لا يُعاد السؤال نفسه مباشرة، بل تُستعمل المهارة في مهمة جديدة.",
         "Կրկնությունը համատեքստային է․ նույն հարցը անմիջապես չի կրկնվում։",
     )
     legacy = lesson_rows(data, unit, qr_files, qr_warnings)
+    add_unit_start_qr(doc, "R01", legacy, qr_files, qr_warnings, accent_color=accent)
     if legacy:
         add_heading(doc, "مرجع V4 المحفوظ", "Պահպանված V4 հղում", level=2)
-        add_table(doc, ["المعرّف", "النوع", "العربية", "النقحرة", "Հայերեն", "الصوت"], legacy, [0.78, 0.67, 1.55, 1.0, 1.63, 0.95], font_size=8.2)
+        for item in legacy:
+            add_activity_card(doc, item, show_id=show_id, show_missing_status=show_id, accent_color=accent)
     manifest = data["audioManifest"]["entries"]
-    rows = []
+    items = []
     for item in data["curriculum"]["review"]:
         # Statut live, pas item.get("audio", {}) qui peut être obsolète dans curriculum.json.
         audio = manifest.get(item["id"], {})
         status_cell = resolve_audio_status_cell(item["id"], audio, qr_files, qr_warnings, FALLBACK_LABELS_AR)
-        rows.append([item["id"], TYPE_AR.get(item["type"], item["type"]), item["skill"], item["promptAr"], item["promptHy"], status_cell])
+        items.append({
+            "id": item["id"],
+            "type": item["type"],
+            "typeLabel": TYPE_AR.get(item["type"], item["type"]),
+            "arabic": item["promptAr"],
+            "translit": None,
+            "armenian": item["promptHy"],
+            "statusCell": status_cell,
+        })
     add_heading(doc, "مراجعة V5 المتنوعة", "V5 բազմազան կրկնություն", level=2)
-    add_table(doc, ["المعرّف", "النوع", "المهارة", "المهمة العربية", "Հայերեն", "الصوت"], rows, [0.78, 0.72, 0.85, 1.78, 1.55, 0.9], font_size=8.1)
+    for item in items:
+        add_activity_card(doc, item, show_id=show_id, show_missing_status=show_id, accent_color=accent)
 
 
 def add_assessment(
@@ -737,8 +979,9 @@ def add_assessment(
     assessment: dict[str, Any],
     qr_files: dict[str, Path],
     qr_warnings: list[str],
+    show_id: bool = True,
 ) -> None:
-    add_heading(doc, assessment["titleAr"], assessment["titleHy"], level=1, code=assessment["id"])
+    add_heading(doc, assessment["titleAr"], assessment["titleHy"], level=1, code=assessment["id"] if show_id else None)
     if assessment["id"] == "X01":
         add_callout(
             doc,
@@ -748,28 +991,31 @@ def add_assessment(
     else:
         add_callout(
             doc,
-            "اختبار إضافي مستقل. لا يُشترط لإتمام Core A1.",
-            "Առանձին լրացուցիչ քննություն է և պարտադիր չէ Core A1-ի համար։",
+            "اختبار إضافي مستقل. لا يُشترط لإتمام المسار الأساسي.",
+            "Առանձին լրացուցիչ քննություն է և պարտադիր չէ հիմնական ուղու համար։",
             fill=PALE_GOLD,
         )
     manifest = data["audioManifest"]["entries"]
-    rows = [
-        [
-            item["id"],
+    rows = []
+    for i, item in enumerate(assessment["items"]):
+        status_cell = resolve_audio_status_cell(item["id"], manifest.get(item["id"], {}), qr_files, qr_warnings)
+        if not show_id and not isinstance(status_cell, QrCell):
+            status_cell = ""  # pas de texte de statut technique dans le profil grand public
+        rows.append([
+            item["id"] if show_id else str(i + 1),
             TYPE_AR.get(item["type"], item["type"]),
             item["skill"],
             item["promptAr"],
             item["promptHy"],
-            resolve_audio_status_cell(item["id"], manifest.get(item["id"], {}), qr_files, qr_warnings),
-        ]
-        for item in assessment["items"]
-    ]
+            status_cell,
+        ])
     add_table(
         doc,
-        ["المعرّف", "النوع", "المهارة", "المهمة", "Հայերեն", "الصوت"],
+        ["الرقم" if not show_id else "المعرّف", "النوع", "المهارة", "المهمة", "Հայերեն", "الصوت"],
         rows,
         [0.7, 0.65, 0.75, 1.98, 1.55, 0.95],
         font_size=8.1,
+        header_color=TRACK_ACCENT["assessment"],
     )
     add_heading(doc, "سلّم مختصر", "Կարճ գնահատման սանդղակ", level=2)
     add_table(
@@ -785,25 +1031,39 @@ def add_assessment(
     )
 
 
-def add_glossary(doc: Document, data: dict[str, Any]) -> None:
-    add_heading(doc, "المعجم المنظّم", "Կազմակերպված բառարան", level=1, code="A01")
+def add_glossary(doc: Document, data: dict[str, Any], show_id: bool = True) -> None:
+    add_heading(doc, "المعجم المنظّم", "Կազմակերպված բառարան", level=1, code="A01" if show_id else None)
     add_callout(
         doc,
         "المعجم مصدره قائمة مفردات منسّقة؛ لا يضم تعليمات التمارين أو الأسئلة الناقصة.",
         "Բառարանը կազմված է խմբագրված բառացանկից և չի ներառում վարժությունների հրահանգներ կամ թերի հարցեր։",
     )
     add_heading(doc, "أ. الكلمات", "Ա. Բառեր", level=2)
-    word_rows = [
-        [item["arabic"], item["transliteration"], item["armenian"], item["partOfSpeech"], item["relatedForm"] or "—", item["source"]]
-        for item in data["glossary"]["words"]
-    ]
-    add_table(doc, ["الكلمة", "النطق", "Հայերեն", "النوع", "جمع/مؤنث", "المصدر"], word_rows, [1.1, 1.05, 1.55, 0.9, 1.2, 0.78], font_size=8.2)
+    if show_id:
+        word_rows = [
+            [item["arabic"], item["transliteration"], item["armenian"], item["partOfSpeech"], item["relatedForm"] or "—", item["source"]]
+            for item in data["glossary"]["words"]
+        ]
+        add_table(doc, ["الكلمة", "النطق", "Հայերեն", "النوع", "جمع/مؤنث", "المصدر"], word_rows, [1.1, 1.05, 1.55, 0.9, 1.2, 0.78], font_size=8.2)
+    else:
+        word_rows = [
+            [item["arabic"], item["transliteration"], item["armenian"], item["partOfSpeech"], item["relatedForm"] or "—"]
+            for item in data["glossary"]["words"]
+        ]
+        add_table(doc, ["الكلمة", "النطق", "Հայերեն", "النوع", "جمع/مؤنث"], word_rows, [1.25, 1.2, 1.78, 1.1, 1.25], font_size=8.4)
     add_heading(doc, "ب. التعبيرات والجمل", "Բ. Արտահայտություններ և նախադասություններ", level=2)
-    expression_rows = [
-        [item["arabic"], item["transliteration"], item["armenian"], item["source"]]
-        for item in data["glossary"]["expressions"]
-    ]
-    add_table(doc, ["التعبير", "النطق", "Հայերեն", "المصدر"], expression_rows, [2.1, 1.45, 2.15, 0.88], font_size=8.3)
+    if show_id:
+        expression_rows = [
+            [item["arabic"], item["transliteration"], item["armenian"], item["source"]]
+            for item in data["glossary"]["expressions"]
+        ]
+        add_table(doc, ["التعبير", "النطق", "Հայերեն", "المصدر"], expression_rows, [2.1, 1.45, 2.15, 0.88], font_size=8.3)
+    else:
+        expression_rows = [
+            [item["arabic"], item["transliteration"], item["armenian"]]
+            for item in data["glossary"]["expressions"]
+        ]
+        add_table(doc, ["التعبير", "النطق", "Հայերեն"], expression_rows, [2.3, 1.6, 2.68], font_size=8.6)
 
 
 def add_release_note(doc: Document, data: dict[str, Any], base_url: str | None) -> None:
@@ -828,6 +1088,110 @@ def add_release_note(doc: Document, data: dict[str, Any], base_url: str | None) 
         [2.0, 4.58],
         font_size=9,
     )
+
+
+def add_foreword_manuel(doc: Document) -> None:
+    """Mot d'ouverture + mention des auteurs — noms seuls, sans titre ni
+    affiliation (aucune information non vérifiable sur les auteurs n'est
+    inventée), au même format que la section correspondante ajoutée à
+    l'article académique associé à ce projet."""
+    add_heading(doc, "مقدّمة", "Ներածություն", level=1)
+    p1 = doc.add_paragraph()
+    add_text(
+        p1,
+        "تأتي هذه الوثيقة استجابةً لحاجة متنامية لدى الناطقين بالأرمنية إلى مورد تعليمي "
+        "متكامل لتعلّم اللغة العربية، وهي لغة ذات امتداد حضاري وثقافي واسع ترتبط بها أرمينيا "
+        "بروابط تاريخية وثقافية عميقة. ويقترح هذا الدليل، بمرافقة تطبيق Noutq، مسارًا تعليميًا "
+        "تدريجيًا يراعي خصوصية المتعلّم الأرمني على المستويات الصوتية والكتابية والتواصلية، "
+        "جامعًا بين الممارسة الورقية التقليدية والتطبيق الرقمي الحديث.",
+        size=10.5,
+        color=INK,
+        rtl=True,
+    )
+    p1.paragraph_format.space_after = Pt(6)
+
+    p2 = doc.add_paragraph()
+    add_text(
+        p2,
+        "Այս փաստաթուղթը ստեղծվել է հայախոս սովորողների աճող կարիքին ի պատասխան՝ ունենալու "
+        "արաբերենի ուսուցման ամբողջական միջոց։ Արաբերենը հարուստ քաղաքակրթական ու մշակութային "
+        "ժառանգություն ունեցող լեզու է, որի հետ Հայաստանը կապված է խորը պատմական ու "
+        "մշակութային կապերով։ Այս ուղեցույցը՝ Noutq հավելվածին զուգահեռ, առաջարկում է "
+        "աստիճանական ուսումնական ուղի՝ հաշվի առնելով հայախոս սովորողի առանձնահատկությունները "
+        "հնչյունաբանական, գրավոր և հաղորդակցական մակարդակներում։",
+        size=9.5,
+        color=ARMENIAN_INK,
+        rtl=False,
+    )
+    p2.paragraph_format.space_after = Pt(12)
+
+    p3 = doc.add_paragraph()
+    add_text(p3, "المؤلّفون: خالد محمد أزلماض، محمد شوقي، أمين أمهان، صونا طونيكيان", size=10.5, bold=True, color=GREEN, rtl=True)
+    p3.paragraph_format.space_after = Pt(14)
+
+
+def add_about_manuel(doc: Document, data: dict[str, Any], has_qr: bool) -> None:
+    """Page de présentation du profil « manuel » : ce que sont Noutq (l'app) et
+    ce livre, comment les utiliser ensemble — en arabe/arménien uniquement,
+    registre pédagogique, sans aucun vocabulaire d'ingénierie."""
+    add_heading(doc, "عن التطبيق وهذا الدليل", "Հավելվածի և այս ուղեցույցի մասին", level=1)
+    p1 = doc.add_paragraph()
+    add_text(
+        p1,
+        "Noutq تطبيق لتعلّم اللغة العربية موجَّه للناطقين بالأرمنية، يجمع بين الاستماع "
+        "والقراءة والكتابة والمحادثة ضمن مسار تدريجي يراعي حاجات المتعلّم الناطق بالأرمنية تحديدًا. "
+        "يعتمد التطبيق على التكرار المتباعد لترسيخ المفردات والتراكيب في الذاكرة طويلة المدى، "
+        "وعلى تصحيح فوري لكل محاولة نطق أو كتابة.",
+        size=10.5,
+        color=INK,
+        rtl=True,
+    )
+    p1.paragraph_format.space_after = Pt(6)
+    p2 = doc.add_paragraph()
+    add_text(
+        p2,
+        "Noutq-ը արաբերենի ուսուցման հավելված է՝ ուղղված հայախոս սովորողներին։ Այն համատեղում է "
+        "լսելը, կարդալը, գրելը և խոսակցական պրակտիկան աստիճանական ուսումնական ուղու շրջանակում՝ "
+        "հաշվի առնելով հատկապես հայախոս սովորողի կարիքները։ Հավելվածն օգտագործում է տարածված "
+        "կրկնության մեթոդը՝ բառապաշարն ու կառույցները երկարաժամկետ հիշողության մեջ ամրապնդելու համար։",
+        size=9.5,
+        color=ARMENIAN_INK,
+        rtl=False,
+    )
+    p2.paragraph_format.space_after = Pt(10)
+
+    add_heading(doc, "كيف تستعمل هذا الدليل مع التطبيق", "Ինչպես օգտագործել այս ուղեցույցը հավելվածի հետ", level=2)
+    p3 = doc.add_paragraph()
+    add_text(
+        p3,
+        "هذا الدليل مرافق للتطبيق لا بديل عنه: اقرأ الكلمة أو الجملة، انطقها بصوت مسموع، "
+        "ثم اكتبها في المساحة المخصّصة تحتها لتثبيت شكلها. ضع علامة في المربّع "
+        "«☐ أتقنته» بعد أن تكون قادرًا على قراءة النشاط وترجمته دون مساعدة.",
+        size=10.5,
+        color=INK,
+        rtl=True,
+    )
+    p3.paragraph_format.space_after = Pt(6)
+    p4 = doc.add_paragraph()
+    add_text(
+        p4,
+        "Այս ուղեցույցը հավելվածին ուղեկցող է, ոչ թե փոխարինող. կարդացեք բառը կամ նախադասությունը, "
+        "արտասանեք բարձրաձայն, ապա գրեք այն ներքևի հատուկ տողում՝ ձևը հիշողության մեջ ամրապնդելու համար։ "
+        "Նշեք «☐ Տիրապետեցի» վանդակը այն բանից հետո, երբ կարողանաք կարդալ ու թարգմանել առաջադրանքն ինքնուրույն։",
+        size=9.5,
+        color=ARMENIAN_INK,
+        rtl=False,
+    )
+    p4.paragraph_format.space_after = Pt(10)
+
+    if has_qr:
+        add_callout(
+            doc,
+            "كل وحدة تبدأ برمز QR: امسحه بكاميرا هاتفك ليفتح التطبيق مباشرة على أوّل نشاط "
+            "في تلك الوحدة، فتستمع إلى النطق الصحيح وتتابع التمرين هناك.",
+            "Յուրաքանչյուր բաժին սկսվում է QR կոդով. սկանավորեք այն ձեր հեռախոսի տեսախցիկով, "
+            "որպեսզի հավելվածը բացվի անմիջապես տվյալ բաժնի առաջին առաջադրանքի վրա։",
+        )
 
 
 def build(
@@ -885,6 +1249,72 @@ def build(
             print(f"[qr] {len(set(qr_warnings))} élément(s) éligible(s) QR sans image générée — voir {qr_report}")
 
 
+def build_manuel(
+    data: dict[str, Any],
+    output: Path,
+    base_url: str | None,
+    qr_files: dict[str, Path],
+    qr_report: Path | None = None,
+) -> None:
+    """Profil « manuel » : document d'apprentissage grand public, arabe/arménien
+    uniquement — aucun identifiant technique (u1.4, C01, schemaVersion…), aucune
+    section d'intégration/infrastructure. Le contenu pédagogique et les QR sont
+    les mêmes que le profil complet ; seule la présentation change."""
+    doc = Document()
+    qr_warnings: list[str] = []
+    configure_document(doc, data["curriculum"]["release"])
+    add_cover(
+        doc,
+        data,
+        show_stats=False,
+        tagline=(
+            "الدليل الرسمي المرافق لتطبيق Noutq — منهج متكامل لتعلّم العربية موجَّه للناطقين بالأرمنية.",
+            "Noutq հավելվածին ուղեկցող պաշտոնական ուղեցույցը՝ արաբերենի ուսուցման ամբողջական ծրագիր հայախոսների համար։",
+        ),
+    )
+    add_foreword_manuel(doc)
+    add_about_manuel(doc, data, has_qr=bool(base_url and qr_files))
+    add_contents(doc, data, show_technical_columns=False)
+    add_learning_guide(doc, data)
+
+    units_by_id = {u["id"]: u for u in data["curriculum"]["units"]}
+    for unit_id in ["C01", "C02", "C03", "C04", "C05", "C06", "E01", "C07", "C08", "C09", "C10", "C11", "C12"]:
+        add_unit(doc, data, units_by_id[unit_id], qr_files, qr_warnings, show_id=False)
+    for unit_id in ["G01", "G02", "G03", "G04", "G05"]:
+        add_unit(doc, data, units_by_id[unit_id], qr_files, qr_warnings, show_id=False)
+    add_review(doc, data, units_by_id["R01"], qr_files, qr_warnings, show_id=False)
+    for assessment in data["curriculum"]["assessments"]:
+        add_assessment(doc, data, assessment, qr_files, qr_warnings, show_id=False)
+    add_glossary(doc, data, show_id=False)
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    doc.core_properties.title = "Noutq — الدليل الرسمي / Պաշտոնական ուղեցույց"
+    doc.core_properties.subject = "دليل تعلّم اللغة العربية للناطقين بالأرمنية"
+    doc.core_properties.author = "Noutq"
+    doc.core_properties.keywords = "Arabic, Armenian, Noutq"
+    doc.save(output)
+
+    if qr_report is not None:
+        qr_report.parent.mkdir(parents=True, exist_ok=True)
+        qr_report.write_text(
+            json.dumps(
+                {
+                    "generatedAt": data["curriculum"].get("buildDate"),
+                    "qrEligibleCount": sum(
+                        1 for e in data["audioManifest"]["entries"].values() if e.get("includeInBookQr")
+                    ),
+                    "qrFilesLoaded": len(qr_files),
+                    "warnings": sorted(set(qr_warnings)),
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        if qr_warnings:
+            print(f"[qr] {len(set(qr_warnings))} élément(s) éligible(s) QR sans image générée — voir {qr_report}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
@@ -907,6 +1337,13 @@ def main() -> None:
         action="store_true",
         help="Force la génération sans image QR même si NOUTQ_PUBLIC_BASE_URL est défini (ex: .env partagé).",
     )
+    parser.add_argument(
+        "--profile",
+        choices=["full", "manuel"],
+        default="full",
+        help="'full' = document complet avec sections techniques (comportement historique). "
+        "'manuel' = guide grand public arabe/arménien uniquement, sans identifiants techniques ni sections d'intégration.",
+    )
     args = parser.parse_args()
     load_dotenv()  # même .env que les scripts TS ; n'écrase jamais une variable déjà présente dans l'environnement.
     data = json.loads(args.data.read_text(encoding="utf-8"))
@@ -927,8 +1364,9 @@ def main() -> None:
     qr_files = load_qr_metadata(args.qr_metadata) if (base_url and not args.no_qr) else {}
     if base_url and not args.no_qr and not qr_files and args.qr_metadata.exists():
         print(f"[qr] {args.qr_metadata} lu mais vide — aucune image QR ne sera intégrée.")
-    build(data, args.output, base_url, qr_files, qr_report=args.qr_report)
-    print(f"Generated {args.output}")
+    builder = build_manuel if args.profile == "manuel" else build
+    builder(data, args.output, base_url, qr_files, qr_report=args.qr_report)
+    print(f"Generated {args.output} (profile={args.profile})")
 
 
 if __name__ == "__main__":
