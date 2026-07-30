@@ -1,0 +1,41 @@
+{
+  "baseUrl": "https://noutq.vercel.app",
+  "count": 5,
+  "items": [
+    {
+      "audioId": "u1.4",
+      "target": "https://noutq.vercel.app/a/u1.4",
+      "qrFile": "output/qr/audio/u1.4.png",
+      "sha256": "7487fe7ee31624e2caf9454965e5f93d0d78e4ac8a1f09b77a75da853c473644",
+      "generatedAt": "2026-07-30T11:31:21.229Z"
+    },
+    {
+      "audioId": "u7.1",
+      "target": "https://noutq.vercel.app/a/u7.1",
+      "qrFile": "output/qr/audio/u7.1.png",
+      "sha256": "ec902a532ecf885f3d0f3aa02e60188d790a48c985ca311343894092db184afa",
+      "generatedAt": "2026-07-30T11:31:21.228Z"
+    },
+    {
+      "audioId": "u8.7",
+      "target": "https://noutq.vercel.app/a/u8.7",
+      "qrFile": "output/qr/audio/u8.7.png",
+      "sha256": "9c1d6c8bd3c1413dc02484a23e23825ddd55f1bdac8c5f397ffb718877c828bd",
+      "generatedAt": "2026-07-30T11:31:21.226Z"
+    },
+    {
+      "audioId": "u13.7",
+      "target": "https://noutq.vercel.app/a/u13.7",
+      "qrFile": "output/qr/audio/u13.7.png",
+      "sha256": "ad6c8e4b17c58426c166a35ea76f93e36507c56affb10d17d918d05f4f014898",
+      "generatedAt": "2026-07-30T11:31:21.228Z"
+    },
+    {
+      "audioId": "v5.c05.01",
+      "target": "https://noutq.vercel.app/a/v5.c05.01",
+      "qrFile": "output/qr/audio/v5.c05.01.png",
+      "sha256": "452cd20090211ab0b36872fd29fbf071a8e261c0c84cfd46171a480ce00f1ba0",
+      "generatedAt": "2026-07-30T11:31:21.230Z"
+    }
+  ]
+}

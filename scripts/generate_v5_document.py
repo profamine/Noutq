@@ -8,10 +8,12 @@ import json
 import os
 import re
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
 
+from dotenv import load_dotenv
 from docx import Document
 from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
@@ -77,6 +79,44 @@ TYPE_AR = {
     "transformation": "تحويل",
     "error-correction": "تصحيح",
 }
+
+
+@dataclass
+class QrCell:
+    """Marqueur détecté par add_table() pour insérer une image QR au lieu
+    d'un texte de statut. La décision d'éligibilité (includeInBookQr) n'est
+    jamais reprise ici : elle vient déjà tranchée du manifeste audio."""
+    audio_id: str
+    qr_path: Path
+
+
+def load_qr_metadata(path: Path) -> dict[str, Path]:
+    """Absent (INCLUDE_AUDIO_QR=false ou pas encore généré) -> dict vide,
+    jamais une erreur : le livre se génère alors sans QR, comme avant cette
+    fonctionnalité."""
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    # qrFile est déjà relatif à la racine du projet (voir generateAudioQr.ts),
+    # donc résolu depuis le cwd — ce script est toujours lancé depuis la racine du repo.
+    return {item["audioId"]: (Path.cwd() / item["qrFile"]).resolve() for item in payload["items"]}
+
+
+def add_qr_cell(cell, audio_id: str, qr_path: Path, *, available: bool) -> None:
+    p = cell.paragraphs[0]
+    clear_paragraph(p)
+    p.paragraph_format.space_after = Pt(1)
+    p.paragraph_format.space_before = Pt(1)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run()
+    # 2.0cm : dans la fourchette 18–22mm demandée, net à 300 DPI (voir generateAudioQr.ts).
+    run.add_picture(str(qr_path), width=Cm(2.0))
+    caption = cell.add_paragraph()
+    caption.paragraph_format.space_after = Pt(0)
+    caption.paragraph_format.space_before = Pt(0)
+    caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    caption_run = caption.add_run("🔊 استمع / Լսիր" if available else "🔊 استمع (قريبًا)")
+    set_run_font(caption_run, "Arial", 6.5, MUTED if available else "B45309")
 
 
 def set_cell_shading(cell, fill: str) -> None:
@@ -293,8 +333,35 @@ def add_table(doc: Document, headers: list[str], rows: Iterable[list[str]], widt
         for i, value in enumerate(row_values):
             if len(table.rows) % 2 == 0:
                 set_cell_shading(row.cells[i], "F7FAF8")
-            add_mixed_cell(row.cells[i], str(value), size=font_size)
+            if isinstance(value, QrCell):
+                add_qr_cell(row.cells[i], value.audio_id, value.qr_path, available=True)
+            else:
+                add_mixed_cell(row.cells[i], str(value), size=font_size)
     return table
+
+
+def resolve_audio_status_cell(
+    exercise_id: str,
+    audio: dict[str, Any],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+    fallback_labels: dict[str, str] | None = None,
+) -> Any:
+    """Statut audio unique, calculé une seule fois à partir du manifeste live —
+    jamais du champ `audio` potentiellement obsolète embarqué dans curriculum.json.
+    Retourne un QrCell (image) quand un QR existe pour cet id, sinon le texte de statut."""
+    available = audio.get("status") == "available"
+    if fallback_labels is not None:
+        fallback = fallback_labels.get(audio.get("fallback"), audio.get("fallback", "—"))
+        status = "متاح" if available else f"بديل: {fallback}"
+    else:
+        status = "متاح" if available else "غير متاح؛ تابع القراءة"
+    if audio.get("includeInBookQr"):
+        qr_path = qr_files.get(exercise_id)
+        if qr_path is not None:
+            return QrCell(exercise_id, qr_path)
+        qr_warnings.append(f"{exercise_id}: مؤهّل لرمز QR لكنه غير مولَّد بعد (status={'available' if available else 'missing'})")
+    return status
 
 
 def add_page_number(paragraph) -> None:
@@ -361,47 +428,60 @@ def configure_document(doc: Document, release: str) -> None:
     update.set(qn("w:val"), "true")
 
 
-def lesson_rows(data: dict[str, Any], unit: dict[str, Any]) -> list[list[str]]:
+FALLBACK_LABELS_AR = {
+    "reading": "قراءة",
+    "role-play": "تمثيل حوار",
+    "writing": "كتابة",
+    "teacher-read": "قراءة المعلّم",
+}
+
+
+def lesson_rows(
+    data: dict[str, Any],
+    unit: dict[str, Any],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+) -> list[list[Any]]:
     manifest = data["audioManifest"]["entries"]
-    rows: list[list[str]] = []
+    rows: list[list[Any]] = []
     for source_id in unit["legacySources"]:
         lesson = data["lessons"][source_id]
         for step in lesson["steps"]:
             exercise_id = f"{source_id}.{step['id']}"
             audio = manifest.get(exercise_id, {})
-            status = "متاح" if audio.get("status") == "available" else "غير متاح؛ تابع القراءة"
+            status_cell = resolve_audio_status_cell(exercise_id, audio, qr_files, qr_warnings)
             rows.append([
                 exercise_id,
                 TYPE_AR.get(step["type"], step["type"]),
                 step.get("arabic", ""),
                 step.get("transliteration", "—") or "—",
                 step.get("armenian", ""),
-                status,
+                status_cell,
             ])
     return rows
 
 
-def activity_rows(data: dict[str, Any], unit_id: str) -> list[list[str]]:
-    rows: list[list[str]] = []
+def activity_rows(
+    data: dict[str, Any],
+    unit_id: str,
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+) -> list[list[Any]]:
+    manifest = data["audioManifest"]["entries"]
+    rows: list[list[Any]] = []
     for activity in data["curriculum"]["newActivities"]:
         if activity["unit"] != unit_id:
             continue
-        audio = activity.get("audio", {})
-        fallback_labels = {
-            "reading": "قراءة",
-            "role-play": "تمثيل حوار",
-            "writing": "كتابة",
-            "teacher-read": "قراءة المعلّم",
-        }
-        fallback = fallback_labels.get(audio.get("fallback"), audio.get("fallback", "—"))
-        status = "متاح" if audio.get("status") == "available" else f"بديل: {fallback}"
+        # Statut live, pas activity.get("audio", {}) qui peut être obsolète dans curriculum.json.
+        audio = manifest.get(activity["id"], {})
+        status_cell = resolve_audio_status_cell(activity["id"], audio, qr_files, qr_warnings, FALLBACK_LABELS_AR)
         rows.append([
             activity["id"],
             TYPE_AR.get(activity["type"], activity["type"]),
             activity.get("arabic", ""),
             activity.get("transliteration", "—") or "—",
             activity.get("armenian", ""),
-            status,
+            status_cell,
         ])
     return rows
 
@@ -569,15 +649,21 @@ def add_integration(doc: Document, data: dict[str, Any], base_url: str | None) -
     add_table(doc, ["المعرّف", "النص القديم", "النص المصحح", "الترحيل"], migration_rows, [0.85, 1.9, 2.45, 1.38], font_size=8)
 
 
-def add_unit(doc: Document, data: dict[str, Any], unit: dict[str, Any]) -> None:
+def add_unit(
+    doc: Document,
+    data: dict[str, Any],
+    unit: dict[str, Any],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+) -> None:
     unit_id = unit["id"]
     add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code=unit_id)
     ar_desc, hy_desc = UNIT_DESCRIPTIONS.get(unit_id, ("", ""))
     if ar_desc:
         add_unit_lead(doc, ar_desc, hy_desc)
 
-    rows = lesson_rows(data, unit)
-    new_rows = activity_rows(data, unit_id)
+    rows = lesson_rows(data, unit, qr_files, qr_warnings)
+    new_rows = activity_rows(data, unit_id, qr_files, qr_warnings)
     if unit_id in {"C02", "C03"}:
         rows = new_rows + rows
         new_rows = []
@@ -617,27 +703,30 @@ def add_unit(doc: Document, data: dict[str, Any], unit: dict[str, Any]) -> None:
         )
 
 
-def add_review(doc: Document, data: dict[str, Any], unit: dict[str, Any]) -> None:
+def add_review(
+    doc: Document,
+    data: dict[str, Any],
+    unit: dict[str, Any],
+    qr_files: dict[str, Path],
+    qr_warnings: list[str],
+) -> None:
     add_heading(doc, unit["titleAr"], unit["titleHy"], level=1, code="R01")
     add_callout(
         doc,
         "المراجعة سياقية: لا يُعاد السؤال نفسه مباشرة، بل تُستعمل المهارة في مهمة جديدة.",
         "Կրկնությունը համատեքստային է․ նույն հարցը անմիջապես չի կրկնվում։",
     )
-    legacy = lesson_rows(data, unit)
+    legacy = lesson_rows(data, unit, qr_files, qr_warnings)
     if legacy:
         add_heading(doc, "مرجع V4 المحفوظ", "Պահպանված V4 հղում", level=2)
         add_table(doc, ["المعرّف", "النوع", "العربية", "النقحرة", "Հայերեն", "الصوت"], legacy, [0.78, 0.67, 1.55, 1.0, 1.63, 0.95], font_size=8.2)
+    manifest = data["audioManifest"]["entries"]
     rows = []
     for item in data["curriculum"]["review"]:
-        audio = item.get("audio", {})
-        fallback = {
-            "teacher-read": "قراءة المعلّم",
-            "reading": "قراءة",
-            "role-play": "تمثيل حوار",
-        }.get(audio.get("fallback"), audio.get("fallback", "—"))
-        status = "متاح" if audio.get("status") == "available" else f"بديل: {fallback}"
-        rows.append([item["id"], TYPE_AR.get(item["type"], item["type"]), item["skill"], item["promptAr"], item["promptHy"], status])
+        # Statut live, pas item.get("audio", {}) qui peut être obsolète dans curriculum.json.
+        audio = manifest.get(item["id"], {})
+        status_cell = resolve_audio_status_cell(item["id"], audio, qr_files, qr_warnings, FALLBACK_LABELS_AR)
+        rows.append([item["id"], TYPE_AR.get(item["type"], item["type"]), item["skill"], item["promptAr"], item["promptHy"], status_cell])
     add_heading(doc, "مراجعة V5 المتنوعة", "V5 բազմազան կրկնություն", level=2)
     add_table(doc, ["المعرّف", "النوع", "المهارة", "المهمة العربية", "Հայերեն", "الصوت"], rows, [0.78, 0.72, 0.85, 1.78, 1.55, 0.9], font_size=8.1)
 
@@ -727,8 +816,15 @@ def add_release_note(doc: Document, data: dict[str, Any], base_url: str | None) 
     )
 
 
-def build(data: dict[str, Any], output: Path, base_url: str | None) -> None:
+def build(
+    data: dict[str, Any],
+    output: Path,
+    base_url: str | None,
+    qr_files: dict[str, Path],
+    qr_report: Path | None = None,
+) -> None:
     doc = Document()
+    qr_warnings: list[str] = []
     configure_document(doc, data["curriculum"]["release"])
     add_cover(doc, data)
     add_contents(doc, data)
@@ -737,10 +833,10 @@ def build(data: dict[str, Any], output: Path, base_url: str | None) -> None:
 
     units_by_id = {u["id"]: u for u in data["curriculum"]["units"]}
     for unit_id in ["C01", "C02", "C03", "C04", "C05", "C06", "E01", "C07", "C08", "C09", "C10", "C11", "C12"]:
-        add_unit(doc, data, units_by_id[unit_id])
+        add_unit(doc, data, units_by_id[unit_id], qr_files, qr_warnings)
     for unit_id in ["G01", "G02", "G03", "G04", "G05"]:
-        add_unit(doc, data, units_by_id[unit_id])
-    add_review(doc, data, units_by_id["R01"])
+        add_unit(doc, data, units_by_id[unit_id], qr_files, qr_warnings)
+    add_review(doc, data, units_by_id["R01"], qr_files, qr_warnings)
     for assessment in data["curriculum"]["assessments"]:
         add_assessment(doc, assessment)
     add_glossary(doc, data)
@@ -753,13 +849,52 @@ def build(data: dict[str, Any], output: Path, base_url: str | None) -> None:
     doc.core_properties.keywords = "Arabic, Armenian, A1, Noutq, V5"
     doc.save(output)
 
+    # Rapport interne uniquement : jamais imprimé dans le livre lui-même.
+    if qr_report is not None:
+        qr_report.parent.mkdir(parents=True, exist_ok=True)
+        qr_report.write_text(
+            json.dumps(
+                {
+                    "generatedAt": data["curriculum"].get("buildDate"),
+                    "qrEligibleCount": sum(
+                        1 for e in data["audioManifest"]["entries"].values() if e.get("includeInBookQr")
+                    ),
+                    "qrFilesLoaded": len(qr_files),
+                    "warnings": sorted(set(qr_warnings)),
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        if qr_warnings:
+            print(f"[qr] {len(set(qr_warnings))} élément(s) éligible(s) QR sans image générée — voir {qr_report}")
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--base-url", default=None)
+    parser.add_argument(
+        "--qr-metadata",
+        type=Path,
+        default=Path("output/qr/audio-qr-manifest.json"),
+        help="Manifeste produit par scripts/generateAudioQr.ts. Absent -> livre généré sans QR (comportement inchangé).",
+    )
+    parser.add_argument(
+        "--qr-report",
+        type=Path,
+        default=Path("reports/qr-eligible-missing.json"),
+        help="Rapport interne (jamais dans le livre) des ids éligibles QR sans image générée.",
+    )
+    parser.add_argument(
+        "--no-qr",
+        action="store_true",
+        help="Force la génération sans image QR même si NOUTQ_PUBLIC_BASE_URL est défini (ex: .env partagé).",
+    )
     args = parser.parse_args()
+    load_dotenv()  # même .env que les scripts TS ; n'écrase jamais une variable déjà présente dans l'environnement.
     data = json.loads(args.data.read_text(encoding="utf-8"))
     raw_base_url = args.base_url or os.environ.get("NOUTQ_PUBLIC_BASE_URL")
     base_url = None
@@ -775,7 +910,10 @@ def main() -> None:
         ):
             raise ValueError("NOUTQ_PUBLIC_BASE_URL must be a clean HTTPS URL")
         base_url = raw_base_url.strip().rstrip("/")
-    build(data, args.output, base_url)
+    qr_files = load_qr_metadata(args.qr_metadata) if (base_url and not args.no_qr) else {}
+    if base_url and not args.no_qr and not qr_files and args.qr_metadata.exists():
+        print(f"[qr] {args.qr_metadata} lu mais vide — aucune image QR ne sera intégrée.")
+    build(data, args.output, base_url, qr_files, qr_report=args.qr_report)
     print(f"Generated {args.output}")
 
 

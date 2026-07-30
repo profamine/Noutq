@@ -18,6 +18,8 @@ import { storageGet, storageSet } from './services/storage';
 import { requestNotificationPermission, scheduleDailyReminderNotification } from './services/notifications';
 import { runV5Migration } from './services/v5Migration';
 import { completeLessonOnce } from './services/progress';
+import { findStepByAudioId } from './data/lessons';
+import { isValidAudioId, extractAudioIdFromPath } from './shared/audioId';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +80,9 @@ function AppContent() {
   const [showPlacementTest, setShowPlacementTest] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  // Étape ciblée par un deep link /a/{audioId} — consommée une seule fois par
+  // LessonScreen puis effacée à la moindre navigation normale (voir plus bas).
+  const [deepLinkStepIndex, setDeepLinkStepIndex] = useState<number | null>(null);
   const [completedUnits, setCompletedUnits] = useState<string[]>([]);
   const [totalXP, setTotalXP] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -184,6 +189,36 @@ function AppContent() {
     return () => { cleanup?.(); };
   }, [currentScreen]);
 
+  // ── Deep link audio /a/{audioId} (App Link Android, ou noutq://a/{audioId}) ─
+  // Ouvre l'activité correspondante et affiche le bouton son ; ne modifie
+  // jamais XP, complétion d'unité ou lessonProgress — voir openAudioDeepLink.
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    (async () => {
+      try {
+        const { App: CapApp } = await import('@capacitor/app');
+        const handle = await CapApp.addListener('appUrlOpen', ({ url }) => {
+          const audioId = extractAudioIdFromPath(url);
+          if (!audioId) return; // pas un lien /a/{audioId} — ignoré, pas une erreur
+          if (!isValidAudioId(audioId)) {
+            console.warn('[deep link] audio_id de forme invalide, ignoré :', audioId);
+            return;
+          }
+          const target = findStepByAudioId(audioId);
+          if (!target) {
+            console.warn('[deep link] audio_id introuvable dans le contenu de cette version de l’app :', audioId);
+            return;
+          }
+          setActiveLesson(target.lessonId);
+          setDeepLinkStepIndex(target.stepIndex);
+          setCurrentScreen('lesson');
+        });
+        cleanup = () => { handle.remove(); };
+      } catch { /* not running in Capacitor */ }
+    })();
+    return () => { cleanup?.(); };
+  }, []);
+
   // ── Callbacks ─────────────────────────────────────────────────────────────
   const markUnitComplete = useCallback((lessonId: string, xpEarned: number) => {
     const today = new Date().toDateString();
@@ -232,11 +267,13 @@ function AppContent() {
 
   const navigateToLesson = useCallback((lessonId: string) => {
     setActiveLesson(lessonId);
+    setDeepLinkStepIndex(null); // navigation normale : jamais l'étape d'un deep link précédent
     setCurrentScreen('lesson');
   }, []);
 
   const goBack = useCallback(() => {
     setActiveLesson(null);
+    setDeepLinkStepIndex(null);
     setCurrentScreen('home');
   }, []);
 
@@ -250,6 +287,7 @@ function AppContent() {
     setShowPlacementTest(false);
     if (recommendedUnitId) {
       setActiveLesson(recommendedUnitId);
+      setDeepLinkStepIndex(null);
       setCurrentScreen('lesson');
     }
   }, []);
@@ -288,7 +326,14 @@ function AppContent() {
 
       <div className="flex-1 w-full flex flex-col h-full bg-white dark:bg-gray-900 md:border-l border-gray-100 dark:border-gray-800 relative">
         {currentScreen === 'home'     && <HomeScreen onStartLesson={navigateToLesson} completedUnits={completedUnits} totalXP={totalXP} streak={streak} />}
-        {currentScreen === 'lesson'   && <LessonScreen onBack={goBack} lessonId={activeLesson} onComplete={markUnitComplete} />}
+        {currentScreen === 'lesson'   && (
+          <LessonScreen
+            onBack={goBack}
+            lessonId={activeLesson}
+            onComplete={markUnitComplete}
+            initialStepIndex={deepLinkStepIndex ?? undefined}
+          />
+        )}
         {currentScreen === 'profile'  && (
           <ProfileScreen
             completedUnits={completedUnits}

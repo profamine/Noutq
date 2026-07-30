@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u8: LessonData = {
   id: "u8",
-  title: "Ժամանակ (الوقت)",
+  title: "Ժամանակ",
   titleAr: "الزمن والوقت",
   xpReward: 50,
   steps: [

@@ -66,3 +66,19 @@ export const lessonsData: Record<string, LessonData> = Object.fromEntries(
 );
 
 export type { LessonData, LessonStep, MatchPair, QuizOption };
+
+/**
+ * Résout un audio_id (legacy "u7.1" ou V5 "v5.c05.01") vers l'écran de leçon
+ * qui le contient réellement, pour le deep link `/a/{audioId}` (Capacitor
+ * appUrlOpen). Le résultat n'est qu'une position de départ pour cette session
+ * — il ne doit jamais être écrit dans lessonProgress avant une interaction réelle.
+ */
+export function findStepByAudioId(audioId: string): { lessonId: string; stepIndex: number } | null {
+  for (const [lessonId, lesson] of Object.entries(lessonsData)) {
+    const stepIndex = lesson.steps.findIndex(
+      (step) => step.audio === audioId || (!step.audio && `${lessonId}.${step.id}` === audioId),
+    );
+    if (stepIndex !== -1) return { lessonId, stepIndex };
+  }
+  return null;
+}

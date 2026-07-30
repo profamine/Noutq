@@ -12,6 +12,12 @@
     "test": "vitest run",
     "generate:v5-audio": "tsx scripts/generateV5AudioManifest.ts && tsx scripts/generateRecordingSheet.ts",
     "validate:v5": "npm run generate:v5-audio && tsx scripts/validateV5.ts",
+    "qr:audio:generate": "tsx scripts/generateAudioQr.ts",
+    "qr:audio:validate": "tsx scripts/validateAudioQr.ts",
+    "qr:audio:all": "npm run qr:audio:generate && npm run qr:audio:validate",
+    "docs:v5:data": "tsx scripts/exportV5DocumentData.ts .tmp/v5-document-data.json",
+    "docs:v5:qr": "npm run qr:audio:all && npm run docs:v5:data && python scripts/generate_v5_document.py --data .tmp/v5-document-data.json --output Noutq-contenu-pedagogique-v5-rc2.docx",
+    "docs:v5:no-qr": "npm run docs:v5:data && python scripts/generate_v5_document.py --data .tmp/v5-document-data.json --output Noutq-contenu-pedagogique-v5-rc2.docx --no-qr",
     "start": "node dist/server.cjs",
     "android:build": "npm run build && npx cap sync android",
     "android:open": "npx cap open android"
@@ -32,6 +38,7 @@
     "express": "^4.21.2",
     "groq-sdk": "^1.1.2",
     "lucide-react": "^0.546.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.1.14",
@@ -43,6 +50,10 @@
     "@capacitor/cli": "8.4.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
+    "@types/pngjs": "^6.0.5",
+    "@types/qrcode": "^1.5.6",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
     "vitest": "^4.1.10"
   }
 }

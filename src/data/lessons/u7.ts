@@ -2,8 +2,8 @@ import { LessonData, pair } from '../types';
 
 export const u7: LessonData = {
   id: "u7",
-  title: "Ողջույններ (التحيات)",
-  titleAr: "التحيات التعارف",
+  title: "Ողջույններ",
+  titleAr: "التحيات",
   xpReward: 50,
   steps: [
     {

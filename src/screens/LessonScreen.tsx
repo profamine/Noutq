@@ -499,13 +499,19 @@ export default function LessonScreen({
   onBack,
   lessonId,
   onComplete,
+  initialStepIndex,
 }: {
   onBack: () => void;
   lessonId: string | null;
   onComplete: (lessonId: string, xpEarned: number) => void;
+  /** Étape de départ pour cette session uniquement (ex. deep link `/a/{audioId}`).
+   *  Ne doit jamais provenir d'autre chose qu'un choix explicite hors composant :
+   *  voir la garde `skipNextPersistRef` plus bas, qui empêche ce point d'entrée
+   *  d'écraser silencieusement la vraie progression sauvegardée de l'apprenant. */
+  initialStepIndex?: number;
 }) {
   const { t, language } = useLanguage();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(() => initialStepIndex ?? 0);
   const [recording, setRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -536,19 +542,30 @@ export default function LessonScreen({
   // ── Modale "Reprendre ?" — affichée si une progression partielle est sauvegardée ──
   const [resumeModal, setResumeModal] = useState<{ stepIndex: number; lives: number } | null>(null);
 
-  // Au montage : vérifier si une progression partielle existe pour cette leçon
+  // Au montage : vérifier si une progression partielle existe pour cette leçon.
+  // Sauté pour une entrée par deep link (initialStepIndex défini) : l'étape
+  // demandée doit s'ouvrir directement, sans proposer de reprendre ailleurs.
   useEffect(() => {
-    if (!lessonId) return;
+    if (!lessonId || initialStepIndex !== undefined) return;
     Preferences.get({ key: `lessonProgress_${lessonId}` }).then(({ value }) => {
       if (!value) return;
       const saved = parseLessonProgress(value, lessonsData[lessonId].steps.length);
       // N'afficher que si l'utilisateur n'est pas à l'étape 0 avec 3 vies.
       if (saved && saved.stepIndex > 0) setResumeModal(saved);
     });
-  }, [lessonId]);
+  }, [lessonId, initialStepIndex]);
 
-  // À chaque changement d'étape ou de vies : persister la progression
+  // À chaque changement d'étape ou de vies : persister la progression — sauf
+  // au tout premier rendu, pour ne jamais écrire lessonProgress avant une
+  // interaction réelle de l'utilisateur (essentiel pour l'entrée par deep
+  // link `/a/{audioId}` : ouvrir une activité ne doit pas écraser une
+  // progression existante plus avancée dans la même leçon).
+  const skipNextPersistRef = useRef(true);
   useEffect(() => {
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
     if (!lessonId || !lessonsData[lessonId] || showCompletion) return;
     Preferences.set({
       key: `lessonProgress_${lessonId}`,

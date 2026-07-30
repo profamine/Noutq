@@ -10,5 +10,6 @@ export default function audioResolver(req: Request, res: Response): void {
     res,
     path.resolve(process.cwd(), 'public', 'audio', 'manifest.v2.json'),
     typeof audioId === 'string' ? audioId : '',
+    process.env.NOUTQ_WEB_AUDIO_ENABLED === 'true',
   );
 }

@@ -2,7 +2,7 @@ import { LessonData, pair } from '../types';
 
 export const u4: LessonData = {
   id: "u4",
-  title: "Ինչ է Ի՛րաբը (الإعراب)",
+  title: "Ինչ է Ի՛րաբը",
   titleAr: "مقدمة في الإعراب",
   xpReward: 50,
   steps: [

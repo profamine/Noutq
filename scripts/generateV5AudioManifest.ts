@@ -30,10 +30,16 @@ interface AudioEntry {
   activityType: string;
   expectedFilename: string;
   legacyAliases?: string[];
+  /** Décidé une fois ici — ni le générateur de QR ni le générateur DOCX ne
+   *  redécident cette règle indépendamment, pour éviter toute divergence. */
+  includeInBookQr: boolean;
+  unitTitleAr?: string;
+  unitTitleHy?: string;
 }
 
 interface CurriculumActivity {
   id: string;
+  unit?: string;
   arabic?: string;
   promptAr?: string;
   type: string;
@@ -42,7 +48,7 @@ interface CurriculumActivity {
 
 interface Curriculum {
   release: string;
-  units: Array<{ id: string; track: string; legacySources: string[] }>;
+  units: Array<{ id: string; titleAr: string; titleHy: string; track: string; legacySources: string[] }>;
   newActivities: CurriculumActivity[];
   review: CurriculumActivity[];
   assessments: Array<{ items: CurriculumActivity[] }>;
@@ -53,11 +59,26 @@ interface Curriculum {
     legacyAudioAlias: boolean;
     legacyAudioText?: string;
   }>;
+  bookQrOverrides?: Array<{ audioId: string; includeInBookQr: boolean }>;
 }
 
 const curriculum = JSON.parse(fs.readFileSync(curriculumPath, 'utf8')) as Curriculum;
 const legacyManifest = JSON.parse(fs.readFileSync(legacyManifestPath, 'utf8')) as Record<string, string>;
 const migrationByExercise = new Map(curriculum.textMigrations.map((item) => [item.exerciseId, item]));
+const bookQrOverrideByAudioId = new Map(
+  (curriculum.bookQrOverrides ?? []).map((item) => [item.audioId, item.includeInBookQr]),
+);
+const v5UnitTitleById = new Map(curriculum.units.map((unit) => [unit.id, unit]));
+
+/** Types dont la valeur d'écoute est intrinsèque à l'activité — seuls ceux-ci
+ *  reçoivent un QR sans déclaration explicite (voir bookQrOverrides pour le reste). */
+const LISTENING_TYPES = new Set(['listen', 'listening', 'listening-discrimination']);
+
+function resolveIncludeInBookQr(audioId: string, activityType: string): boolean {
+  const override = bookQrOverrideByAudioId.get(audioId);
+  if (override !== undefined) return override;
+  return LISTENING_TYPES.has(activityType);
+}
 
 const entries: Record<string, AudioEntry> = {};
 const textIndex: Record<string, string> = {};
@@ -95,15 +116,25 @@ function idBasedCandidates(exerciseId: string): string[] {
   return [`${exerciseId}.mp3`, `${exerciseId}.wav`];
 }
 
-function addEntry(exerciseId: string, text: string, audio: AudioSpec, activityType: string): void {
+function addEntry(
+  exerciseId: string,
+  text: string,
+  audio: AudioSpec,
+  activityType: string,
+  unitTitle?: { titleAr: string; titleHy: string },
+): void {
   if (entries[exerciseId]) throw new Error(`DUPLICATE_AUDIO_ID:${exerciseId}`);
   const migration = migrationByExercise.get(exerciseId);
   // Nom canonique attendu pour cet ID, indépendamment du nom réel trouvé sur le
   // disque (qui peut être un ancien nom dérivé du texte — voir legacyFilenameCandidates).
   const expectedFilename = `${exerciseId}.mp3`;
-  const diskSrc = audio.status === 'missing'
-    ? resolveFromDisk([...idBasedCandidates(exerciseId), ...legacyFilenameCandidates(text)])
-    : null;
+  // Le fichier nommé par ID (voix unique régénérée) prime TOUJOURS sur une
+  // correspondance texte->wav héritée de l'ancien manifest.json, même quand
+  // celui-ci déclarait déjà `audio` comme disponible : sinon l'ancien fichier
+  // (voix Gemini) continue d'être servi silencieusement après régénération.
+  const idBasedSrc = resolveFromDisk(idBasedCandidates(exerciseId));
+  const diskSrc = idBasedSrc
+    ?? (audio.status === 'missing' ? resolveFromDisk(legacyFilenameCandidates(text)) : null);
   const resolvedAudio = diskSrc
     ? { status: 'available' as const, src: diskSrc }
     : audio;
@@ -115,9 +146,14 @@ function addEntry(exerciseId: string, text: string, audio: AudioSpec, activityTy
     stablePath: `/a/${encodeURIComponent(exerciseId)}`,
     activityType,
     expectedFilename,
+    includeInBookQr: resolveIncludeInBookQr(exerciseId, activityType),
   };
   if (resolvedAudio.src) entry.src = resolvedAudio.src;
   if (resolvedAudio.fallback) entry.fallback = resolvedAudio.fallback;
+  if (unitTitle) {
+    entry.unitTitleAr = unitTitle.titleAr;
+    entry.unitTitleHy = unitTitle.titleHy;
+  }
   if (migration?.legacyAudioAlias) {
     entry.legacyAliases = [migration.from];
     const legacySource = legacyManifest[migration.legacyAudioText ?? migration.from];
@@ -134,10 +170,15 @@ for (const [lessonId, lesson] of Object.entries(lessonsData)) {
     if (step.audio?.startsWith('v5.')) continue;
     const exerciseId = `${lessonId}.${step.id}`;
     const src = legacyManifest[step.arabic];
-    addEntry(exerciseId, step.arabic, src
-      ? { status: 'available', src }
-      : { status: 'missing', fallback: step.type === 'listen' ? 'reading' : 'native-tts-or-reading' },
-    step.type);
+    addEntry(
+      exerciseId,
+      step.arabic,
+      src
+        ? { status: 'available', src }
+        : { status: 'missing', fallback: step.type === 'listen' ? 'reading' : 'native-tts-or-reading' },
+      step.type,
+      { titleAr: lesson.titleAr, titleHy: lesson.title },
+    );
   }
 }
 
@@ -150,7 +191,8 @@ const v5Activities = [
 for (const activity of v5Activities) {
   if (!activity.audio) continue;
   const text = activity.arabic ?? activity.promptAr ?? '';
-  addEntry(activity.id, text, activity.audio, activity.type);
+  const unit = activity.unit ? v5UnitTitleById.get(activity.unit) : undefined;
+  addEntry(activity.id, text, activity.audio, activity.type, unit && { titleAr: unit.titleAr, titleHy: unit.titleHy });
 }
 
 const manifest = {

@@ -1165,5 +1165,17 @@
       ],
       "delivery": "teacher-led"
     }
+  ],
+  "bookQrOverrides": [
+    {
+      "audioId": "u8.7",
+      "includeInBookQr": true,
+      "reason": "Échantillon QR demandé explicitement (question 'kam as-sāʿa?' — forte valeur d'écoute malgré le type quiz)."
+    },
+    {
+      "audioId": "u13.7",
+      "includeInBookQr": true,
+      "reason": "Échantillon QR demandé explicitement (question médicale corrigée — forte valeur d'écoute malgré le type quiz)."
+    }
   ]
 }

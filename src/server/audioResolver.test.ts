@@ -14,6 +14,8 @@ let server: http.Server;
 let baseUrl: string;
 let missingIdServer: http.Server;
 let missingIdBaseUrl: string;
+let webAudioServer: http.Server;
+let webAudioBaseUrl: string;
 
 async function listen(app: express.Express): Promise<{ server: http.Server; baseUrl: string }> {
   const srv = await new Promise<http.Server>((resolve) => {
@@ -25,6 +27,8 @@ async function listen(app: express.Express): Promise<{ server: http.Server; base
 }
 
 beforeAll(async () => {
+  // webAudioEnabled=false (comportement par défaut, celui de production) :
+  // l'audio reste Local-first, jamais de redirection même si le fichier existe.
   const app = express();
   app.get('/a/:audioId', (req, res) => handleAudioResolver(req, res, manifestPath));
   ({ server, baseUrl } = await listen(app));
@@ -32,19 +36,32 @@ beforeAll(async () => {
   const missingIdApp = express();
   missingIdApp.get('/a/:audioId', (req, res) => handleAudioResolver(req, res, missingIdManifestPath));
   ({ server: missingIdServer, baseUrl: missingIdBaseUrl } = await listen(missingIdApp));
+
+  // webAudioEnabled=true : opt-in explicite, seul cas où une redirection réelle a lieu.
+  const webAudioApp = express();
+  webAudioApp.get('/a/:audioId', (req, res) => handleAudioResolver(req, res, manifestPath, undefined, true));
+  ({ server: webAudioServer, baseUrl: webAudioBaseUrl } = await listen(webAudioApp));
 });
 
 afterAll(async () => {
   await Promise.all(
-    [server, missingIdServer].map(
+    [server, missingIdServer, webAudioServer].map(
       (s) => new Promise<void>((resolve, reject) => s.close((error) => error ? reject(error) : resolve())),
     ),
   );
 });
 
 describe('stable audio resolver', () => {
-  it('redirects a known available ID to its real local asset', async () => {
+  it('never redirects to the local asset by default — audio stays Local-first even when available', async () => {
     const response = await fetch(`${baseUrl}/a/u7.1`, { redirect: 'manual' });
+    expect(response.status).toBe(200);
+    const body = await response.text();
+    expect(body).toContain('جاهز داخل تطبيق Noutq');
+    expect(body).not.toContain('غير متاح'); // c'est bien le message "disponible", pas "manquant"
+  });
+
+  it('only redirects to the real local asset when NOUTQ_WEB_AUDIO_ENABLED is explicitly on', async () => {
+    const response = await fetch(`${webAudioBaseUrl}/a/u7.1`, { redirect: 'manual' });
     expect(response.status).toBe(302);
     expect(response.headers.get('location')).toMatch(/^\/audio\//);
   });

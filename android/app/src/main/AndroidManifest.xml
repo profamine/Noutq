@@ -22,6 +22,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!--
+              Android App Link vers le resolver audio /a/{audioId} (QR du livre).
+              autoVerify="true" déclenche la vérification automatique du domaine
+              via assetlinks.json au moment de l'installation — sans elle, Android
+              affiche un choix « ouvrir avec » au lieu d'ouvrir Noutq directement.
+              Voir docs/android-app-links.md pour la procédure de vérification.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="noutq.vercel.app"
+                    android:pathPrefix="/a/" />
+            </intent-filter>
+
         </activity>
 
         <provider

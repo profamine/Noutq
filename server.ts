@@ -20,7 +20,7 @@ async function startServer(): Promise<void> {
     const manifestPath = IS_PROD
       ? path.resolve(process.cwd(), 'dist', 'audio', 'manifest.v2.json')
       : path.resolve(process.cwd(), 'public', 'audio', 'manifest.v2.json');
-    handleAudioResolver(req, res, manifestPath);
+    handleAudioResolver(req, res, manifestPath, undefined, process.env.NOUTQ_WEB_AUDIO_ENABLED === 'true');
   });
 
   // ── Middleware Vite (dev) ou fichiers statiques (prod) ──────────────────

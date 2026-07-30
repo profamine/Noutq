@@ -14,7 +14,10 @@
       "stablePath": "/a/u1.0",
       "activityType": "listen",
       "expectedFilename": "u1.0.mp3",
-      "src": "/audio/أ_ب_ت_ث_ج_ح_خ_د_ذ_ر_ز_س_ش_ص_ض_ط_ظ_ع_غ_ف_....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u1.0.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.1": {
       "exerciseId": "u1.1",
@@ -24,7 +27,10 @@
       "stablePath": "/a/u1.1",
       "activityType": "listen",
       "expectedFilename": "u1.1.mp3",
-      "src": "/audio/بَ__بِ__بُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u1.1.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.2": {
       "exerciseId": "u1.2",
@@ -34,7 +40,10 @@
       "stablePath": "/a/u1.2",
       "activityType": "quiz",
       "expectedFilename": "u1.2.mp3",
-      "src": "/audio/بَ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.2.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.21": {
       "exerciseId": "u1.21",
@@ -44,7 +53,10 @@
       "stablePath": "/a/u1.21",
       "activityType": "quiz",
       "expectedFilename": "u1.21.mp3",
-      "src": "/audio/بَ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.21.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.3": {
       "exerciseId": "u1.3",
@@ -54,7 +66,10 @@
       "stablePath": "/a/u1.3",
       "activityType": "quiz",
       "expectedFilename": "u1.3.mp3",
-      "src": "/audio/بِ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.3.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.31": {
       "exerciseId": "u1.31",
@@ -64,7 +79,10 @@
       "stablePath": "/a/u1.31",
       "activityType": "quiz",
       "expectedFilename": "u1.31.mp3",
-      "src": "/audio/بِ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.31.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.4": {
       "exerciseId": "u1.4",
@@ -74,7 +92,10 @@
       "stablePath": "/a/u1.4",
       "activityType": "listen",
       "expectedFilename": "u1.4.mp3",
-      "src": "/audio/مَكْتَب.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u1.4.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.5": {
       "exerciseId": "u1.5",
@@ -84,7 +105,10 @@
       "stablePath": "/a/u1.5",
       "activityType": "match",
       "expectedFilename": "u1.5.mp3",
-      "src": "/audio/جمع_الحركات.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.5.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u1.6": {
       "exerciseId": "u1.6",
@@ -94,7 +118,10 @@
       "stablePath": "/a/u1.6",
       "activityType": "write",
       "expectedFilename": "u1.6.mp3",
-      "src": "/audio/مَكْتَب.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u1.6.mp3",
+      "unitTitleAr": "الحروف والحركات الأساسية",
+      "unitTitleHy": "Տառեր և ձայնավոր նշաններ"
     },
     "u2.1": {
       "exerciseId": "u2.1",
@@ -104,7 +131,10 @@
       "stablePath": "/a/u2.1",
       "activityType": "listen",
       "expectedFilename": "u2.1.mp3",
-      "src": "/audio/بَا__بُو__بِي.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u2.1.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.2": {
       "exerciseId": "u2.2",
@@ -114,7 +144,10 @@
       "stablePath": "/a/u2.2",
       "activityType": "quiz",
       "expectedFilename": "u2.2.mp3",
-      "src": "/audio/بَا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.2.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.21": {
       "exerciseId": "u2.21",
@@ -124,7 +157,10 @@
       "stablePath": "/a/u2.21",
       "activityType": "quiz",
       "expectedFilename": "u2.21.mp3",
-      "src": "/audio/بَا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.21.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.3": {
       "exerciseId": "u2.3",
@@ -134,7 +170,10 @@
       "stablePath": "/a/u2.3",
       "activityType": "listen",
       "expectedFilename": "u2.3.mp3",
-      "src": "/audio/بَاب.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u2.3.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.4": {
       "exerciseId": "u2.4",
@@ -144,7 +183,10 @@
       "stablePath": "/a/u2.4",
       "activityType": "listen",
       "expectedFilename": "u2.4.mp3",
-      "src": "/audio/نُور.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u2.4.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.5": {
       "exerciseId": "u2.5",
@@ -154,7 +196,10 @@
       "stablePath": "/a/u2.5",
       "activityType": "quiz",
       "expectedFilename": "u2.5.mp3",
-      "src": "/audio/بِنْت.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.5.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.6": {
       "exerciseId": "u2.6",
@@ -164,7 +209,10 @@
       "stablePath": "/a/u2.6",
       "activityType": "match",
       "expectedFilename": "u2.6.mp3",
-      "src": "/audio/مد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.6.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.7": {
       "exerciseId": "u2.7",
@@ -174,7 +222,10 @@
       "stablePath": "/a/u2.7",
       "activityType": "speak",
       "expectedFilename": "u2.7.mp3",
-      "src": "/audio/بَاب.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.7.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u2.8": {
       "exerciseId": "u2.8",
@@ -184,7 +235,10 @@
       "stablePath": "/a/u2.8",
       "activityType": "write",
       "expectedFilename": "u2.8.mp3",
-      "src": "/audio/نُور.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u2.8.mp3",
+      "unitTitleAr": "المدود الثلاثة",
+      "unitTitleHy": "Երկարացումներ (ā, ū, ī)"
     },
     "u3.1": {
       "exerciseId": "u3.1",
@@ -194,7 +248,10 @@
       "stablePath": "/a/u3.1",
       "activityType": "listen",
       "expectedFilename": "u3.1.mp3",
-      "src": "/audio/كِتَابٌ__كِتَابًا__كِتَابٍ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u3.1.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.2": {
       "exerciseId": "u3.2",
@@ -204,7 +261,10 @@
       "stablePath": "/a/u3.2",
       "activityType": "quiz",
       "expectedFilename": "u3.2.mp3",
-      "src": "/audio/كِتَابٌ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.2.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.21": {
       "exerciseId": "u3.21",
@@ -214,7 +274,10 @@
       "stablePath": "/a/u3.21",
       "activityType": "quiz",
       "expectedFilename": "u3.21.mp3",
-      "src": "/audio/كِتَابٌ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.21.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.3": {
       "exerciseId": "u3.3",
@@ -224,7 +287,10 @@
       "stablePath": "/a/u3.3",
       "activityType": "quiz",
       "expectedFilename": "u3.3.mp3",
-      "src": "/audio/كِتَابًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.3.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.31": {
       "exerciseId": "u3.31",
@@ -234,7 +300,10 @@
       "stablePath": "/a/u3.31",
       "activityType": "quiz",
       "expectedFilename": "u3.31.mp3",
-      "src": "/audio/كِتَابًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.31.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.4": {
       "exerciseId": "u3.4",
@@ -244,7 +313,10 @@
       "stablePath": "/a/u3.4",
       "activityType": "quiz",
       "expectedFilename": "u3.4.mp3",
-      "src": "/audio/كِتَابٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.4.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.41": {
       "exerciseId": "u3.41",
@@ -254,7 +326,10 @@
       "stablePath": "/a/u3.41",
       "activityType": "quiz",
       "expectedFilename": "u3.41.mp3",
-      "src": "/audio/كِتَابٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.41.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.5": {
       "exerciseId": "u3.5",
@@ -264,7 +339,10 @@
       "stablePath": "/a/u3.5",
       "activityType": "speak",
       "expectedFilename": "u3.5.mp3",
-      "src": "/audio/كِتَابٌ_—_كِتَابًا_—_كِتَابٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.5.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.6": {
       "exerciseId": "u3.6",
@@ -274,7 +352,10 @@
       "stablePath": "/a/u3.6",
       "activityType": "listen",
       "expectedFilename": "u3.6.mp3",
-      "src": "/audio/هَذَا_كِتَابٌ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u3.6.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.7": {
       "exerciseId": "u3.7",
@@ -284,7 +365,10 @@
       "stablePath": "/a/u3.7",
       "activityType": "match",
       "expectedFilename": "u3.7.mp3",
-      "src": "/audio/تنوين.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.7.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u3.8": {
       "exerciseId": "u3.8",
@@ -294,7 +378,10 @@
       "stablePath": "/a/u3.8",
       "activityType": "write",
       "expectedFilename": "u3.8.mp3",
-      "src": "/audio/كِتَابٌ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u3.8.mp3",
+      "unitTitleAr": "التنوين",
+      "unitTitleHy": "Թանուին (Անորոշ կատեգ.)"
     },
     "u4.1": {
       "exerciseId": "u4.1",
@@ -304,7 +391,10 @@
       "stablePath": "/a/u4.1",
       "activityType": "listen",
       "expectedFilename": "u4.1.mp3",
-      "src": "/audio/الرَّفْع__النَّصْب__الجَرّ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u4.1.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.2": {
       "exerciseId": "u4.2",
@@ -314,7 +404,10 @@
       "stablePath": "/a/u4.2",
       "activityType": "listen",
       "expectedFilename": "u4.2.mp3",
-      "src": "/audio/الوَلَدُ_يَلْعَبُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u4.2.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.3": {
       "exerciseId": "u4.3",
@@ -324,7 +417,10 @@
       "stablePath": "/a/u4.3",
       "activityType": "quiz",
       "expectedFilename": "u4.3.mp3",
-      "src": "/audio/الوَلَدُ_يَلْعَبُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.3.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.31": {
       "exerciseId": "u4.31",
@@ -334,7 +430,10 @@
       "stablePath": "/a/u4.31",
       "activityType": "quiz",
       "expectedFilename": "u4.31.mp3",
-      "src": "/audio/الوَلَدُ_يَلْعَبُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.31.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.5": {
       "exerciseId": "u4.5",
@@ -344,7 +443,10 @@
       "stablePath": "/a/u4.5",
       "activityType": "listen",
       "expectedFilename": "u4.5.mp3",
-      "src": "/audio/رَأَيْتُ_الوَلَدَ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u4.5.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.6": {
       "exerciseId": "u4.6",
@@ -354,7 +456,10 @@
       "stablePath": "/a/u4.6",
       "activityType": "quiz",
       "expectedFilename": "u4.6.mp3",
-      "src": "/audio/رَأَيْتُ_الوَلَدَ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.6.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.7": {
       "exerciseId": "u4.7",
@@ -364,7 +469,10 @@
       "stablePath": "/a/u4.7",
       "activityType": "listen",
       "expectedFilename": "u4.7.mp3",
-      "src": "/audio/ذَهَبْتُ_إِلَى_البَيْتِ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u4.7.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.8": {
       "exerciseId": "u4.8",
@@ -374,7 +482,10 @@
       "stablePath": "/a/u4.8",
       "activityType": "quiz",
       "expectedFilename": "u4.8.mp3",
-      "src": "/audio/إِلَى_البَيْتِ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.8.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.9": {
       "exerciseId": "u4.9",
@@ -384,7 +495,10 @@
       "stablePath": "/a/u4.9",
       "activityType": "match",
       "expectedFilename": "u4.9.mp3",
-      "src": "/audio/الحالات.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.9.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.10": {
       "exerciseId": "u4.10",
@@ -394,7 +508,10 @@
       "stablePath": "/a/u4.10",
       "activityType": "speak",
       "expectedFilename": "u4.10.mp3",
-      "src": "/audio/الوَلَدُ_يَلْعَبُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.10.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u4.11": {
       "exerciseId": "u4.11",
@@ -404,7 +521,10 @@
       "stablePath": "/a/u4.11",
       "activityType": "write",
       "expectedFilename": "u4.11.mp3",
-      "src": "/audio/الوَلَدُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u4.11.mp3",
+      "unitTitleAr": "مقدمة في الإعراب",
+      "unitTitleHy": "Ինչ է Ի՛րաբը"
     },
     "u5.1": {
       "exerciseId": "u5.1",
@@ -414,7 +534,10 @@
       "stablePath": "/a/u5.1",
       "activityType": "listen",
       "expectedFilename": "u5.1.mp3",
-      "src": "/audio/وَاحِد.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.1.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.2": {
       "exerciseId": "u5.2",
@@ -424,7 +547,10 @@
       "stablePath": "/a/u5.2",
       "activityType": "listen",
       "expectedFilename": "u5.2.mp3",
-      "src": "/audio/اِثْنَان.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.2.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.3": {
       "exerciseId": "u5.3",
@@ -434,7 +560,10 @@
       "stablePath": "/a/u5.3",
       "activityType": "listen",
       "expectedFilename": "u5.3.mp3",
-      "src": "/audio/ثَلَاثَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.3.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.4": {
       "exerciseId": "u5.4",
@@ -444,7 +573,10 @@
       "stablePath": "/a/u5.4",
       "activityType": "listen",
       "expectedFilename": "u5.4.mp3",
-      "src": "/audio/أَرْبَعَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.4.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.5": {
       "exerciseId": "u5.5",
@@ -454,7 +586,10 @@
       "stablePath": "/a/u5.5",
       "activityType": "listen",
       "expectedFilename": "u5.5.mp3",
-      "src": "/audio/خَمْسَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.5.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.6": {
       "exerciseId": "u5.6",
@@ -464,7 +599,10 @@
       "stablePath": "/a/u5.6",
       "activityType": "listen",
       "expectedFilename": "u5.6.mp3",
-      "src": "/audio/سِتَّة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.6.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.7": {
       "exerciseId": "u5.7",
@@ -474,7 +612,10 @@
       "stablePath": "/a/u5.7",
       "activityType": "listen",
       "expectedFilename": "u5.7.mp3",
-      "src": "/audio/سَبْعَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.7.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.8": {
       "exerciseId": "u5.8",
@@ -484,7 +625,10 @@
       "stablePath": "/a/u5.8",
       "activityType": "match",
       "expectedFilename": "u5.8.mp3",
-      "src": "/audio/أرقام_الجزء_الأول.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.8.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.9": {
       "exerciseId": "u5.9",
@@ -494,7 +638,10 @@
       "stablePath": "/a/u5.9",
       "activityType": "listen",
       "expectedFilename": "u5.9.mp3",
-      "src": "/audio/ثَمَانِيَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.9.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.10": {
       "exerciseId": "u5.10",
@@ -504,7 +651,10 @@
       "stablePath": "/a/u5.10",
       "activityType": "listen",
       "expectedFilename": "u5.10.mp3",
-      "src": "/audio/تِسْعَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.10.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.11": {
       "exerciseId": "u5.11",
@@ -514,7 +664,10 @@
       "stablePath": "/a/u5.11",
       "activityType": "listen",
       "expectedFilename": "u5.11.mp3",
-      "src": "/audio/عَشَرَة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u5.11.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.12": {
       "exerciseId": "u5.12",
@@ -524,7 +677,10 @@
       "stablePath": "/a/u5.12",
       "activityType": "match",
       "expectedFilename": "u5.12.mp3",
-      "src": "/audio/أرقام_الجزء_الثاني.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.12.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.13": {
       "exerciseId": "u5.13",
@@ -534,7 +690,10 @@
       "stablePath": "/a/u5.13",
       "activityType": "match",
       "expectedFilename": "u5.13.mp3",
-      "src": "/audio/أرقام_الجزء_الثالث.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.13.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.14": {
       "exerciseId": "u5.14",
@@ -544,7 +703,10 @@
       "stablePath": "/a/u5.14",
       "activityType": "quiz",
       "expectedFilename": "u5.14.mp3",
-      "src": "/audio/عَشَرَة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.14.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.141": {
       "exerciseId": "u5.141",
@@ -554,7 +716,10 @@
       "stablePath": "/a/u5.141",
       "activityType": "quiz",
       "expectedFilename": "u5.141.mp3",
-      "src": "/audio/عَشَرَة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.141.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.15": {
       "exerciseId": "u5.15",
@@ -564,7 +729,10 @@
       "stablePath": "/a/u5.15",
       "activityType": "write",
       "expectedFilename": "u5.15.mp3",
-      "src": "/audio/وَاحِد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.15.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u5.16": {
       "exerciseId": "u5.16",
@@ -574,7 +742,10 @@
       "stablePath": "/a/u5.16",
       "activityType": "speak",
       "expectedFilename": "u5.16.mp3",
-      "src": "/audio/وَاحِد،_اِثْنَان،_ثَلَاثَة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u5.16.mp3",
+      "unitTitleAr": "الأرقام من 1 إلى 10",
+      "unitTitleHy": "Թվեր 1-10"
     },
     "u6.1": {
       "exerciseId": "u6.1",
@@ -584,7 +755,10 @@
       "stablePath": "/a/u6.1",
       "activityType": "listen",
       "expectedFilename": "u6.1.mp3",
-      "src": "/audio/أَنَا_أَدْرُسُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u6.1.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.2": {
       "exerciseId": "u6.2",
@@ -594,7 +768,10 @@
       "stablePath": "/a/u6.2",
       "activityType": "listen",
       "expectedFilename": "u6.2.mp3",
-      "src": "/audio/هُوَ_يَدْرُسُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u6.2.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.3": {
       "exerciseId": "u6.3",
@@ -604,7 +781,10 @@
       "stablePath": "/a/u6.3",
       "activityType": "listen",
       "expectedFilename": "u6.3.mp3",
-      "src": "/audio/أَنْتَ_تَكْتُبُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u6.3.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.4": {
       "exerciseId": "u6.4",
@@ -614,7 +794,10 @@
       "stablePath": "/a/u6.4",
       "activityType": "quiz",
       "expectedFilename": "u6.4.mp3",
-      "src": "/audio/%D9%87%D9%90%D9%8A%D9%8E.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.4.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.41": {
       "exerciseId": "u6.41",
@@ -624,7 +807,10 @@
       "stablePath": "/a/u6.41",
       "activityType": "quiz",
       "expectedFilename": "u6.41.mp3",
-      "src": "/audio/%D9%87%D9%90%D9%8A%D9%8E.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.41.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.5": {
       "exerciseId": "u6.5",
@@ -634,7 +820,10 @@
       "stablePath": "/a/u6.5",
       "activityType": "quiz",
       "expectedFilename": "u6.5.mp3",
-      "src": "/audio/يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.5.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.51": {
       "exerciseId": "u6.51",
@@ -644,7 +833,10 @@
       "stablePath": "/a/u6.51",
       "activityType": "quiz",
       "expectedFilename": "u6.51.mp3",
-      "src": "/audio/يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.51.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.6": {
       "exerciseId": "u6.6",
@@ -654,7 +846,10 @@
       "stablePath": "/a/u6.6",
       "activityType": "match",
       "expectedFilename": "u6.6.mp3",
-      "src": "/audio/الضمائر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.6.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.7": {
       "exerciseId": "u6.7",
@@ -664,7 +859,10 @@
       "stablePath": "/a/u6.7",
       "activityType": "speak",
       "expectedFilename": "u6.7.mp3",
-      "src": "/audio/أَنَا_أَدْرُسُ_وهُوَ_يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.7.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u6.8": {
       "exerciseId": "u6.8",
@@ -674,7 +872,10 @@
       "stablePath": "/a/u6.8",
       "activityType": "write",
       "expectedFilename": "u6.8.mp3",
-      "src": "/audio/يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u6.8.mp3",
+      "unitTitleAr": "الأفعال والضمائر",
+      "unitTitleHy": "Բայեր և դերանուններ"
     },
     "u7.1": {
       "exerciseId": "u7.1",
@@ -684,7 +885,10 @@
       "stablePath": "/a/u7.1",
       "activityType": "listen",
       "expectedFilename": "u7.1.mp3",
-      "src": "/audio/مَرْحَبًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u7.1.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.2": {
       "exerciseId": "u7.2",
@@ -694,7 +898,10 @@
       "stablePath": "/a/u7.2",
       "activityType": "listen",
       "expectedFilename": "u7.2.mp3",
-      "src": "/audio/السَّلَامُ_عَلَيْكُم.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u7.2.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.3": {
       "exerciseId": "u7.3",
@@ -704,7 +911,10 @@
       "stablePath": "/a/u7.3",
       "activityType": "listen",
       "expectedFilename": "u7.3.mp3",
-      "src": "/audio/كَيْفَ_حَالُك؟.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u7.3.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.4": {
       "exerciseId": "u7.4",
@@ -714,7 +924,10 @@
       "stablePath": "/a/u7.4",
       "activityType": "listen",
       "expectedFilename": "u7.4.mp3",
-      "src": "/audio/أَنَا_بِخَيْر،_شُكْرًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u7.4.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.5": {
       "exerciseId": "u7.5",
@@ -724,7 +937,10 @@
       "stablePath": "/a/u7.5",
       "activityType": "quiz",
       "expectedFilename": "u7.5.mp3",
-      "src": "/audio/مَرْحَبًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.5.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.51": {
       "exerciseId": "u7.51",
@@ -734,7 +950,10 @@
       "stablePath": "/a/u7.51",
       "activityType": "quiz",
       "expectedFilename": "u7.51.mp3",
-      "src": "/audio/مَرْحَبًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.51.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.6": {
       "exerciseId": "u7.6",
@@ -744,7 +963,10 @@
       "stablePath": "/a/u7.6",
       "activityType": "quiz",
       "expectedFilename": "u7.6.mp3",
-      "src": "/audio/شُكْرًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.6.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.61": {
       "exerciseId": "u7.61",
@@ -754,7 +976,10 @@
       "stablePath": "/a/u7.61",
       "activityType": "quiz",
       "expectedFilename": "u7.61.mp3",
-      "src": "/audio/شُكْرًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.61.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.7": {
       "exerciseId": "u7.7",
@@ -764,7 +989,10 @@
       "stablePath": "/a/u7.7",
       "activityType": "match",
       "expectedFilename": "u7.7.mp3",
-      "src": "/audio/تحيات.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.7.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.8": {
       "exerciseId": "u7.8",
@@ -774,7 +1002,10 @@
       "stablePath": "/a/u7.8",
       "activityType": "speak",
       "expectedFilename": "u7.8.mp3",
-      "src": "/audio/مَرْحَبًا،_كَيْفَ_حَالُك؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.8.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u7.9": {
       "exerciseId": "u7.9",
@@ -784,7 +1015,10 @@
       "stablePath": "/a/u7.9",
       "activityType": "write",
       "expectedFilename": "u7.9.mp3",
-      "src": "/audio/شُكْرًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u7.9.mp3",
+      "unitTitleAr": "التحيات",
+      "unitTitleHy": "Ողջույններ"
     },
     "u8.1": {
       "exerciseId": "u8.1",
@@ -794,7 +1028,10 @@
       "stablePath": "/a/u8.1",
       "activityType": "listen",
       "expectedFilename": "u8.1.mp3",
-      "src": "/audio/اليَوْم.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u8.1.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.2": {
       "exerciseId": "u8.2",
@@ -804,7 +1041,10 @@
       "stablePath": "/a/u8.2",
       "activityType": "listen",
       "expectedFilename": "u8.2.mp3",
-      "src": "/audio/غَدًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u8.2.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.3": {
       "exerciseId": "u8.3",
@@ -814,7 +1054,10 @@
       "stablePath": "/a/u8.3",
       "activityType": "listen",
       "expectedFilename": "u8.3.mp3",
-      "src": "/audio/أَمْس.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u8.3.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.4": {
       "exerciseId": "u8.4",
@@ -824,7 +1067,10 @@
       "stablePath": "/a/u8.4",
       "activityType": "quiz",
       "expectedFilename": "u8.4.mp3",
-      "src": "/audio/اليَوْم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.4.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.41": {
       "exerciseId": "u8.41",
@@ -834,7 +1080,10 @@
       "stablePath": "/a/u8.41",
       "activityType": "quiz",
       "expectedFilename": "u8.41.mp3",
-      "src": "/audio/اليَوْم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.41.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.5": {
       "exerciseId": "u8.5",
@@ -844,7 +1093,10 @@
       "stablePath": "/a/u8.5",
       "activityType": "match",
       "expectedFilename": "u8.5.mp3",
-      "src": "/audio/الزمن.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.5.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.6": {
       "exerciseId": "u8.6",
@@ -854,7 +1106,10 @@
       "stablePath": "/a/u8.6",
       "activityType": "listen",
       "expectedFilename": "u8.6.mp3",
-      "src": "/audio/اليَوْم_هُوَ_الخَمِيس.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u8.6.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.7": {
       "exerciseId": "u8.7",
@@ -864,7 +1119,10 @@
       "stablePath": "/a/u8.7",
       "activityType": "quiz",
       "expectedFilename": "u8.7.mp3",
-      "src": "/audio/كَمِ_السَّاعَة؟.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u8.7.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.71": {
       "exerciseId": "u8.71",
@@ -874,7 +1132,10 @@
       "stablePath": "/a/u8.71",
       "activityType": "quiz",
       "expectedFilename": "u8.71.mp3",
-      "src": "/audio/كَمِ_السَّاعَة؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.71.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.8": {
       "exerciseId": "u8.8",
@@ -884,7 +1145,10 @@
       "stablePath": "/a/u8.8",
       "activityType": "speak",
       "expectedFilename": "u8.8.mp3",
-      "src": "/audio/اليَوْم_هُوَ_الخَمِيس.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.8.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u8.9": {
       "exerciseId": "u8.9",
@@ -894,7 +1158,10 @@
       "stablePath": "/a/u8.9",
       "activityType": "write",
       "expectedFilename": "u8.9.mp3",
-      "src": "/audio/أَمْس.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u8.9.mp3",
+      "unitTitleAr": "الزمن والوقت",
+      "unitTitleHy": "Ժամանակ"
     },
     "u9.1": {
       "exerciseId": "u9.1",
@@ -904,7 +1171,10 @@
       "stablePath": "/a/u9.1",
       "activityType": "listen",
       "expectedFilename": "u9.1.mp3",
-      "src": "/audio/أَحْمَر__أَخْضَر__أَزْرَق__أَصْفَر__أَبْ....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u9.1.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.2": {
       "exerciseId": "u9.2",
@@ -914,7 +1184,10 @@
       "stablePath": "/a/u9.2",
       "activityType": "listen",
       "expectedFilename": "u9.2.mp3",
-      "src": "/audio/السَّيَّارَةُ_حَمْرَاء.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u9.2.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.3": {
       "exerciseId": "u9.3",
@@ -924,7 +1197,10 @@
       "stablePath": "/a/u9.3",
       "activityType": "quiz",
       "expectedFilename": "u9.3.mp3",
-      "src": "/audio/أَحْمَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.3.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.31": {
       "exerciseId": "u9.31",
@@ -934,7 +1210,10 @@
       "stablePath": "/a/u9.31",
       "activityType": "quiz",
       "expectedFilename": "u9.31.mp3",
-      "src": "/audio/أَحْمَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.31.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.4": {
       "exerciseId": "u9.4",
@@ -944,7 +1223,10 @@
       "stablePath": "/a/u9.4",
       "activityType": "quiz",
       "expectedFilename": "u9.4.mp3",
-      "src": "/audio/الكِتَابُ_أَزْرَق.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.4.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.41": {
       "exerciseId": "u9.41",
@@ -954,7 +1236,10 @@
       "stablePath": "/a/u9.41",
       "activityType": "quiz",
       "expectedFilename": "u9.41.mp3",
-      "src": "/audio/الكِتَابُ_أَزْرَق.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.41.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.5": {
       "exerciseId": "u9.5",
@@ -964,7 +1249,10 @@
       "stablePath": "/a/u9.5",
       "activityType": "match",
       "expectedFilename": "u9.5.mp3",
-      "src": "/audio/الألوان.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.5.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.6": {
       "exerciseId": "u9.6",
@@ -974,7 +1262,10 @@
       "stablePath": "/a/u9.6",
       "activityType": "listen",
       "expectedFilename": "u9.6.mp3",
-      "src": "/audio/مَا_لَوْنُ_السَّمَاء؟_—_السَّمَاءُ_زَرْق....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u9.6.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.7": {
       "exerciseId": "u9.7",
@@ -984,7 +1275,10 @@
       "stablePath": "/a/u9.7",
       "activityType": "quiz",
       "expectedFilename": "u9.7.mp3",
-      "src": "/audio/مَا_لَوْنُ_الشَّجَرَة؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.7.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.71": {
       "exerciseId": "u9.71",
@@ -994,7 +1288,10 @@
       "stablePath": "/a/u9.71",
       "activityType": "quiz",
       "expectedFilename": "u9.71.mp3",
-      "src": "/audio/مَا_لَوْنُ_الشَّجَرَة؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.71.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.8": {
       "exerciseId": "u9.8",
@@ -1004,7 +1301,10 @@
       "stablePath": "/a/u9.8",
       "activityType": "write",
       "expectedFilename": "u9.8.mp3",
-      "src": "/audio/أَحْمَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.8.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u9.9": {
       "exerciseId": "u9.9",
@@ -1014,7 +1314,10 @@
       "stablePath": "/a/u9.9",
       "activityType": "speak",
       "expectedFilename": "u9.9.mp3",
-      "src": "/audio/السَّيَّارَةُ_حَمْرَاء_وَالكِتَابُ_أَزْر....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u9.9.mp3",
+      "unitTitleAr": "الألوان",
+      "unitTitleHy": "Գույներ"
     },
     "u10.1": {
       "exerciseId": "u10.1",
@@ -1024,7 +1327,10 @@
       "stablePath": "/a/u10.1",
       "activityType": "listen",
       "expectedFilename": "u10.1.mp3",
-      "src": "/audio/أَب__أُمّ__أَخ__أُخْت__جَدّ__جَدَّة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u10.1.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.2": {
       "exerciseId": "u10.2",
@@ -1034,7 +1340,10 @@
       "stablePath": "/a/u10.2",
       "activityType": "listen",
       "expectedFilename": "u10.2.mp3",
-      "src": "/audio/أَبِي_اسْمُهُ_كَرِيم.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u10.2.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.3": {
       "exerciseId": "u10.3",
@@ -1044,7 +1353,10 @@
       "stablePath": "/a/u10.3",
       "activityType": "quiz",
       "expectedFilename": "u10.3.mp3",
-      "src": "/audio/أُمّ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.3.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.31": {
       "exerciseId": "u10.31",
@@ -1054,7 +1366,10 @@
       "stablePath": "/a/u10.31",
       "activityType": "quiz",
       "expectedFilename": "u10.31.mp3",
-      "src": "/audio/أُمّ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.31.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.4": {
       "exerciseId": "u10.4",
@@ -1064,7 +1379,10 @@
       "stablePath": "/a/u10.4",
       "activityType": "quiz",
       "expectedFilename": "u10.4.mp3",
-      "src": "/audio/أَخِي_يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.4.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.41": {
       "exerciseId": "u10.41",
@@ -1074,7 +1392,10 @@
       "stablePath": "/a/u10.41",
       "activityType": "quiz",
       "expectedFilename": "u10.41.mp3",
-      "src": "/audio/أَخِي_يَدْرُسُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.41.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.5": {
       "exerciseId": "u10.5",
@@ -1084,7 +1405,10 @@
       "stablePath": "/a/u10.5",
       "activityType": "match",
       "expectedFilename": "u10.5.mp3",
-      "src": "/audio/العائلة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.5.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.6": {
       "exerciseId": "u10.6",
@@ -1094,7 +1418,10 @@
       "stablePath": "/a/u10.6",
       "activityType": "listen",
       "expectedFilename": "u10.6.mp3",
-      "src": "/audio/عِنْدِي_أَخٌ_وَأُخْتَان.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u10.6.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.7": {
       "exerciseId": "u10.7",
@@ -1104,7 +1431,10 @@
       "stablePath": "/a/u10.7",
       "activityType": "quiz",
       "expectedFilename": "u10.7.mp3",
-      "src": "/audio/كَمْ_أَخًا_عِنْدَك؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.7.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.71": {
       "exerciseId": "u10.71",
@@ -1114,7 +1444,10 @@
       "stablePath": "/a/u10.71",
       "activityType": "quiz",
       "expectedFilename": "u10.71.mp3",
-      "src": "/audio/كَمْ_أَخًا_عِنْدَك؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.71.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.8": {
       "exerciseId": "u10.8",
@@ -1124,7 +1457,10 @@
       "stablePath": "/a/u10.8",
       "activityType": "speak",
       "expectedFilename": "u10.8.mp3",
-      "src": "/audio/عِنْدِي_أَبٌ_وَأُمٌّ_وَأَخٌ_وَاحِد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.8.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u10.9": {
       "exerciseId": "u10.9",
@@ -1134,7 +1470,10 @@
       "stablePath": "/a/u10.9",
       "activityType": "write",
       "expectedFilename": "u10.9.mp3",
-      "src": "/audio/أُمّ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u10.9.mp3",
+      "unitTitleAr": "العائلة",
+      "unitTitleHy": "Ընտանիք"
     },
     "u11.1": {
       "exerciseId": "u11.1",
@@ -1144,7 +1483,10 @@
       "stablePath": "/a/u11.1",
       "activityType": "listen",
       "expectedFilename": "u11.1.mp3",
-      "src": "/audio/خُبْز__مَاء__لَبَن__تُفَّاح__أَرُزّ__دَج....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u11.1.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.2": {
       "exerciseId": "u11.2",
@@ -1154,7 +1496,10 @@
       "stablePath": "/a/u11.2",
       "activityType": "listen",
       "expectedFilename": "u11.2.mp3",
-      "src": "/audio/أَنَا_جَائِع_—_أُرِيدُ_خُبْزًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u11.2.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.3": {
       "exerciseId": "u11.3",
@@ -1164,7 +1509,10 @@
       "stablePath": "/a/u11.3",
       "activityType": "quiz",
       "expectedFilename": "u11.3.mp3",
-      "src": "/audio/مَاء.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.3.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.31": {
       "exerciseId": "u11.31",
@@ -1174,7 +1522,10 @@
       "stablePath": "/a/u11.31",
       "activityType": "quiz",
       "expectedFilename": "u11.31.mp3",
-      "src": "/audio/مَاء.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.31.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.4": {
       "exerciseId": "u11.4",
@@ -1184,7 +1535,10 @@
       "stablePath": "/a/u11.4",
       "activityType": "quiz",
       "expectedFilename": "u11.4.mp3",
-      "src": "/audio/أُرِيدُ_كُوبَ_مَاءٍ_مِنْ_فَضْلِك.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.4.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.5": {
       "exerciseId": "u11.5",
@@ -1194,7 +1548,10 @@
       "stablePath": "/a/u11.5",
       "activityType": "match",
       "expectedFilename": "u11.5.mp3",
-      "src": "/audio/الطعام.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.5.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.6": {
       "exerciseId": "u11.6",
@@ -1204,7 +1561,10 @@
       "stablePath": "/a/u11.6",
       "activityType": "listen",
       "expectedFilename": "u11.6.mp3",
-      "src": "/audio/هَذَا_الطَّعَامُ_لَذِيذ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u11.6.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.7": {
       "exerciseId": "u11.7",
@@ -1214,7 +1574,10 @@
       "stablePath": "/a/u11.7",
       "activityType": "quiz",
       "expectedFilename": "u11.7.mp3",
-      "src": "/audio/أُرِيدُ....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.7.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.8": {
       "exerciseId": "u11.8",
@@ -1224,7 +1587,10 @@
       "stablePath": "/a/u11.8",
       "activityType": "speak",
       "expectedFilename": "u11.8.mp3",
-      "src": "/audio/أَنَا_جَائِع_وَأُرِيدُ_خُبْزًا_وَمَاء.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.8.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u11.9": {
       "exerciseId": "u11.9",
@@ -1234,7 +1600,10 @@
       "stablePath": "/a/u11.9",
       "activityType": "write",
       "expectedFilename": "u11.9.mp3",
-      "src": "/audio/خُبْز.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u11.9.mp3",
+      "unitTitleAr": "الطعام والشراب",
+      "unitTitleHy": "Ուտելիք և ջուր"
     },
     "u12.1": {
       "exerciseId": "u12.1",
@@ -1244,7 +1613,10 @@
       "stablePath": "/a/u12.1",
       "activityType": "listen",
       "expectedFilename": "u12.1.mp3",
-      "src": "/audio/فِي__عَلَى__بَيْنَ__أَمَامَ__خَلْفَ__بِج....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u12.1.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.2": {
       "exerciseId": "u12.2",
@@ -1254,7 +1626,10 @@
       "stablePath": "/a/u12.2",
       "activityType": "listen",
       "expectedFilename": "u12.2.mp3",
-      "src": "/audio/الكِتَابُ_عَلَى_المَكْتَب.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u12.2.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.3": {
       "exerciseId": "u12.3",
@@ -1264,7 +1639,10 @@
       "stablePath": "/a/u12.3",
       "activityType": "quiz",
       "expectedFilename": "u12.3.mp3",
-      "src": "/audio/الكِتَابُ_فِي_الحَقِيبَة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.3.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.31": {
       "exerciseId": "u12.31",
@@ -1274,7 +1652,10 @@
       "stablePath": "/a/u12.31",
       "activityType": "quiz",
       "expectedFilename": "u12.31.mp3",
-      "src": "/audio/الكِتَابُ_فِي_الحَقِيبَة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.31.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.4": {
       "exerciseId": "u12.4",
@@ -1284,7 +1665,10 @@
       "stablePath": "/a/u12.4",
       "activityType": "quiz",
       "expectedFilename": "u12.4.mp3",
-      "src": "/audio/المَسْجِدُ_أَمَامَ_البَيْت.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.4.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.5": {
       "exerciseId": "u12.5",
@@ -1294,7 +1678,10 @@
       "stablePath": "/a/u12.5",
       "activityType": "match",
       "expectedFilename": "u12.5.mp3",
-      "src": "/audio/حروف_الجر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.5.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.6": {
       "exerciseId": "u12.6",
@@ -1304,7 +1691,10 @@
       "stablePath": "/a/u12.6",
       "activityType": "listen",
       "expectedFilename": "u12.6.mp3",
-      "src": "/audio/أَيْنَ_الكِتَاب؟_—_الكِتَابُ_بَيْنَ_القَ....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u12.6.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.7": {
       "exerciseId": "u12.7",
@@ -1314,7 +1704,10 @@
       "stablePath": "/a/u12.7",
       "activityType": "quiz",
       "expectedFilename": "u12.7.mp3",
-      "src": "/audio/أَيْنَ_المَدْرَسَة؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.7.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.8": {
       "exerciseId": "u12.8",
@@ -1324,7 +1717,10 @@
       "stablePath": "/a/u12.8",
       "activityType": "speak",
       "expectedFilename": "u12.8.mp3",
-      "src": "/audio/الكِتَابُ_عَلَى_المَكْتَبِ_وَالقَلَمُ_فِ....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.8.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.9": {
       "exerciseId": "u12.9",
@@ -1334,7 +1730,10 @@
       "stablePath": "/a/u12.9",
       "activityType": "write",
       "expectedFilename": "u12.9.mp3",
-      "src": "/audio/عَلَى.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.9.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u12.10": {
       "exerciseId": "u12.10",
@@ -1344,7 +1743,10 @@
       "stablePath": "/a/u12.10",
       "activityType": "match",
       "expectedFilename": "u12.10.mp3",
-      "src": "/audio/الأماكن.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u12.10.mp3",
+      "unitTitleAr": "الأماكن وحروف الجر",
+      "unitTitleHy": "Տեղեր և նախդիրներ"
     },
     "u13.1": {
       "exerciseId": "u13.1",
@@ -1354,7 +1756,10 @@
       "stablePath": "/a/u13.1",
       "activityType": "listen",
       "expectedFilename": "u13.1.mp3",
-      "src": "/audio/رَأْس__يَد__رِجْل__عَيْن__أُذُن__فَم.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u13.1.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.2": {
       "exerciseId": "u13.2",
@@ -1364,7 +1769,10 @@
       "stablePath": "/a/u13.2",
       "activityType": "listen",
       "expectedFilename": "u13.2.mp3",
-      "src": "/audio/رَأْسِي_يُؤْلِمُنِي.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u13.2.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.3": {
       "exerciseId": "u13.3",
@@ -1374,7 +1782,10 @@
       "stablePath": "/a/u13.3",
       "activityType": "quiz",
       "expectedFilename": "u13.3.mp3",
-      "src": "/audio/يَد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u13.3.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.31": {
       "exerciseId": "u13.31",
@@ -1384,7 +1795,10 @@
       "stablePath": "/a/u13.31",
       "activityType": "quiz",
       "expectedFilename": "u13.31.mp3",
-      "src": "/audio/يَد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u13.31.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.5": {
       "exerciseId": "u13.5",
@@ -1394,7 +1808,10 @@
       "stablePath": "/a/u13.5",
       "activityType": "match",
       "expectedFilename": "u13.5.mp3",
-      "src": "/audio/أعضاء_الجسم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u13.5.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.6": {
       "exerciseId": "u13.6",
@@ -1404,7 +1821,10 @@
       "stablePath": "/a/u13.6",
       "activityType": "listen",
       "expectedFilename": "u13.6.mp3",
-      "src": "/audio/عِنْدِي_أَلَمٌ_فِي_ظَهْرِي.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u13.6.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.7": {
       "exerciseId": "u13.7",
@@ -1414,7 +1834,10 @@
       "stablePath": "/a/u13.7",
       "activityType": "quiz",
       "expectedFilename": "u13.7.mp3",
+      "includeInBookQr": true,
       "src": "/audio/u13.7.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր",
       "legacyAliases": [
         "أَيْنَ تُؤْلِمُك؟"
       ]
@@ -1427,7 +1850,10 @@
       "stablePath": "/a/u13.8",
       "activityType": "speak",
       "expectedFilename": "u13.8.mp3",
-      "src": "/audio/رَأْسِي_يُؤْلِمُنِي.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u13.8.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u13.9": {
       "exerciseId": "u13.9",
@@ -1437,7 +1863,10 @@
       "stablePath": "/a/u13.9",
       "activityType": "write",
       "expectedFilename": "u13.9.mp3",
-      "src": "/audio/يَد.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u13.9.mp3",
+      "unitTitleAr": "أعضاء الجسم",
+      "unitTitleHy": "Մարմնի մասեր"
     },
     "u14.1": {
       "exerciseId": "u14.1",
@@ -1447,7 +1876,10 @@
       "stablePath": "/a/u14.1",
       "activityType": "listen",
       "expectedFilename": "u14.1.mp3",
-      "src": "/audio/مُشْمِس__غَائِم__مَطَر__ثَلْج__رِيح__حَا....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u14.1.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.2": {
       "exerciseId": "u14.2",
@@ -1457,7 +1889,10 @@
       "stablePath": "/a/u14.2",
       "activityType": "listen",
       "expectedFilename": "u14.2.mp3",
+      "includeInBookQr": true,
       "src": "/audio/u14.2.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ",
       "legacyAliases": [
         "الجَوُّ اليَوْم مُشْمِس"
       ]
@@ -1470,7 +1905,10 @@
       "stablePath": "/a/u14.3",
       "activityType": "quiz",
       "expectedFilename": "u14.3.mp3",
-      "src": "/audio/مَطَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u14.3.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.31": {
       "exerciseId": "u14.31",
@@ -1480,7 +1918,10 @@
       "stablePath": "/a/u14.31",
       "activityType": "quiz",
       "expectedFilename": "u14.31.mp3",
-      "src": "/audio/مَطَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u14.31.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.5": {
       "exerciseId": "u14.5",
@@ -1490,7 +1931,10 @@
       "stablePath": "/a/u14.5",
       "activityType": "match",
       "expectedFilename": "u14.5.mp3",
-      "src": "/audio/الطقس.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u14.5.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.6": {
       "exerciseId": "u14.6",
@@ -1500,7 +1944,10 @@
       "stablePath": "/a/u14.6",
       "activityType": "listen",
       "expectedFilename": "u14.6.mp3",
-      "src": "/audio/كَيْفَ_الجَوُّ_غَدًا؟_—_سَيَكُونُ_بَارِد....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u14.6.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.7": {
       "exerciseId": "u14.7",
@@ -1510,7 +1957,10 @@
       "stablePath": "/a/u14.7",
       "activityType": "quiz",
       "expectedFilename": "u14.7.mp3",
-      "src": "/audio/سَيَكُونُ_حَارًّا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u14.7.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u14.8": {
       "exerciseId": "u14.8",
@@ -1520,7 +1970,10 @@
       "stablePath": "/a/u14.8",
       "activityType": "speak",
       "expectedFilename": "u14.8.mp3",
+      "includeInBookQr": false,
       "src": "/audio/u14.8.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ",
       "legacyAliases": [
         "الجَوُّ اليَوْم غَائِم وَبَارِد"
       ]
@@ -1533,7 +1986,10 @@
       "stablePath": "/a/u14.9",
       "activityType": "write",
       "expectedFilename": "u14.9.mp3",
-      "src": "/audio/مَطَر.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u14.9.mp3",
+      "unitTitleAr": "الطقس",
+      "unitTitleHy": "Եղանակ"
     },
     "u15.1": {
       "exerciseId": "u15.1",
@@ -1543,7 +1999,10 @@
       "stablePath": "/a/u15.1",
       "activityType": "listen",
       "expectedFilename": "u15.1.mp3",
-      "src": "/audio/مَدْرَسَة__فَصْل__كِتَاب__قَلَم__سَبُّور....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u15.1.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.2": {
       "exerciseId": "u15.2",
@@ -1553,7 +2012,10 @@
       "stablePath": "/a/u15.2",
       "activityType": "listen",
       "expectedFilename": "u15.2.mp3",
-      "src": "/audio/المُعَلِّمُ_يَشْرَحُ_الدَّرْس.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u15.2.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.3": {
       "exerciseId": "u15.3",
@@ -1563,7 +2025,10 @@
       "stablePath": "/a/u15.3",
       "activityType": "quiz",
       "expectedFilename": "u15.3.mp3",
-      "src": "/audio/مُعَلِّم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u15.3.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.31": {
       "exerciseId": "u15.31",
@@ -1573,7 +2038,10 @@
       "stablePath": "/a/u15.31",
       "activityType": "quiz",
       "expectedFilename": "u15.31.mp3",
-      "src": "/audio/مُعَلِّم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u15.31.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.5": {
       "exerciseId": "u15.5",
@@ -1583,7 +2051,10 @@
       "stablePath": "/a/u15.5",
       "activityType": "match",
       "expectedFilename": "u15.5.mp3",
-      "src": "/audio/المدرسة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u15.5.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.6": {
       "exerciseId": "u15.6",
@@ -1593,7 +2064,10 @@
       "stablePath": "/a/u15.6",
       "activityType": "listen",
       "expectedFilename": "u15.6.mp3",
-      "src": "/audio/أُحِبُّ_الرِّيَاضِيَّات.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u15.6.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.7": {
       "exerciseId": "u15.7",
@@ -1603,7 +2077,10 @@
       "stablePath": "/a/u15.7",
       "activityType": "quiz",
       "expectedFilename": "u15.7.mp3",
+      "includeInBookQr": false,
       "src": "/audio/u15.7.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում",
       "legacyAliases": [
         "أَيُّ مَادَّةٍ تُحِبّ؟"
       ]
@@ -1616,7 +2093,10 @@
       "stablePath": "/a/u15.8",
       "activityType": "speak",
       "expectedFilename": "u15.8.mp3",
-      "src": "/audio/أَنَا_تِلْمِيذٌ_وَأُحِبُّ_الرِّيَاضِيَّا....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u15.8.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u15.9": {
       "exerciseId": "u15.9",
@@ -1626,7 +2106,10 @@
       "stablePath": "/a/u15.9",
       "activityType": "write",
       "expectedFilename": "u15.9.mp3",
-      "src": "/audio/قَلَم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u15.9.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "u16.1": {
       "exerciseId": "u16.1",
@@ -1636,7 +2119,10 @@
       "stablePath": "/a/u16.1",
       "activityType": "listen",
       "expectedFilename": "u16.1.mp3",
-      "src": "/audio/أَهْلًا_—_أَهْلًا_وَسَهْلًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u16.1.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.2": {
       "exerciseId": "u16.2",
@@ -1646,7 +2132,10 @@
       "stablePath": "/a/u16.2",
       "activityType": "listen",
       "expectedFilename": "u16.2.mp3",
-      "src": "/audio/أَنَا_اسْمِي_..._وَأَنَا_مِنْ_أَرْمِينِي....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u16.2.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.3": {
       "exerciseId": "u16.3",
@@ -1656,7 +2145,10 @@
       "stablePath": "/a/u16.3",
       "activityType": "quiz",
       "expectedFilename": "u16.3.mp3",
+      "includeInBookQr": false,
       "src": "/audio/u16.3.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ",
       "legacyAliases": [
         "كَيْفَ تَقُولُ 'ես հայ եմ' بِالعَرَبِيَّة؟"
       ]
@@ -1669,7 +2161,10 @@
       "stablePath": "/a/u16.31",
       "activityType": "quiz",
       "expectedFilename": "u16.31.mp3",
-      "src": "/audio/u16.31.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/u16.31.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.5": {
       "exerciseId": "u16.5",
@@ -1679,7 +2174,10 @@
       "stablePath": "/a/u16.5",
       "activityType": "match",
       "expectedFilename": "u16.5.mp3",
-      "src": "/audio/محادثة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u16.5.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.6": {
       "exerciseId": "u16.6",
@@ -1689,7 +2187,10 @@
       "stablePath": "/a/u16.6",
       "activityType": "listen",
       "expectedFilename": "u16.6.mp3",
-      "src": "/audio/هَلْ_تَتَكَلَّمُ_العَرَبِيَّة؟_—_نَعَم،_....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u16.6.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.7": {
       "exerciseId": "u16.7",
@@ -1699,7 +2200,10 @@
       "stablePath": "/a/u16.7",
       "activityType": "quiz",
       "expectedFilename": "u16.7.mp3",
-      "src": "/audio/هَلْ_تَتَكَلَّمُ_العَرَبِيَّة؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u16.7.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.8": {
       "exerciseId": "u16.8",
@@ -1709,7 +2213,10 @@
       "stablePath": "/a/u16.8",
       "activityType": "speak",
       "expectedFilename": "u16.8.mp3",
-      "src": "/audio/أَهْلًا،_أَنَا_اسْمِي_..._وَأَنَا_مِنْ_أ....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u16.8.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.9": {
       "exerciseId": "u16.9",
@@ -1719,7 +2226,10 @@
       "stablePath": "/a/u16.9",
       "activityType": "speak",
       "expectedFilename": "u16.9.mp3",
-      "src": "/audio/هَلْ_تَتَكَلَّمُ_العَرَبِيَّة؟_—_نَعَم،_....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u16.9.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u16.10": {
       "exerciseId": "u16.10",
@@ -1729,7 +2239,10 @@
       "stablePath": "/a/u16.10",
       "activityType": "write",
       "expectedFilename": "u16.10.mp3",
-      "src": "/audio/نَعَم.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u16.10.mp3",
+      "unitTitleAr": "محادثة كاملة",
+      "unitTitleHy": "Խոսում եմ"
     },
     "u17.1": {
       "exerciseId": "u17.1",
@@ -1739,7 +2252,10 @@
       "stablePath": "/a/u17.1",
       "activityType": "listen",
       "expectedFilename": "u17.1.mp3",
-      "src": "/audio/سُوق__دُكَّان__ثَمَن__غَالٍ__رَخِيص__أُر....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u17.1.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.2": {
       "exerciseId": "u17.2",
@@ -1749,7 +2265,10 @@
       "stablePath": "/a/u17.2",
       "activityType": "listen",
       "expectedFilename": "u17.2.mp3",
-      "src": "/audio/بِكَمْ_هَذَا؟_—_هَذَا_بِعَشَرَةِ_دَرَاهِ....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u17.2.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.3": {
       "exerciseId": "u17.3",
@@ -1759,7 +2278,10 @@
       "stablePath": "/a/u17.3",
       "activityType": "quiz",
       "expectedFilename": "u17.3.mp3",
-      "src": "/audio/غَالٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.3.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.31": {
       "exerciseId": "u17.31",
@@ -1769,7 +2291,10 @@
       "stablePath": "/a/u17.31",
       "activityType": "quiz",
       "expectedFilename": "u17.31.mp3",
-      "src": "/audio/غَالٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.31.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.4": {
       "exerciseId": "u17.4",
@@ -1779,7 +2304,10 @@
       "stablePath": "/a/u17.4",
       "activityType": "listen",
       "expectedFilename": "u17.4.mp3",
-      "src": "/audio/أُرِيدُ_أَنْ_أَشْتَرِيَ_هَذَا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u17.4.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.5": {
       "exerciseId": "u17.5",
@@ -1789,7 +2317,10 @@
       "stablePath": "/a/u17.5",
       "activityType": "match",
       "expectedFilename": "u17.5.mp3",
-      "src": "/audio/التسوق.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.5.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.6": {
       "exerciseId": "u17.6",
@@ -1799,7 +2330,10 @@
       "stablePath": "/a/u17.6",
       "activityType": "quiz",
       "expectedFilename": "u17.6.mp3",
-      "src": "/audio/بِكَمْ_هَذَا؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.6.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.7": {
       "exerciseId": "u17.7",
@@ -1809,7 +2343,10 @@
       "stablePath": "/a/u17.7",
       "activityType": "speak",
       "expectedFilename": "u17.7.mp3",
-      "src": "/audio/بِكَمْ_هَذَا؟_—_هَذَا_غَالٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.7.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u17.8": {
       "exerciseId": "u17.8",
@@ -1819,7 +2356,10 @@
       "stablePath": "/a/u17.8",
       "activityType": "write",
       "expectedFilename": "u17.8.mp3",
-      "src": "/audio/غَالٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u17.8.mp3",
+      "unitTitleAr": "التسوق",
+      "unitTitleHy": "Գնումներ"
     },
     "u18.1": {
       "exerciseId": "u18.1",
@@ -1829,7 +2369,10 @@
       "stablePath": "/a/u18.1",
       "activityType": "listen",
       "expectedFilename": "u18.1.mp3",
-      "src": "/audio/يَمِين__يَسَار__أَمَامَ__خَلْفَ__مُسْتَق....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u18.1.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.2": {
       "exerciseId": "u18.2",
@@ -1839,7 +2382,10 @@
       "stablePath": "/a/u18.2",
       "activityType": "listen",
       "expectedFilename": "u18.2.mp3",
-      "src": "/audio/اِذْهَبْ_يَمِينًا_ثُمَّ_يَسَارًا.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u18.2.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.3": {
       "exerciseId": "u18.3",
@@ -1849,7 +2395,10 @@
       "stablePath": "/a/u18.3",
       "activityType": "quiz",
       "expectedFilename": "u18.3.mp3",
-      "src": "/audio/يَمِين.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.3.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.31": {
       "exerciseId": "u18.31",
@@ -1859,7 +2408,10 @@
       "stablePath": "/a/u18.31",
       "activityType": "quiz",
       "expectedFilename": "u18.31.mp3",
-      "src": "/audio/يَمِين.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.31.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.4": {
       "exerciseId": "u18.4",
@@ -1869,7 +2421,10 @@
       "stablePath": "/a/u18.4",
       "activityType": "listen",
       "expectedFilename": "u18.4.mp3",
-      "src": "/audio/أَيْنَ_ٱلْمَحَطَّة؟_—_اِمْشِ_مُسْتَقِيمً....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u18.4.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.5": {
       "exerciseId": "u18.5",
@@ -1879,7 +2434,10 @@
       "stablePath": "/a/u18.5",
       "activityType": "match",
       "expectedFilename": "u18.5.mp3",
-      "src": "/audio/الاتجاهات.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.5.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.6": {
       "exerciseId": "u18.6",
@@ -1889,7 +2447,10 @@
       "stablePath": "/a/u18.6",
       "activityType": "quiz",
       "expectedFilename": "u18.6.mp3",
-      "src": "/audio/اِذْهَبْ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.6.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.7": {
       "exerciseId": "u18.7",
@@ -1899,7 +2460,10 @@
       "stablePath": "/a/u18.7",
       "activityType": "speak",
       "expectedFilename": "u18.7.mp3",
-      "src": "/audio/اِذْهَبْ_يَمِينًا_ثُمَّ_مُسْتَقِيمًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.7.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u18.8": {
       "exerciseId": "u18.8",
@@ -1909,7 +2473,10 @@
       "stablePath": "/a/u18.8",
       "activityType": "write",
       "expectedFilename": "u18.8.mp3",
-      "src": "/audio/يَمِين.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u18.8.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "u19.1": {
       "exerciseId": "u19.1",
@@ -1919,7 +2486,10 @@
       "stablePath": "/a/u19.1",
       "activityType": "listen",
       "expectedFilename": "u19.1.mp3",
-      "src": "/audio/أَسْتَيْقِظُ__أَفْطِرُ__أَعْمَلُ__أَدْرُ....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u19.1.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.2": {
       "exerciseId": "u19.2",
@@ -1929,7 +2499,10 @@
       "stablePath": "/a/u19.2",
       "activityType": "listen",
       "expectedFilename": "u19.2.mp3",
-      "src": "/audio/أَسْتَيْقِظُ_السَّاعَة_السَّابِعَة_صَبَا....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u19.2.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.3": {
       "exerciseId": "u19.3",
@@ -1939,7 +2512,10 @@
       "stablePath": "/a/u19.3",
       "activityType": "listen",
       "expectedFilename": "u19.3.mp3",
-      "src": "/audio/أَعْمَلُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u19.3.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.4": {
       "exerciseId": "u19.4",
@@ -1949,7 +2525,10 @@
       "stablePath": "/a/u19.4",
       "activityType": "quiz",
       "expectedFilename": "u19.4.mp3",
-      "src": "/audio/أَنَامُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.4.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.41": {
       "exerciseId": "u19.41",
@@ -1959,7 +2538,10 @@
       "stablePath": "/a/u19.41",
       "activityType": "quiz",
       "expectedFilename": "u19.41.mp3",
-      "src": "/audio/أَنَامُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.41.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.5": {
       "exerciseId": "u19.5",
@@ -1969,7 +2551,10 @@
       "stablePath": "/a/u19.5",
       "activityType": "match",
       "expectedFilename": "u19.5.mp3",
-      "src": "/audio/الروتين.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.5.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.6": {
       "exerciseId": "u19.6",
@@ -1979,7 +2564,10 @@
       "stablePath": "/a/u19.6",
       "activityType": "quiz",
       "expectedFilename": "u19.6.mp3",
-      "src": "/audio/صَبَاحًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.6.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.7": {
       "exerciseId": "u19.7",
@@ -1989,7 +2577,10 @@
       "stablePath": "/a/u19.7",
       "activityType": "speak",
       "expectedFilename": "u19.7.mp3",
-      "src": "/audio/أَسْتَيْقِظُ_صَبَاحًا_وَأَعْمَلُ_وَأَنَا....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.7.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u19.8": {
       "exerciseId": "u19.8",
@@ -1999,7 +2590,10 @@
       "stablePath": "/a/u19.8",
       "activityType": "write",
       "expectedFilename": "u19.8.mp3",
-      "src": "/audio/أَنَامُ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u19.8.mp3",
+      "unitTitleAr": "الروتين اليومي",
+      "unitTitleHy": "Օրվա կյանք"
     },
     "u20.1": {
       "exerciseId": "u20.1",
@@ -2009,7 +2603,10 @@
       "stablePath": "/a/u20.1",
       "activityType": "listen",
       "expectedFilename": "u20.1.mp3",
-      "src": "/audio/مُرَاجَعَة_شَامِلَة_—_كُلُّ_مَا_تَعَلَّم....wav"
+      "includeInBookQr": true,
+      "src": "/audio/u20.1.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.2": {
       "exerciseId": "u20.2",
@@ -2019,7 +2616,10 @@
       "stablePath": "/a/u20.2",
       "activityType": "quiz",
       "expectedFilename": "u20.2.mp3",
-      "src": "/audio/كَيْفَ_حَالُك؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.2.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.21": {
       "exerciseId": "u20.21",
@@ -2029,7 +2629,10 @@
       "stablePath": "/a/u20.21",
       "activityType": "quiz",
       "expectedFilename": "u20.21.mp3",
-      "src": "/audio/كَيْفَ_حَالُك؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.21.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.3": {
       "exerciseId": "u20.3",
@@ -2039,7 +2642,10 @@
       "stablePath": "/a/u20.3",
       "activityType": "quiz",
       "expectedFilename": "u20.3.mp3",
-      "src": "/audio/الكِتَابُ_عَلَى_المَكْتَبِ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.3.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.31": {
       "exerciseId": "u20.31",
@@ -2049,7 +2655,10 @@
       "stablePath": "/a/u20.31",
       "activityType": "quiz",
       "expectedFilename": "u20.31.mp3",
-      "src": "/audio/عَلَى.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.31.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.4": {
       "exerciseId": "u20.4",
@@ -2059,7 +2668,10 @@
       "stablePath": "/a/u20.4",
       "activityType": "match",
       "expectedFilename": "u20.4.mp3",
-      "src": "/audio/مراجعة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.4.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.5": {
       "exerciseId": "u20.5",
@@ -2069,7 +2681,10 @@
       "stablePath": "/a/u20.5",
       "activityType": "quiz",
       "expectedFilename": "u20.5.mp3",
-      "src": "/audio/أَنَا_أَدْرُسُ_العَرَبِيَّة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.5.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.6": {
       "exerciseId": "u20.6",
@@ -2079,7 +2694,10 @@
       "stablePath": "/a/u20.6",
       "activityType": "speak",
       "expectedFilename": "u20.6.mp3",
-      "src": "/audio/أَهْلًا،_أَنَا_اسْمِي_..._أَنَا_مِنْ_أَر....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.6.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.7": {
       "exerciseId": "u20.7",
@@ -2089,7 +2707,10 @@
       "stablePath": "/a/u20.7",
       "activityType": "speak",
       "expectedFilename": "u20.7.mp3",
-      "src": "/audio/هَلْ_تَتَكَلَّمُ_العَرَبِيَّة؟_—_نَعَم،_....wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.7.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u20.8": {
       "exerciseId": "u20.8",
@@ -2099,7 +2720,10 @@
       "stablePath": "/a/u20.8",
       "activityType": "write",
       "expectedFilename": "u20.8.mp3",
-      "src": "/audio/شُكْرًا.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u20.8.mp3",
+      "unitTitleAr": "مراجعة شاملة",
+      "unitTitleHy": "Վերջնական թեստ"
     },
     "u21.1": {
       "exerciseId": "u21.1",
@@ -2109,7 +2733,10 @@
       "stablePath": "/a/u21.1",
       "activityType": "listen",
       "expectedFilename": "u21.1.mp3",
-      "src": "/audio/الأَعْدَاد.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u21.1.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.2": {
       "exerciseId": "u21.2",
@@ -2119,7 +2746,10 @@
       "stablePath": "/a/u21.2",
       "activityType": "quiz",
       "expectedFilename": "u21.2.mp3",
-      "src": "/audio/عِنْدِي_ـ_ـ_ـ_؟_(كُتُب).wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.2.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.3": {
       "exerciseId": "u21.3",
@@ -2129,7 +2759,10 @@
       "stablePath": "/a/u21.3",
       "activityType": "quiz",
       "expectedFilename": "u21.3.mp3",
-      "src": "/audio/فِي_القِسْمِ_ـ_ـ_ـ_؟_(طُلَّاب).wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.3.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.4": {
       "exerciseId": "u21.4",
@@ -2139,7 +2772,10 @@
       "stablePath": "/a/u21.4",
       "activityType": "quiz",
       "expectedFilename": "u21.4.mp3",
-      "src": "/audio/قَرَأْتُ_ـ_ـ_ـ_؟_(دُرُوس).wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.4.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.5": {
       "exerciseId": "u21.5",
@@ -2149,7 +2785,10 @@
       "stablePath": "/a/u21.5",
       "activityType": "match",
       "expectedFilename": "u21.5.mp3",
-      "src": "/audio/مطابقة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.5.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.6": {
       "exerciseId": "u21.6",
@@ -2159,7 +2798,10 @@
       "stablePath": "/a/u21.6",
       "activityType": "write",
       "expectedFilename": "u21.6.mp3",
-      "src": "/audio/ثَلَاثَةُ_كُتُبٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.6.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u21.7": {
       "exerciseId": "u21.7",
@@ -2169,7 +2811,10 @@
       "stablePath": "/a/u21.7",
       "activityType": "quiz",
       "expectedFilename": "u21.7.mp3",
-      "src": "/audio/تصحيح_الخطأ_خَمْسَةُ_كِتَابٍ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u21.7.mp3",
+      "unitTitleAr": "الأعداد وتوظيفها",
+      "unitTitleHy": "Թվեր և դրանց կիրառումը"
     },
     "u22.1": {
       "exerciseId": "u22.1",
@@ -2179,7 +2824,10 @@
       "stablePath": "/a/u22.1",
       "activityType": "listen",
       "expectedFilename": "u22.1.mp3",
-      "src": "/audio/الحَرَكَاتُ_الإِعْرَابِيَّة.wav"
+      "includeInBookQr": true,
+      "src": "/audio/u22.1.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.2": {
       "exerciseId": "u22.2",
@@ -2189,7 +2837,10 @@
       "stablePath": "/a/u22.2",
       "activityType": "quiz",
       "expectedFilename": "u22.2.mp3",
-      "src": "/audio/كَتَبَ_ـ_ـ_ـ_؟_الدَّرْسَ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.2.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.3": {
       "exerciseId": "u22.3",
@@ -2199,7 +2850,10 @@
       "stablePath": "/a/u22.3",
       "activityType": "quiz",
       "expectedFilename": "u22.3.mp3",
-      "src": "/audio/ذَهَبَ_الوَلَدُ_إِلَى_ـ_ـ_ـ_؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.3.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.4": {
       "exerciseId": "u22.4",
@@ -2209,7 +2863,10 @@
       "stablePath": "/a/u22.4",
       "activityType": "quiz",
       "expectedFilename": "u22.4.mp3",
-      "src": "/audio/قَرَأَ_الطَّالِبُ_ـ_ـ_ـ_؟.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.4.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.5": {
       "exerciseId": "u22.5",
@@ -2219,7 +2876,10 @@
       "stablePath": "/a/u22.5",
       "activityType": "match",
       "expectedFilename": "u22.5.mp3",
-      "src": "/audio/الكلمة_المناسبة.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.5.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.6": {
       "exerciseId": "u22.6",
@@ -2229,7 +2889,10 @@
       "stablePath": "/a/u22.6",
       "activityType": "quiz",
       "expectedFilename": "u22.6.mp3",
-      "src": "/audio/تصحيح_الخطأ_جَاءَ_الطَّالِبَ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.6.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "u22.7": {
       "exerciseId": "u22.7",
@@ -2239,7 +2902,10 @@
       "stablePath": "/a/u22.7",
       "activityType": "write",
       "expectedFilename": "u22.7.mp3",
-      "src": "/audio/فِي_البَيْتِ.wav"
+      "includeInBookQr": false,
+      "src": "/audio/u22.7.mp3",
+      "unitTitleAr": "الحركات الإعرابية",
+      "unitTitleHy": "Քերականական ձայնավորներ"
     },
     "v5.c02.01": {
       "exerciseId": "v5.c02.01",
@@ -2249,7 +2915,10 @@
       "stablePath": "/a/v5.c02.01",
       "activityType": "reading",
       "expectedFilename": "v5.c02.01.mp3",
-      "src": "/audio/v5.c02.01.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.01.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.02": {
       "exerciseId": "v5.c02.02",
@@ -2259,7 +2928,10 @@
       "stablePath": "/a/v5.c02.02",
       "activityType": "reading",
       "expectedFilename": "v5.c02.02.mp3",
-      "src": "/audio/v5.c02.02.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.02.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.03": {
       "exerciseId": "v5.c02.03",
@@ -2269,7 +2941,10 @@
       "stablePath": "/a/v5.c02.03",
       "activityType": "reading",
       "expectedFilename": "v5.c02.03.mp3",
-      "src": "/audio/v5.c02.03.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.03.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.04": {
       "exerciseId": "v5.c02.04",
@@ -2279,7 +2954,10 @@
       "stablePath": "/a/v5.c02.04",
       "activityType": "listening",
       "expectedFilename": "v5.c02.04.mp3",
-      "src": "/audio/بَ__بِ__بُ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c02.04.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.05": {
       "exerciseId": "v5.c02.05",
@@ -2289,7 +2967,10 @@
       "stablePath": "/a/v5.c02.05",
       "activityType": "listening",
       "expectedFilename": "v5.c02.05.mp3",
-      "src": "/audio/بَا__بُو__بِي.wav"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c02.05.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.06": {
       "exerciseId": "v5.c02.06",
@@ -2299,7 +2980,10 @@
       "stablePath": "/a/v5.c02.06",
       "activityType": "reading",
       "expectedFilename": "v5.c02.06.mp3",
-      "src": "/audio/v5.c02.06.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.06.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.07": {
       "exerciseId": "v5.c02.07",
@@ -2309,7 +2993,10 @@
       "stablePath": "/a/v5.c02.07",
       "activityType": "reading",
       "expectedFilename": "v5.c02.07.mp3",
-      "src": "/audio/v5.c02.07.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.07.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.08": {
       "exerciseId": "v5.c02.08",
@@ -2319,7 +3006,10 @@
       "stablePath": "/a/v5.c02.08",
       "activityType": "reading",
       "expectedFilename": "v5.c02.08.mp3",
-      "src": "/audio/v5.c02.08.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.08.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.09": {
       "exerciseId": "v5.c02.09",
@@ -2329,7 +3019,10 @@
       "stablePath": "/a/v5.c02.09",
       "activityType": "listening",
       "expectedFilename": "v5.c02.09.mp3",
-      "src": "/audio/v5.c02.09.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c02.09.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.10": {
       "exerciseId": "v5.c02.10",
@@ -2339,7 +3032,10 @@
       "stablePath": "/a/v5.c02.10",
       "activityType": "reading",
       "expectedFilename": "v5.c02.10.mp3",
-      "src": "/audio/v5.c02.10.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.10.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c02.11": {
       "exerciseId": "v5.c02.11",
@@ -2349,7 +3045,10 @@
       "stablePath": "/a/v5.c02.11",
       "activityType": "production",
       "expectedFilename": "v5.c02.11.mp3",
-      "src": "/audio/v5.c02.11.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c02.11.mp3",
+      "unitTitleAr": "أسس القراءة",
+      "unitTitleHy": "Ընթերցանության հիմունքներ"
     },
     "v5.c03.01": {
       "exerciseId": "v5.c03.01",
@@ -2359,7 +3058,10 @@
       "stablePath": "/a/v5.c03.01",
       "activityType": "listening",
       "expectedFilename": "v5.c03.01.mp3",
-      "src": "/audio/v5.c03.01.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c03.01.mp3",
+      "unitTitleAr": "التحيات والتعارف",
+      "unitTitleHy": "Ողջույններ և ծանոթություն"
     },
     "v5.c03.02": {
       "exerciseId": "v5.c03.02",
@@ -2369,7 +3071,10 @@
       "stablePath": "/a/v5.c03.02",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c03.02.mp3",
-      "src": "/audio/v5.c03.02.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c03.02.mp3",
+      "unitTitleAr": "التحيات والتعارف",
+      "unitTitleHy": "Ողջույններ և ծանոթություն"
     },
     "v5.c03.03": {
       "exerciseId": "v5.c03.03",
@@ -2379,7 +3084,10 @@
       "stablePath": "/a/v5.c03.03",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c03.03.mp3",
-      "src": "/audio/v5.c03.03.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c03.03.mp3",
+      "unitTitleAr": "التحيات والتعارف",
+      "unitTitleHy": "Ողջույններ և ծանոթություն"
     },
     "v5.c03.04": {
       "exerciseId": "v5.c03.04",
@@ -2389,7 +3097,10 @@
       "stablePath": "/a/v5.c03.04",
       "activityType": "production",
       "expectedFilename": "v5.c03.04.mp3",
-      "src": "/audio/v5.c03.04.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c03.04.mp3",
+      "unitTitleAr": "التحيات والتعارف",
+      "unitTitleHy": "Ողջույններ և ծանոթություն"
     },
     "v5.c05.01": {
       "exerciseId": "v5.c05.01",
@@ -2399,7 +3110,10 @@
       "stablePath": "/a/v5.c05.01",
       "activityType": "listening",
       "expectedFilename": "v5.c05.01.mp3",
-      "src": "/audio/v5.c05.01.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c05.01.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.c05.02": {
       "exerciseId": "v5.c05.02",
@@ -2409,7 +3123,10 @@
       "stablePath": "/a/v5.c05.02",
       "activityType": "listening",
       "expectedFilename": "v5.c05.02.mp3",
-      "src": "/audio/v5.c05.02.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c05.02.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.c05.03": {
       "exerciseId": "v5.c05.03",
@@ -2419,7 +3136,10 @@
       "stablePath": "/a/v5.c05.03",
       "activityType": "listening",
       "expectedFilename": "v5.c05.03.mp3",
-      "src": "/audio/v5.c05.03.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c05.03.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.c05.04": {
       "exerciseId": "v5.c05.04",
@@ -2429,7 +3149,10 @@
       "stablePath": "/a/v5.c05.04",
       "activityType": "listening",
       "expectedFilename": "v5.c05.04.mp3",
-      "src": "/audio/v5.c05.04.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c05.04.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.c05.05": {
       "exerciseId": "v5.c05.05",
@@ -2439,7 +3162,10 @@
       "stablePath": "/a/v5.c05.05",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c05.05.mp3",
-      "src": "/audio/v5.c05.05.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c05.05.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.c05.06": {
       "exerciseId": "v5.c05.06",
@@ -2449,7 +3175,10 @@
       "stablePath": "/a/v5.c05.06",
       "activityType": "writing",
       "expectedFilename": "v5.c05.06.mp3",
-      "src": "/audio/v5.c05.06.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c05.06.mp3",
+      "unitTitleAr": "الوقت والطقس",
+      "unitTitleHy": "Ժամանակը և եղանակը"
     },
     "v5.e01.01": {
       "exerciseId": "v5.e01.01",
@@ -2459,7 +3188,10 @@
       "stablePath": "/a/v5.e01.01",
       "activityType": "listening",
       "expectedFilename": "v5.e01.01.mp3",
-      "src": "/audio/v5.e01.01.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.e01.01.mp3",
+      "unitTitleAr": "الجسم والصحة",
+      "unitTitleHy": "Մարմին և առողջություն"
     },
     "v5.e01.02": {
       "exerciseId": "v5.e01.02",
@@ -2469,7 +3201,10 @@
       "stablePath": "/a/v5.e01.02",
       "activityType": "listening",
       "expectedFilename": "v5.e01.02.mp3",
-      "src": "/audio/v5.e01.02.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.e01.02.mp3",
+      "unitTitleAr": "الجسم والصحة",
+      "unitTitleHy": "Մարմին և առողջություն"
     },
     "v5.e01.03": {
       "exerciseId": "v5.e01.03",
@@ -2479,7 +3214,10 @@
       "stablePath": "/a/v5.e01.03",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.e01.03.mp3",
-      "src": "/audio/v5.e01.03.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.e01.03.mp3",
+      "unitTitleAr": "الجسم والصحة",
+      "unitTitleHy": "Մարմին և առողջություն"
     },
     "v5.e01.04": {
       "exerciseId": "v5.e01.04",
@@ -2489,7 +3227,10 @@
       "stablePath": "/a/v5.e01.04",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.e01.04.mp3",
-      "src": "/audio/v5.e01.04.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.e01.04.mp3",
+      "unitTitleAr": "الجسم والصحة",
+      "unitTitleHy": "Մարմին և առողջություն"
     },
     "v5.c09.01": {
       "exerciseId": "v5.c09.01",
@@ -2499,7 +3240,10 @@
       "stablePath": "/a/v5.c09.01",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c09.01.mp3",
-      "src": "/audio/v5.c09.01.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c09.01.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "v5.c09.02": {
       "exerciseId": "v5.c09.02",
@@ -2509,7 +3253,10 @@
       "stablePath": "/a/v5.c09.02",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c09.02.mp3",
-      "src": "/audio/v5.c09.02.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c09.02.mp3",
+      "unitTitleAr": "في المدرسة",
+      "unitTitleHy": "Դպրոցում"
     },
     "v5.c10.01": {
       "exerciseId": "v5.c10.01",
@@ -2519,7 +3266,10 @@
       "stablePath": "/a/v5.c10.01",
       "activityType": "mini-dialogue",
       "expectedFilename": "v5.c10.01.mp3",
-      "src": "/audio/v5.c10.01.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c10.01.mp3",
+      "unitTitleAr": "التسوّق",
+      "unitTitleHy": "Գնումներ"
     },
     "v5.c10.02": {
       "exerciseId": "v5.c10.02",
@@ -2529,7 +3279,10 @@
       "stablePath": "/a/v5.c10.02",
       "activityType": "production",
       "expectedFilename": "v5.c10.02.mp3",
-      "src": "/audio/v5.c10.02.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c10.02.mp3",
+      "unitTitleAr": "التسوّق",
+      "unitTitleHy": "Գնումներ"
     },
     "v5.c11.01": {
       "exerciseId": "v5.c11.01",
@@ -2539,7 +3292,10 @@
       "stablePath": "/a/v5.c11.01",
       "activityType": "listening",
       "expectedFilename": "v5.c11.01.mp3",
-      "src": "/audio/اِذْهَبْ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c11.01.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "v5.c11.02": {
       "exerciseId": "v5.c11.02",
@@ -2549,7 +3305,10 @@
       "stablePath": "/a/v5.c11.02",
       "activityType": "listening",
       "expectedFilename": "v5.c11.02.mp3",
-      "src": "/audio/v5.c11.02.mp3"
+      "includeInBookQr": true,
+      "src": "/audio/v5.c11.02.mp3",
+      "unitTitleAr": "الاتجاهات",
+      "unitTitleHy": "Ուղղություններ"
     },
     "v5.c12.01": {
       "exerciseId": "v5.c12.01",
@@ -2559,7 +3318,10 @@
       "stablePath": "/a/v5.c12.01",
       "activityType": "production",
       "expectedFilename": "v5.c12.01.mp3",
-      "src": "/audio/v5.c12.01.mp3"
+      "includeInBookQr": false,
+      "src": "/audio/v5.c12.01.mp3",
+      "unitTitleAr": "الحياة اليومية",
+      "unitTitleHy": "Առօրյա կյանք"
     },
     "v5.r01.01": {
       "exerciseId": "v5.r01.01",
@@ -2569,6 +3331,7 @@
       "stablePath": "/a/v5.r01.01",
       "activityType": "listening",
       "expectedFilename": "v5.r01.01.mp3",
+      "includeInBookQr": true,
       "src": "/audio/v5.r01.01.mp3"
     },
     "v5.x01.01": {
@@ -2579,6 +3342,7 @@
       "stablePath": "/a/v5.x01.01",
       "activityType": "listening",
       "expectedFilename": "v5.x01.01.mp3",
+      "includeInBookQr": true,
       "src": "/audio/v5.x01.01.mp3"
     },
     "v5.x01.04": {
@@ -2589,6 +3353,7 @@
       "stablePath": "/a/v5.x01.04",
       "activityType": "listening-discrimination",
       "expectedFilename": "v5.x01.04.mp3",
+      "includeInBookQr": true,
       "src": "/audio/v5.x01.04.mp3"
     },
     "v5.x02.01": {
@@ -2599,7 +3364,8 @@
       "stablePath": "/a/v5.x02.01",
       "activityType": "listening-discrimination",
       "expectedFilename": "v5.x02.01.mp3",
-      "src": "/audio/كِتَابٌ__كِتَابًا__كِتَابٍ.wav"
+      "includeInBookQr": true,
+      "src": "/audio/v5.x02.01.mp3"
     }
   },
   "textIndex": {
