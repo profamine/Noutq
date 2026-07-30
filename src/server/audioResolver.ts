@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import fs from 'fs';
-import { isValidAudioId } from '../shared/audioId';
+import { isValidAudioId } from '../shared/audioId.js';
 
 export { isValidAudioId };
 
